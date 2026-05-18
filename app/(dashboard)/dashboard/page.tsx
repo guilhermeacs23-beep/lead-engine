@@ -1,25 +1,44 @@
 'use client'
 import { useState, useEffect } from 'react'
-import { fetchDashboardMetrics, fetchLeads } from '@/lib/supabase'
+import { fetchDashboardMetrics, fetchLeads, fetchFunnelData, fetchActivitiesStats } from '@/lib/supabase'
 import { SOURCE_LABELS, SEGMENT_LABELS } from '@/lib/mock-data'
 import { formatCurrencyShort } from '@/lib/utils'
-import { TrendingUp, TrendingDown, Loader2 } from 'lucide-react'
+import { TrendingUp, TrendingDown, Loader2, ChevronRight, Activity, Target, BarChart2 } from 'lucide-react'
 
-const WEEK_BARS = [40, 65, 35, 80, 55]
+const STATUS_LABELS: Record<string, string> = {
+  novo: 'Novo', contactado: 'Contactado', proposta: 'Proposta',
+  negociando: 'Negociando', fechado: 'Fechado', perdido: 'Perdido',
+}
+
+const STATUS_COLORS: Record<string, string> = {
+  novo: '#818cf8', contactado: '#60a5fa', proposta: '#fbbf24',
+  negociando: '#f472b6', fechado: '#34d399', perdido: '#ef4444',
+}
+
+const TIPO_LABELS: Record<string, string> = {
+  ligacao: 'Ligação', email: 'E-mail', reuniao: 'Reunião',
+  nota: 'Nota', proposta: 'Proposta', status: 'Status',
+}
 
 export default function DashboardPage() {
-  const [metrics, setMetrics] = useState<any>(null)
-  const [recent,  setRecent]  = useState<any[]>([])
-  const [loading, setLoading] = useState(true)
+  const [metrics,    setMetrics]    = useState<any>(null)
+  const [recent,     setRecent]     = useState<any[]>([])
+  const [funnel,     setFunnel]     = useState<any[]>([])
+  const [activities, setActivities] = useState<any>({ total: 0, por_tipo: [] })
+  const [loading,    setLoading]    = useState(true)
 
   useEffect(() => {
     async function load() {
-      const [m, leads] = await Promise.all([
+      const [m, leads, f, a] = await Promise.all([
         fetchDashboardMetrics(),
         fetchLeads(),
+        fetchFunnelData(),
+        fetchActivitiesStats(),
       ])
       setMetrics(m)
       setRecent(leads.slice(0, 5))
+      setFunnel(f)
+      setActivities(a)
       setLoading(false)
     }
     load()
@@ -28,7 +47,7 @@ export default function DashboardPage() {
   if (loading) {
     return (
       <div className="flex h-full items-center justify-center gap-2 text-sm text-white/30">
-        <Loader2 size={18} className="animate-spin" />Carregando métricas…
+        <Loader2 size={18} className="animate-spin" />Carregando Insights…
       </div>
     )
   }
@@ -60,15 +79,16 @@ export default function DashboardPage() {
     },
   ] : []
 
+  const maxFunnelCount = Math.max(...funnel.map(f => f.count), 1)
+
   return (
-    <div className="flex h-full flex-col overflow-auto p-5">
-      {/* Métricas */}
-      <div className="mb-5 grid grid-cols-4 gap-3">
+    <div className="flex h-full flex-col overflow-auto p-5 gap-4">
+
+      {/* ── KPIs ── */}
+      <div className="grid grid-cols-4 gap-3">
         {METRIC_CARDS.map((m) => (
-          <div key={m.label}
-            className="rounded-xl p-4"
-            style={{ background: 'rgba(255,255,255,0.06)', border: '0.5px solid rgba(255,255,255,0.10)' }}
-          >
+          <div key={m.label} className="rounded-xl p-4"
+            style={{ background: 'rgba(255,255,255,0.06)', border: '0.5px solid rgba(255,255,255,0.10)' }}>
             <p className="mb-1.5 text-[11px] text-white/50">{m.label}</p>
             <p className="text-2xl font-medium text-white/95">{m.value}</p>
             <p className={`mt-1 flex items-center gap-1 text-[11px] ${m.up ? 'text-emerald-400' : 'text-red-400'}`}>
@@ -79,71 +99,46 @@ export default function DashboardPage() {
         ))}
       </div>
 
-      {/* Two columns */}
-      <div className="grid flex-1 grid-cols-2 gap-4">
-        {/* Leads recentes */}
-        <div className="glass-card flex flex-col gap-0 overflow-hidden">
-          <p className="mb-3 text-[13px] font-medium text-white/80">Leads recentes</p>
-          {recent.length === 0 ? (
-            <p className="py-4 text-center text-xs text-white/30">Nenhum lead ainda</p>
-          ) : recent.map((lead) => (
-            <div key={lead.id}
-              className="flex items-center gap-2.5 border-b py-2.5"
-              style={{ borderColor: 'rgba(255,255,255,0.06)' }}
-            >
-              <div className="h-2 w-2 flex-shrink-0 rounded-full"
-                style={{ background: lead.score_ia >= 80 ? '#ef4444' : lead.score_ia >= 65 ? '#f59e0b' : '#60a5fa' }} />
-              <div className="flex-1 min-w-0">
-                <p className="truncate text-[12px] font-medium text-white/90">{lead.empresa}</p>
-                <p className="truncate text-[10px] text-white/40">
-                  {SEGMENT_LABELS[lead.segmento] ?? lead.segmento} · {lead.cidade}, {lead.estado}
-                </p>
-              </div>
-              <span className="shrink-0 rounded-lg px-2 py-0.5 text-[10px]"
-                style={getStatusStyle(lead.status)}>
-                {getStatusLabel(lead.status)}
-              </span>
-            </div>
-          ))}
+      {/* ── Saúde do funil ── */}
+      <div className="rounded-xl p-5" style={{ background: 'rgba(255,255,255,0.05)', border: '0.5px solid rgba(255,255,255,0.10)' }}>
+        <div className="mb-4 flex items-center gap-2">
+          <Target size={14} className="text-indigo-400" strokeWidth={1.5} />
+          <p className="text-[13px] font-medium text-white/80">Saúde do funil</p>
+          <span className="ml-auto text-[11px] text-white/35">
+            Taxa de ganho: <span className="text-white/70">{metrics?.taxa_conversao ?? 0}%</span>
+          </span>
         </div>
 
-        {/* Fontes + Gráfico */}
-        <div className="glass-card flex flex-col gap-4">
-          <div>
-            <p className="mb-3 text-[13px] font-medium text-white/80">Leads por semana</p>
-            <div className="flex h-20 items-end gap-2">
-              {WEEK_BARS.map((h, i) => (
-                <div key={i} className="flex flex-1 flex-col items-center gap-1.5">
-                  <div className="w-full rounded-t-sm" style={{ height: `${h}%`, background: 'rgba(99,102,241,0.5)' }} />
-                  <span className="text-[10px] text-white/30">S{i + 1}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <div className="border-t pt-4" style={{ borderColor: 'rgba(255,255,255,0.07)' }}>
-            <p className="mb-3 text-[13px] font-medium text-white/80">Fontes de leads</p>
-            <div className="flex flex-col gap-2.5">
-              {(metrics?.por_fonte ?? []).map(({ fonte, pct }: { fonte: string; pct: number }) => {
-                const src = SOURCE_LABELS[fonte]
-                return (
-                  <div key={fonte} className="flex items-center gap-2.5 text-[12px]">
-                    <span className="w-24 text-white/50">{src?.label ?? fonte}</span>
-                    <div className="flex-1 overflow-hidden rounded-full"
-                      style={{ height: 5, background: 'rgba(255,255,255,0.08)' }}>
-                      <div className="h-full rounded-full"
-                        style={{ width: `${pct}%`, background: src?.color ?? '#6366f1' }} />
-                    </div>
-                    <span className="w-8 text-right font-medium text-white/80">{pct}%</span>
+        {funnel.length === 0 ? (
+          <p className="py-6 text-center text-xs text-white/30">Nenhum lead no pipeline ainda</p>
+        ) : (
+          <div className="flex items-end gap-0">
+            {funnel.map((step, i) => {
+              const color = STATUS_COLORS[step.step] ?? '#6366f1'
+              const barH  = maxFunnelCount > 0 ? Math.max(8, Math.round((step.count / maxFunnelCount) * 80)) : 8
+              return (
+                <div key={step.step} className="flex flex-1 flex-col items-center gap-2">
+                  {/* Conversion arrow between steps */}
+                  <div className="flex w-full items-center justify-center">
+                    {i > 0 && (
+                      <span className="rounded-full px-2 py-0.5 text-[10px] font-medium"
+                        style={{ background: `${color}20`, color }}>
+                        {step.pct_conversao}%
+                      </span>
+                    )}
                   </div>
-                )
-              })}
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  )
-}
 
-functio
+                  {/* Count above bar */}
+                  <span className="text-[13px] font-medium text-white/80">{step.count}</span>
+
+                  {/* Bar */}
+                  <div className="relative w-full overflow-hidden rounded-t-lg"
+                    style={{ height: barH, background: `${color}CC` }}>
+                    <div className="absolute inset-0 opacity-30"
+                      style={{ background: 'linear-gradient(to bottom, rgba(255,255,255,0.2), transparent)' }} />
+                  </div>
+
+                  {/* Label */}
+                  <div className="flex flex-col items-center gap-0.5">
+                    <div className="h-1.5 w-1.5 rounded-full" style={{ background: color }} />
+                    <span className="
