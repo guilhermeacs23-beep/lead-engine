@@ -1,9 +1,10 @@
 'use client'
-import { useState } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { Lead, LeadStatus } from '@/types'
 import { KanbanColumn } from './kanban-column'
-import { MOCK_LEADS, KANBAN_COLUMNS } from '@/lib/mock-data'
-import { Kanban, List, Calendar, Map, Filter, Sparkles } from 'lucide-react'
+import { KANBAN_COLUMNS } from '@/lib/mock-data'
+import { fetchLeadsByStatus, updateLeadStatus } from '@/lib/supabase'
+import { Kanban, List, Calendar, Map, Filter, Sparkles, Loader2 } from 'lucide-react'
 
 const VIEW_TABS = [
   { id: 'kanban',      label: 'Kanban',      Icon: Kanban   },
@@ -13,11 +14,27 @@ const VIEW_TABS = [
 ]
 
 export function KanbanBoard() {
-  const [leads, setLeads]   = useState<Lead[]>(MOCK_LEADS)
-  const [view, setView]     = useState('kanban')
+  const [leads,   setLeads]   = useState<Lead[]>([])
+  const [view,    setView]    = useState('kanban')
+  const [loading, setLoading] = useState(true)
+
+  const load = useCallback(async () => {
+    setLoading(true)
+    const data = await fetchLeadsByStatus()
+    setLeads(data as Lead[])
+    setLoading(false)
+  }, [])
+
+  useEffect(() => { load() }, [load])
 
   function getLeadsByStatus(status: LeadStatus) {
     return leads.filter((l) => l.status === status)
+  }
+
+  async function handleMoveCard(leadId: string, newStatus: LeadStatus) {
+    // Optimistic update
+    setLeads(prev => prev.map(l => l.id === leadId ? { ...l, status: newStatus } : l))
+    await updateLeadStatus(leadId, newStatus)
   }
 
   return (
@@ -44,36 +61,15 @@ export function KanbanBoard() {
         ))}
 
         <div className="ml-auto flex items-center gap-2">
+          {loading && (
+            <span className="flex items-center gap-1.5 text-xs text-white/30">
+              <Loader2 size={11} className="animate-spin" />Sincronizando…
+            </span>
+          )}
           <button className="flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-xs text-white/45 transition-all hover:bg-white/[0.06] hover:text-white/70"
             style={{ border: '0.5px solid rgba(255,255,255,0.10)' }}>
             <Filter size={11} strokeWidth={1.5} />
             Filtros
           </button>
           <button className="flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-xs transition-all"
-            style={{
-              background: 'linear-gradient(135deg,rgba(99,102,241,0.2),rgba(139,92,246,0.2))',
-              border: '0.5px solid rgba(139,92,246,0.35)',
-              color: '#a78bfa',
-            }}>
-            <Sparkles size={11} strokeWidth={1.5} />
-            Gerar Leads IA
-          </button>
-        </div>
-      </div>
-
-      {/* Board */}
-      <div className="flex flex-1 gap-3.5 overflow-x-auto overflow-y-hidden p-4">
-        {KANBAN_COLUMNS.map((col) => (
-          <KanbanColumn
-            key={col.id}
-            id={col.id as LeadStatus}
-            title={col.title}
-            color={col.color}
-            dotColor={col.dotColor}
-            leads={getLeadsByStatus(col.id as LeadStatus)}
-          />
-        ))}
-      </div>
-    </div>
-  )
-}
+ 

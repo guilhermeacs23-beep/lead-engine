@@ -12,10 +12,11 @@ interface KanbanColumnProps {
   leads: Lead[]
   onAddLead?: (status: LeadStatus) => void
   onLeadClick?: (lead: Lead) => void
+  onMoveCard?: (leadId: string, newStatus: LeadStatus) => void
 }
 
 export function KanbanColumn({
-  id, title, color, leads, onAddLead, onLeadClick
+  id, title, color, leads, onAddLead, onLeadClick, onMoveCard
 }: KanbanColumnProps) {
   const total = leads.reduce((sum, l) => sum + (l.valor_estimado ?? 0), 0)
 
@@ -51,9 +52,4 @@ export function KanbanColumn({
         className="mt-1.5 flex items-center gap-1.5 rounded-lg px-2.5 py-2 text-[11px] text-white/35 transition-all hover:bg-white/[0.07] hover:text-white/60"
         style={{ border: '0.5px dashed rgba(255,255,255,0.12)' }}
       >
-        <Plus size={12} strokeWidth={2} />
-        Adicionar lead
-      </button>
-    </div>
-  )
-}
+        <Plus size={12} 

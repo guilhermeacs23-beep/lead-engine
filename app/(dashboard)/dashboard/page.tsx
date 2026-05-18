@@ -1,51 +1,70 @@
-import { MOCK_METRICS, MOCK_LEADS, SOURCE_LABELS, SEGMENT_LABELS } from '@/lib/mock-data'
+'use client'
+import { useState, useEffect } from 'react'
+import { fetchDashboardMetrics, fetchLeads } from '@/lib/supabase'
+import { SOURCE_LABELS, SEGMENT_LABELS } from '@/lib/mock-data'
 import { formatCurrencyShort } from '@/lib/utils'
-import { TrendingUp, TrendingDown } from 'lucide-react'
-
-const METRICS = [
-  {
-    label: 'Leads este mês',
-    value: MOCK_METRICS.leads_mes,
-    delta: `+${MOCK_METRICS.leads_delta}% vs mês anterior`,
-    up: true,
-  },
-  {
-    label: 'Em negociação',
-    value: formatCurrencyShort(MOCK_METRICS.valor_pipeline),
-    delta: `+${MOCK_METRICS.oportunidades} oportunidades`,
-    up: true,
-  },
-  {
-    label: 'Fechados (mês)',
-    value: MOCK_METRICS.fechados_mes,
-    delta: formatCurrencyShort(MOCK_METRICS.valor_fechado) + ' convertido',
-    up: true,
-  },
-  {
-    label: 'Taxa de conversão',
-    value: `${MOCK_METRICS.taxa_conversao}%`,
-    delta: `${MOCK_METRICS.taxa_delta}% vs meta`,
-    up: false,
-  },
-]
-
-const RECENT = MOCK_LEADS.slice(0, 5)
-
-const SOURCE_BARS = [
-  { source: 'linkedin',  pct: 52 },
-  { source: 'google',    pct: 28 },
-  { source: 'cnpj',      pct: 13 },
-  { source: 'indicacao', pct:  7 },
-]
+import { TrendingUp, TrendingDown, Loader2 } from 'lucide-react'
 
 const WEEK_BARS = [40, 65, 35, 80, 55]
 
 export default function DashboardPage() {
+  const [metrics, setMetrics] = useState<any>(null)
+  const [recent,  setRecent]  = useState<any[]>([])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    async function load() {
+      const [m, leads] = await Promise.all([
+        fetchDashboardMetrics(),
+        fetchLeads(),
+      ])
+      setMetrics(m)
+      setRecent(leads.slice(0, 5))
+      setLoading(false)
+    }
+    load()
+  }, [])
+
+  if (loading) {
+    return (
+      <div className="flex h-full items-center justify-center gap-2 text-sm text-white/30">
+        <Loader2 size={18} className="animate-spin" />Carregando métricas…
+      </div>
+    )
+  }
+
+  const METRIC_CARDS = metrics ? [
+    {
+      label: 'Leads este mês',
+      value: metrics.leads_mes,
+      delta: `+${metrics.leads_delta}% vs mês anterior`,
+      up: true,
+    },
+    {
+      label: 'Em negociação',
+      value: formatCurrencyShort(metrics.valor_pipeline),
+      delta: `+${metrics.oportunidades} oportunidades`,
+      up: true,
+    },
+    {
+      label: 'Fechados (mês)',
+      value: metrics.fechados_mes,
+      delta: `${formatCurrencyShort(metrics.valor_fechado)} convertido`,
+      up: true,
+    },
+    {
+      label: 'Taxa de conversão',
+      value: `${metrics.taxa_conversao}%`,
+      delta: `${metrics.taxa_delta}% vs meta`,
+      up: metrics.taxa_delta >= 0,
+    },
+  ] : []
+
   return (
     <div className="flex h-full flex-col overflow-auto p-5">
-      {/* Metrics */}
+      {/* Métricas */}
       <div className="mb-5 grid grid-cols-4 gap-3">
-        {METRICS.map((m) => (
+        {METRIC_CARDS.map((m) => (
           <div key={m.label}
             className="rounded-xl p-4"
             style={{ background: 'rgba(255,255,255,0.06)', border: '0.5px solid rgba(255,255,255,0.10)' }}
@@ -65,7 +84,9 @@ export default function DashboardPage() {
         {/* Leads recentes */}
         <div className="glass-card flex flex-col gap-0 overflow-hidden">
           <p className="mb-3 text-[13px] font-medium text-white/80">Leads recentes</p>
-          {RECENT.map((lead) => (
+          {recent.length === 0 ? (
+            <p className="py-4 text-center text-xs text-white/30">Nenhum lead ainda</p>
+          ) : recent.map((lead) => (
             <div key={lead.id}
               className="flex items-center gap-2.5 border-b py-2.5"
               style={{ borderColor: 'rgba(255,255,255,0.06)' }}
@@ -75,7 +96,7 @@ export default function DashboardPage() {
               <div className="flex-1 min-w-0">
                 <p className="truncate text-[12px] font-medium text-white/90">{lead.empresa}</p>
                 <p className="truncate text-[10px] text-white/40">
-                  {SEGMENT_LABELS[lead.segmento]} · {lead.cidade}, {lead.estado}
+                  {SEGMENT_LABELS[lead.segmento] ?? lead.segmento} · {lead.cidade}, {lead.estado}
                 </p>
               </div>
               <span className="shrink-0 rounded-lg px-2 py-0.5 text-[10px]"
@@ -103,15 +124,15 @@ export default function DashboardPage() {
           <div className="border-t pt-4" style={{ borderColor: 'rgba(255,255,255,0.07)' }}>
             <p className="mb-3 text-[13px] font-medium text-white/80">Fontes de leads</p>
             <div className="flex flex-col gap-2.5">
-              {SOURCE_BARS.map(({ source, pct }) => {
-                const src = SOURCE_LABELS[source]
+              {(metrics?.por_fonte ?? []).map(({ fonte, pct }: { fonte: string; pct: number }) => {
+                const src = SOURCE_LABELS[fonte]
                 return (
-                  <div key={source} className="flex items-center gap-2.5 text-[12px]">
-                    <span className="w-24 text-white/50">{src?.label}</span>
+                  <div key={fonte} className="flex items-center gap-2.5 text-[12px]">
+                    <span className="w-24 text-white/50">{src?.label ?? fonte}</span>
                     <div className="flex-1 overflow-hidden rounded-full"
                       style={{ height: 5, background: 'rgba(255,255,255,0.08)' }}>
                       <div className="h-full rounded-full"
-                        style={{ width: `${pct}%`, background: src?.color }} />
+                        style={{ width: `${pct}%`, background: src?.color ?? '#6366f1' }} />
                     </div>
                     <span className="w-8 text-right font-medium text-white/80">{pct}%</span>
                   </div>
@@ -125,21 +146,4 @@ export default function DashboardPage() {
   )
 }
 
-function getStatusLabel(status: string): string {
-  const map: Record<string, string> = {
-    novo: 'Novo', contactado: 'Contactado', proposta: 'Proposta',
-    negociando: 'Negociando', fechado: 'Fechado', perdido: 'Perdido',
-  }
-  return map[status] ?? status
-}
-
-function getStatusStyle(status: string): React.CSSProperties {
-  const map: Record<string, { color: string; background: string }> = {
-    novo:       { color: '#818cf8', background: 'rgba(99,102,241,0.15)'  },
-    contactado: { color: '#60a5fa', background: 'rgba(59,130,246,0.15)'  },
-    proposta:   { color: '#fbbf24', background: 'rgba(245,158,11,0.15)'  },
-    negociando: { color: '#f472b6', background: 'rgba(236,72,153,0.15)'  },
-    fechado:    { color: '#34d399', background: 'rgba(16,185,129,0.15)'  },
-  }
-  return map[status] ?? {}
-}
+functio

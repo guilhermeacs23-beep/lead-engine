@@ -3,39 +3,29 @@ import { createClient } from '@supabase/supabase-js'
 const supabaseUrl  = process.env.NEXT_PUBLIC_SUPABASE_URL!
 const supabaseAnon = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 
-// Cliente público (browser)
 export const supabase = createClient(supabaseUrl, supabaseAnon)
 
-// Tipos do banco (expandir conforme o schema crescer)
-export type Database = {
-  public: {
-    Tables: {
-      leads: {
-        Row: {
-          id: string
-          empresa: string
-          contato_nome: string
-          contato_cargo: string
-          telefone: string | null
-          email: string | null
-          cidade: string
-          estado: string
-          segmento: string
-          cnae: string | null
-          website: string | null
-          score_ia: number
-          observacoes: string | null
-          status: string
-          fonte: string
-          valor_estimado: number | null
-          responsavel_id: string | null
-          tenant_id: string
-          created_at: string
-          updated_at: string
-        }
-        Insert: Omit<Database['public']['Tables']['leads']['Row'], 'id' | 'created_at' | 'updated_at'>
-        Update: Partial<Database['public']['Tables']['leads']['Insert']>
-      }
-    }
-  }
-}
+// Tenant fixo por enquanto (antes de implementar auth completo)
+export const TENANT_ID = '00000000-0000-0000-0000-000000000001'
+
+// ── Leads ────────────────────────────────────────────────────
+
+export async function fetchLeads(filters?: {
+  segmento?: string
+  estado?:   string
+  fontes?:   string[]
+  query?:    string
+}) {
+  let q = supabase
+    .from('leads')
+    .select('*')
+    .eq('tenant_id', TENANT_ID)
+    .order('score_ia', { ascending: false })
+
+  if (filters?.segmento)                      q = q.eq('segmento', filters.segmento)
+  if (filters?.estado && filters.estado !== 'Todos') q = q.eq('estado', filters.estado)
+  if (filters?.fontes?.length)                q = q.in('fonte', filters.fontes)
+  if (filters?.query)                         q = q.ilike('empresa', `%${filters.query}%`)
+
+  const { data, error } = await q
+  if (error) { con
