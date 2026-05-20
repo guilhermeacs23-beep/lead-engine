@@ -104,3 +104,7 @@ export function KanbanBoard() {
             />
           ))}
         </div>
+      )}
+    </div>
+  )
+}
