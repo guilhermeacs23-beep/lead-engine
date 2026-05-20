@@ -177,4 +177,7 @@ function SelectField({ label, value, onChange, children }: {
         className="w-full appearance-none rounded-lg px-3 py-2 text-xs text-white/80 outline-none"
         style={{ background: 'rgba(255,255,255,0.07)', border: '0.5px solid rgba(255,255,255,0.12)' }}>
         {children}
-      </se
+      </select>
+    </div>
+  )
+}
