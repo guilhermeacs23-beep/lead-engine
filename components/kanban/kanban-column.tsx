@@ -1,5 +1,4 @@
 'use client'
-import React from 'react'
 import { Lead, LeadStatus } from '@/types'
 import { LeadCard } from './lead-card'
 import { formatCurrencyShort } from '@/lib/utils'
@@ -36,7 +35,7 @@ export function KanbanColumn({
           </span>
         </div>
         <p className="mt-1 text-[13px] font-medium" style={{ color }}>
-          {total > 0 ? `${formatCurrencyShort(total)}/mês` : '-'}
+          {total > 0 ? `${formatCurrencyShort(total)}/mês` : '—'}
         </p>
       </div>
 
@@ -53,4 +52,9 @@ export function KanbanColumn({
         className="mt-1.5 flex items-center gap-1.5 rounded-lg px-2.5 py-2 text-[11px] text-white/35 transition-all hover:bg-white/[0.07] hover:text-white/60"
         style={{ border: '0.5px dashed rgba(255,255,255,0.12)' }}
       >
-        <Plus size={12} 
+        <Plus size={12} strokeWidth={2} />
+        Adicionar lead
+      </button>
+    </div>
+  )
+}
