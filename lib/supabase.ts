@@ -88,7 +88,7 @@ export async function fetchDashboardMetrics() {
   }
 }
 
-// -- Funil / Insights ----------------------------------------─
+// -- Funil / Insights ----------------------------------------
 
 const FUNNEL_STEPS = ['novo', 'contactado', 'proposta', 'negociando', 'fechado'] as const
 
