@@ -73,4 +73,34 @@ export function KanbanBoard() {
             Filtros
           </button>
           <button className="flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-xs transition-all"
- 
+            style={{
+              background: 'linear-gradient(135deg,rgba(99,102,241,0.2),rgba(139,92,246,0.2))',
+              border: '0.5px solid rgba(139,92,246,0.35)',
+              color: '#a78bfa',
+            }}>
+            <Sparkles size={11} strokeWidth={1.5} />
+            Gerar Leads IA
+          </button>
+        </div>
+      </div>
+
+      {/* Board */}
+      {loading && leads.length === 0 ? (
+        <div className="flex flex-1 items-center justify-center gap-2 text-sm text-white/30">
+          <Loader2 size={18} className="animate-spin" />
+          Carregando pipeline…
+        </div>
+      ) : (
+        <div className="flex flex-1 gap-3.5 overflow-x-auto overflow-y-hidden p-4">
+          {KANBAN_COLUMNS.map((col) => (
+            <KanbanColumn
+              key={col.id}
+              id={col.id as LeadStatus}
+              title={col.title}
+              color={col.color}
+              dotColor={col.dotColor}
+              leads={getLeadsByStatus(col.id as LeadStatus)}
+              onMoveCard={handleMoveCard}
+            />
+          ))}
+        </div>
