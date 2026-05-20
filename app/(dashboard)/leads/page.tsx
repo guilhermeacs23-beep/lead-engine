@@ -63,7 +63,7 @@ export default function LeadsPage() {
         <SelectField label="Porte da empresa" value="" onChange={() => {}}>
           <option>Todos os portes</option>
           <option>Pequena (até 50 func.)</option>
-          <option>Média (50-500)</option>
+          <option>Media (50-500)</option>
           <option>Grande (500+)</option>
         </SelectField>
       </div>
@@ -172,4 +172,9 @@ function SelectField({ label, value, onChange, children }: {
 }) {
   return (
     <div>
-      <p className="mb-1.5 text-[11px] text
+      <p className="mb-1.5 text-[11px] text-white/40">{label}</p>
+      <select value={value} onChange={e => onChange(e.target.value)}
+        className="w-full appearance-none rounded-lg px-3 py-2 text-xs text-white/80 outline-none"
+        style={{ background: 'rgba(255,255,255,0.07)', border: '0.5px solid rgba(255,255,255,0.12)' }}>
+        {children}
+      </se
