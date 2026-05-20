@@ -1,4 +1,5 @@
 'use client'
+import React from 'react'
 import { usePathname } from 'next/navigation'
 import { Search, Globe, Plus } from 'lucide-react'
 import { BgPanel } from '@/components/ui/bg-panel'

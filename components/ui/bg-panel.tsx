@@ -1,4 +1,5 @@
 'use client'
+import React from 'react'
 import { useUIStore } from '@/store/ui-store'
 import { useEffect, useRef } from 'react'
 import { Upload } from 'lucide-react'

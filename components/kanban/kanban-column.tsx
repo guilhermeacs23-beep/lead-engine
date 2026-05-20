@@ -1,4 +1,5 @@
 'use client'
+import React from 'react'
 import { Lead, LeadStatus } from '@/types'
 import { LeadCard } from './lead-card'
 import { formatCurrencyShort } from '@/lib/utils'

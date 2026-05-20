@@ -1,9 +1,10 @@
 'use client'
+import React from 'react'
 import { useState, useEffect } from 'react'
 import { fetchDashboardMetrics, fetchLeads, fetchFunnelData, fetchActivitiesStats } from '@/lib/supabase'
 import { SOURCE_LABELS, SEGMENT_LABELS } from '@/lib/mock-data'
 import { formatCurrencyShort } from '@/lib/utils'
-import { TrendingUp, TrendingDown, Loader2, ChevronRight, Activity, Target, BarChart2 } from 'lucide-react'
+import { TrendingUp, TrendingDown, Loader2, Activity, Target, BarChart2 } from 'lucide-react'
 
 const STATUS_LABELS: Record<string, string> = {
   novo: 'Novo', contactado: 'Contactado', proposta: 'Proposta',

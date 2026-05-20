@@ -1,4 +1,5 @@
 'use client'
+import React from 'react'
 import { Lead } from '@/types'
 import { formatCurrencyShort, getScoreColor } from '@/lib/utils'
 import { SOURCE_LABELS, SEGMENT_LABELS, LABEL_COLORS } from '@/lib/mock-data'

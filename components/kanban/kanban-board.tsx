@@ -1,4 +1,5 @@
 'use client'
+import React from 'react'
 import { useState, useEffect, useCallback } from 'react'
 import { Lead, LeadStatus } from '@/types'
 import { KanbanColumn } from './kanban-column'

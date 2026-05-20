@@ -1,4 +1,5 @@
 'use client'
+import React from 'react'
 import { useState, useEffect, useCallback } from 'react'
 import { fetchLeads } from '@/lib/supabase'
 import { SOURCE_LABELS, SEGMENT_LABELS } from '@/lib/mock-data'
