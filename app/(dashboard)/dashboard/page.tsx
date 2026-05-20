@@ -85,7 +85,7 @@ export default function DashboardPage() {
   return (
     <div className="flex h-full flex-col overflow-auto p-5 gap-4">
 
-      {/* -- KPIs -- */}
+      {/* KPIs */}
       <div className="grid grid-cols-4 gap-3">
         {METRIC_CARDS.map((m) => (
           <div key={m.label} className="rounded-xl p-4"
@@ -100,7 +100,7 @@ export default function DashboardPage() {
         ))}
       </div>
 
-      {/* -- Saúde do funil -- */}
+      {/* Saude do funil */}
       <div className="rounded-xl p-5" style={{ background: 'rgba(255,255,255,0.05)', border: '0.5px solid rgba(255,255,255,0.10)' }}>
         <div className="mb-4 flex items-center gap-2">
           <Target size={14} className="text-indigo-400" strokeWidth={1.5} />
@@ -142,4 +142,122 @@ export default function DashboardPage() {
                   {/* Label */}
                   <div className="flex flex-col items-center gap-0.5">
                     <div className="h-1.5 w-1.5 rounded-full" style={{ background: color }} />
-                    <span className="
+                    <span className="text-[10px] text-white/50">{STATUS_LABELS[step.step]}</span>
+                    {step.valor > 0 && (
+                      <span className="text-[10px] font-medium" style={{ color }}>
+                        {formatCurrencyShort(step.valor)}
+                      </span>
+                    )}
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+        )}
+      </div>
+
+      {/* Row 3: Leads recentes + Fontes + Atividades */}
+      <div className="grid grid-cols-3 gap-4">
+
+        {/* Leads recentes */}
+        <div className="glass-card flex flex-col overflow-hidden">
+          <div className="mb-3 flex items-center gap-2">
+            <BarChart2 size={13} className="text-indigo-400" strokeWidth={1.5} />
+            <p className="text-[13px] font-medium text-white/80">Leads recentes</p>
+          </div>
+          {recent.length === 0 ? (
+            <p className="py-4 text-center text-xs text-white/30">Nenhum lead ainda</p>
+          ) : recent.map((lead) => (
+            <div key={lead.id}
+              className="flex items-center gap-2 border-b py-2"
+              style={{ borderColor: 'rgba(255,255,255,0.06)' }}>
+              <div className="h-1.5 w-1.5 flex-shrink-0 rounded-full"
+                style={{ background: STATUS_COLORS[lead.status] ?? '#94a3b8' }} />
+              <div className="flex-1 min-w-0">
+                <p className="truncate text-[11px] font-medium text-white/85">{lead.empresa}</p>
+                <p className="truncate text-[10px] text-white/40">
+                  {SEGMENT_LABELS[lead.segmento] ?? lead.segmento} · {lead.cidade}
+                </p>
+              </div>
+              <span className="shrink-0 rounded-md px-1.5 py-0.5 text-[9px]"
+                style={{ color: STATUS_COLORS[lead.status], background: `${STATUS_COLORS[lead.status]}20` }}>
+                {STATUS_LABELS[lead.status] ?? lead.status}
+              </span>
+            </div>
+          ))}
+        </div>
+
+        {/* Fontes de leads */}
+        <div className="glass-card flex flex-col">
+          <div className="mb-3 flex items-center gap-2">
+            <Activity size={13} className="text-indigo-400" strokeWidth={1.5} />
+            <p className="text-[13px] font-medium text-white/80">Fontes de leads</p>
+          </div>
+          <div className="flex flex-col gap-3">
+            {(metrics?.por_fonte ?? []).map(({ fonte, pct }: { fonte: string; pct: number }) => {
+              const src = SOURCE_LABELS[fonte]
+              return (
+                <div key={fonte} className="flex flex-col gap-1">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[11px] text-white/55">{src?.label ?? fonte}</span>
+                    <span className="text-[11px] font-medium text-white/80">{pct}%</span>
+                  </div>
+                  <div className="h-1.5 w-full overflow-hidden rounded-full"
+                    style={{ background: 'rgba(255,255,255,0.08)' }}>
+                    <div className="h-full rounded-full transition-all duration-500"
+                      style={{ width: `${pct}%`, background: src?.color ?? '#6366f1' }} />
+                  </div>
+                </div>
+              )
+            })}
+            {(!metrics?.por_fonte || metrics.por_fonte.length === 0) && (
+              <p className="py-4 text-center text-xs text-white/30">Sem dados de fontes</p>
+            )}
+          </div>
+        </div>
+
+        {/* Status de atividades */}
+        <div className="glass-card flex flex-col">
+          <div className="mb-3 flex items-center gap-2">
+            <Activity size={13} className="text-indigo-400" strokeWidth={1.5} />
+            <p className="text-[13px] font-medium text-white/80">Atividades</p>
+            <span className="ml-auto rounded-full px-2 py-0.5 text-[10px] text-white/50"
+              style={{ background: 'rgba(255,255,255,0.08)' }}>
+              {activities.total} total
+            </span>
+          </div>
+
+          {activities.total === 0 ? (
+            <div className="flex flex-1 flex-col items-center justify-center gap-2 py-4">
+              <p className="text-xs text-white/30">Nenhuma atividade registrada</p>
+              <p className="text-[10px] text-white/20">As atividades aparecerão aqui quando os vendedores registrarem ligações, e-mails e reuniões</p>
+            </div>
+          ) : (
+            <div className="flex flex-col gap-3">
+              {activities.por_tipo.map(({ tipo, count, color }: { tipo: string; count: number; color: string }) => {
+                const pct = activities.total > 0 ? Math.round((count / activities.total) * 100) : 0
+                return (
+                  <div key={tipo} className="flex flex-col gap-1">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-1.5">
+                        <div className="h-1.5 w-1.5 rounded-full" style={{ background: color }} />
+                        <span className="text-[11px] text-white/55">{TIPO_LABELS[tipo] ?? tipo}</span>
+                      </div>
+                      <span className="text-[11px] font-medium text-white/80">{count}</span>
+                    </div>
+                    <div className="h-1.5 w-full overflow-hidden rounded-full"
+                      style={{ background: 'rgba(255,255,255,0.08)' }}>
+                      <div className="h-full rounded-full transition-all duration-500"
+                        style={{ width: `${pct}%`, background: color }} />
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  )
+}
+                               
