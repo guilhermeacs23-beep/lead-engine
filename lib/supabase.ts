@@ -8,7 +8,7 @@ export const supabase = createClient(supabaseUrl, supabaseAnon)
 // Tenant fixo por enquanto (antes de implementar auth completo)
 export const TENANT_ID = '00000000-0000-0000-0000-000000000001'
 
-// ── Leads ────────────────────────────────────────────────────
+// -- Leads ----------------------------------------------------
 
 export async function fetchLeads(filters?: {
   segmento?: string
@@ -88,7 +88,7 @@ export async function fetchDashboardMetrics() {
   }
 }
 
-// ── Funil / Insights ─────────────────────────────────────────
+// -- Funil / Insights ----------------------------------------─
 
 const FUNNEL_STEPS = ['novo', 'contactado', 'proposta', 'negociando', 'fechado'] as const
 
@@ -152,7 +152,7 @@ export async function fetchActivitiesStats() {
   return { total: data.length, por_tipo }
 }
 
-// ── Tipos do banco
+// -- Tipos do banco
 export type Database = {
   public: {
     Tables: {

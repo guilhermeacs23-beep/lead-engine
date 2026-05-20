@@ -63,7 +63,7 @@ export default function LeadsPage() {
         <SelectField label="Porte da empresa" value="" onChange={() => {}}>
           <option>Todos os portes</option>
           <option>Pequena (até 50 func.)</option>
-          <option>Média (50–500)</option>
+          <option>Média (50-500)</option>
           <option>Grande (500+)</option>
         </SelectField>
       </div>

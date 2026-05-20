@@ -36,7 +36,7 @@ export function KanbanColumn({
           </span>
         </div>
         <p className="mt-1 text-[13px] font-medium" style={{ color }}>
-          {total > 0 ? `${formatCurrencyShort(total)}/mês` : '—'}
+          {total > 0 ? `${formatCurrencyShort(total)}/mês` : '-'}
         </p>
       </div>
 

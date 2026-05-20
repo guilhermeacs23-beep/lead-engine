@@ -85,7 +85,7 @@ export default function DashboardPage() {
   return (
     <div className="flex h-full flex-col overflow-auto p-5 gap-4">
 
-      {/* ── KPIs ── */}
+      {/* -- KPIs -- */}
       <div className="grid grid-cols-4 gap-3">
         {METRIC_CARDS.map((m) => (
           <div key={m.label} className="rounded-xl p-4"
@@ -100,7 +100,7 @@ export default function DashboardPage() {
         ))}
       </div>
 
-      {/* ── Saúde do funil ── */}
+      {/* -- Saúde do funil -- */}
       <div className="rounded-xl p-5" style={{ background: 'rgba(255,255,255,0.05)', border: '0.5px solid rgba(255,255,255,0.10)' }}>
         <div className="mb-4 flex items-center gap-2">
           <Target size={14} className="text-indigo-400" strokeWidth={1.5} />
