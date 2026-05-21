@@ -136,3 +136,5 @@ body {
 .bg-violet   { background: linear-gradient(135deg, #1a0020 0%, #2d0035 40%, #0d0015 100%); }
 .bg-gold     { background: linear-gradient(135deg, #1a1500 0%, #2d2400 40%, #0d0c00 100%); }
 .bg-navy     { background: linear-gradient(135deg, #001a2d 0%, #00263d 40%, #000d1a 100%); }
+.bg-arctic   { background: linear-gradient(135deg, #c8d8f0 0%, #a8c0e8 50%, #7ba3d4 100%); }
+.bg-pearl    { background: linear-gradient(135deg, #e8eff8 0%, #d4e3f4 50%, #bdd0ea 100%); }
