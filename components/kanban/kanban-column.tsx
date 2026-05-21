@@ -48,23 +48,28 @@ export function KanbanColumn({
   return (
     <div className="flex w-[220px] flex-shrink-0 flex-col">
 
-      {/* ── Faixa colorida em formato de SETA (estilo Bitrix) ── */}
+      {/* ── Header ÚNICO em seta — título + valor numa peça só ── */}
       <div
         style={{
           background: color,
-          padding: '6px 20px 6px 12px',
-          clipPath: 'polygon(0 0, calc(100% - 14px) 0, 100% 50%, calc(100% - 14px) 100%, 0 100%)',
-          borderRadius: '8px 0 0 0',
+          /* seta apontando direita, encaixada ao corpo abaixo */
+          clipPath: 'polygon(0 0, calc(100% - 16px) 0, 100% 50%, calc(100% - 16px) 100%, 0 100%)',
+          padding: '8px 28px 10px 12px',
+          marginBottom: 0,
         }}
       >
-        <div className="flex items-center justify-between gap-1 min-h-[20px]">
+        {/* Linha do título */}
+        <div className="flex items-center justify-between gap-1">
           {editing ? (
             <input
               autoFocus
               value={editTitle}
               onChange={e => setEditTitle(e.target.value)}
-              onKeyDown={e => { if (e.key === 'Enter') saveRename(); if (e.key === 'Escape') setEditing(false) }}
-              className="flex-1 rounded px-1 text-[11px] font-semibold text-white bg-white/20 outline-none placeholder:text-white/50"
+              onKeyDown={e => {
+                if (e.key === 'Enter') saveRename()
+                if (e.key === 'Escape') setEditing(false)
+              }}
+              className="flex-1 rounded px-1 text-[11px] font-bold text-white bg-white/20 outline-none"
               style={{ minWidth: 0 }}
             />
           ) : (
@@ -104,32 +109,27 @@ export function KanbanColumn({
             ) : null}
           </div>
         </div>
-      </div>
 
-      {/* ── Valor monetário: centralizado, maior, sem negrito ── */}
-      <div
-        style={{
-          background: 'rgba(255,255,255,0.05)',
-          borderLeft: '0.5px solid rgba(255,255,255,0.08)',
-          borderRight: '0.5px solid rgba(255,255,255,0.08)',
-          padding: '10px 12px 8px',
-          textAlign: 'center',
-        }}
-      >
-        <p style={{ fontSize: '17px', fontWeight: 400, color: 'rgba(255,255,255,0.92)', letterSpacing: '-0.3px' }}>
-          {total > 0 ? `${formatCurrencyShort(total)}/mês` : <span style={{ color: 'rgba(255,255,255,0.3)', fontSize: '14px' }}>—</span>}
+        {/* Valor monetário — dentro do mesmo bloco */}
+        <p
+          className="mt-2 text-center"
+          style={{ fontSize: '16px', fontWeight: 400, color: 'rgba(255,255,255,0.95)', letterSpacing: '-0.2px' }}
+        >
+          {total > 0
+            ? `${formatCurrencyShort(total)}/mês`
+            : <span style={{ opacity: 0.4 }}>—</span>}
         </p>
       </div>
 
-      {/* ── Cards / drop zone ── */}
+      {/* ── Cards / drop zone — conectado direto ao header ── */}
       <div
         className="kanban-col-body flex-1 overflow-y-auto transition-all duration-150"
         style={{
           minHeight: 80,
+          borderRadius: '0 0 10px 10px',
           outline: isDragOver ? `2px dashed ${color}` : '2px dashed transparent',
           outlineOffset: '-3px',
-          borderRadius: '0 0 10px 10px',
-          background: isDragOver ? `${color}15` : undefined,
+          background: isDragOver ? `${color}18` : undefined,
         }}
         onDragOver={handleDragOver}
         onDragLeave={handleDragLeave}
