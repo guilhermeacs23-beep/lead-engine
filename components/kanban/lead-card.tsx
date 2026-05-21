@@ -19,20 +19,20 @@ const STATUS_GRADIENT: Record<string, string> = {
 }
 
 const STATUS_VALUE_COLOR: Record<string, string> = {
-  novo:       '#6366f1',
-  contactado: '#3b82f6',
-  proposta:   '#f59e0b',
-  negociando: '#ec4899',
-  fechado:    '#10b981',
-  perdido:    '#ef4444',
+  novo:       '#5b5fc7',
+  contactado: '#2563eb',
+  proposta:   '#d97706',
+  negociando: '#db2777',
+  fechado:    '#059669',
+  perdido:    '#dc2626',
 }
 
 export function LeadCard({ lead, onClick }: LeadCardProps) {
-  const score  = getScoreColor(lead.score_ia)
-  const source = SOURCE_LABELS[lead.fonte]
-  const segment = SEGMENT_LABELS[lead.segmento] ?? lead.segmento
+  const score        = getScoreColor(lead.score_ia)
+  const source       = SOURCE_LABELS[lead.fonte]
+  const segment      = SEGMENT_LABELS[lead.segmento] ?? lead.segmento
   const labelGradient = STATUS_GRADIENT[lead.status] ?? 'linear-gradient(90deg,#94a3b8,#cbd5e1)'
-  const valueColor    = STATUS_VALUE_COLOR[lead.status] ?? '#6366f1'
+  const valueColor   = STATUS_VALUE_COLOR[lead.status] ?? '#5b5fc7'
 
   function handleDragStart(e: React.DragEvent) {
     e.dataTransfer.setData('leadId', lead.id)
@@ -51,43 +51,43 @@ export function LeadCard({ lead, onClick }: LeadCardProps) {
       onDragEnd={handleDragEnd}
       onClick={() => onClick?.(lead)}
     >
-      {/* Colored top strip */}
-      <div className="mb-2.5 h-[3px] w-3/5 rounded-full" style={{ background: labelGradient }} />
+      {/* Barra colorida de status */}
+      <div className="mb-3 h-[3px] w-3/5 rounded-full" style={{ background: labelGradient }} />
 
-      {/* Company name */}
-      <p className="text-[12px] font-semibold leading-tight text-slate-800">{lead.empresa}</p>
-      <p className="mt-0.5 mb-2.5 text-[10px] text-slate-400">
+      {/* Nome da empresa */}
+      <p className="text-[14px] font-bold leading-tight text-slate-800">{lead.empresa}</p>
+      <p className="mt-1 mb-3 text-[12px] font-medium text-slate-500">
         {lead.contato_nome} · {lead.contato_cargo}
       </p>
 
-      {/* Value */}
+      {/* Valor estimado */}
       {lead.valor_estimado && (
-        <p className="mb-2 text-[13px] font-semibold" style={{ color: valueColor }}>
+        <p className="mb-2.5 text-[14px] font-bold" style={{ color: valueColor }}>
           {formatCurrencyShort(lead.valor_estimado)}/mês
         </p>
       )}
 
       {/* Tags */}
-      <div className="flex flex-wrap items-center gap-1">
+      <div className="flex flex-wrap items-center gap-1.5">
         <span className="tag">{segment}</span>
         {source && (
           <span className="tag" style={{ color: source.color, borderColor: `${source.color}40`, background: source.bg }}>
             {source.label}
           </span>
         )}
-        <span className="score-badge ml-auto" style={{ color: score.color, background: score.bg }}>
+        <span className="score-badge ml-auto text-[12px]" style={{ color: score.color, background: score.bg }}>
           {lead.score_ia}
         </span>
       </div>
 
       {/* Footer */}
-      <div className="mt-2.5 flex items-center gap-2 border-t pt-2" style={{ borderColor: '#f1f5f9' }}>
-        <span className="flex items-center gap-1 text-[10px] text-slate-400">
-          <Mail size={11} strokeWidth={1.5} />
+      <div className="mt-3 flex items-center gap-3 border-t pt-2.5" style={{ borderColor: '#edf2f7' }}>
+        <span className="flex items-center gap-1 text-[11px] font-medium text-slate-400">
+          <Mail size={12} strokeWidth={1.5} />
           {Math.floor(Math.random() * 8) + 1}
         </span>
-        <span className="flex items-center gap-1 text-[10px] text-slate-400">
-          <Clock size={11} strokeWidth={1.5} />
+        <span className="flex items-center gap-1 text-[11px] font-medium text-slate-400">
+          <Clock size={12} strokeWidth={1.5} />
           {Math.floor(Math.random() * 5) + 1}d
         </span>
       </div>
