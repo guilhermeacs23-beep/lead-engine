@@ -1,5 +1,4 @@
 'use client'
-import React from 'react'
 import { useUIStore } from '@/store/ui-store'
 import { useEffect, useRef } from 'react'
 import { Upload } from 'lucide-react'
@@ -15,6 +14,8 @@ const THEMES = [
   { id: 'bg-violet',  label: 'Violeta',      g: '#1a0020,#2d0035,#0d0015' },
   { id: 'bg-gold',    label: 'Dourado',      g: '#1a1500,#2d2400,#0d0c00' },
   { id: 'bg-navy',    label: 'Marinho',      g: '#001a2d,#00263d,#000d1a' },
+  { id: 'bg-arctic',  label: 'Ártico',       g: '#c8d8f0,#a8c0e8,#7ba3d4' },
+  { id: 'bg-pearl',   label: 'Pérola',       g: '#e8eff8,#d4e3f4,#bdd0ea' },
 ] as const
 
 type ThemeId = typeof THEMES[number]['id']
