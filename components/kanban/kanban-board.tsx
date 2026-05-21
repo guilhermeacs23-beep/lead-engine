@@ -18,13 +18,11 @@ export function KanbanBoard() {
   const [view,    setView]    = useState('kanban')
   const [loading, setLoading] = useState(true)
 
-  // Column management from store
   const { columns, addColumn, removeColumn, renameColumn } = useUIStore()
 
-  // Add column UI state
-  const [adding, setAdding]       = useState(false)
-  const [newTitle, setNewTitle]   = useState('')
-  const [newColor, setNewColor]   = useState(COLUMN_COLOR_OPTIONS[4])
+  const [adding,   setAdding]   = useState(false)
+  const [newTitle, setNewTitle] = useState('')
+  const [newColor, setNewColor] = useState(COLUMN_COLOR_OPTIONS[4])
 
   const load = useCallback(async () => {
     setLoading(true)
@@ -74,7 +72,7 @@ export function KanbanBoard() {
             className={`flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-xs transition-all duration-150
               ${view === id
                 ? 'bg-indigo-500/20 font-medium text-indigo-300'
-                : 'text-white/40 hover:bg-white/[0.06] hover:text-white/70'}`}
+                : 'text-white/55 hover:bg-white/[0.06] hover:text-white/80'}`}
           >
             <Icon size={12} strokeWidth={1.5} />
             {label}
@@ -83,11 +81,11 @@ export function KanbanBoard() {
 
         <div className="ml-auto flex items-center gap-2">
           {loading && (
-            <span className="flex items-center gap-1.5 text-xs text-white/30">
+            <span className="flex items-center gap-1.5 text-xs text-white/40">
               <Loader2 size={11} className="animate-spin" />Sincronizando…
             </span>
           )}
-          <button className="flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-xs text-white/45 transition-all hover:bg-white/[0.06] hover:text-white/70"
+          <button className="flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-xs text-white/60 transition-all hover:bg-white/[0.06] hover:text-white/80"
             style={{ border: '0.5px solid rgba(255,255,255,0.10)' }}>
             <Filter size={11} strokeWidth={1.5} />Filtros
           </button>
@@ -128,7 +126,7 @@ export function KanbanBoard() {
           {!adding ? (
             <button
               onClick={() => setAdding(true)}
-              className="flex w-[210px] flex-shrink-0 items-center gap-2 rounded-xl px-4 py-3 text-sm text-white/35 transition-all hover:bg-white/[0.07] hover:text-white/60"
+              className="flex w-[210px] flex-shrink-0 items-center gap-2 rounded-xl px-4 py-3 text-sm text-white/45 transition-all hover:bg-white/[0.07] hover:text-white/70"
               style={{ border: '1.5px dashed rgba(255,255,255,0.15)', alignSelf: 'flex-start' }}
             >
               <Plus size={14} strokeWidth={2} />
@@ -156,7 +154,6 @@ export function KanbanBoard() {
                 style={{ background: 'rgba(255,255,255,0.08)', border: '0.5px solid rgba(255,255,255,0.15)' }}
               />
 
-              {/* Color picker */}
               <div className="flex flex-wrap gap-1.5">
                 {COLUMN_COLOR_OPTIONS.map(c => (
                   <button
@@ -165,7 +162,7 @@ export function KanbanBoard() {
                     className="h-5 w-5 rounded-full transition-all"
                     style={{
                       background: c,
-                      outline: newColor === c ? `2px solid white` : '2px solid transparent',
+                      outline: newColor === c ? '2px solid white' : '2px solid transparent',
                       outlineOffset: '1px',
                     }}
                   />
@@ -182,4 +179,8 @@ export function KanbanBoard() {
               </button>
             </div>
           )}
-        </
+        </div>
+      )}
+    </div>
+  )
+}
