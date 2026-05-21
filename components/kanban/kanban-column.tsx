@@ -1,6 +1,6 @@
 'use client'
 import React, { useState } from 'react'
-import { Lead, LeadStatus } from '@/types'
+import { Lead } from '@/types'
 import { LeadCard } from './lead-card'
 import { formatCurrencyShort } from '@/lib/utils'
 import { Plus, Trash2, Pencil, Check } from 'lucide-react'
@@ -46,14 +46,15 @@ export function KanbanColumn({
   }
 
   return (
-    <div className="flex w-[210px] flex-shrink-0 flex-col">
+    <div className="flex w-[220px] flex-shrink-0 flex-col">
 
-      {/* ── Faixa colorida estreita (Bitrix style) ── */}
+      {/* ── Faixa colorida em formato de SETA (estilo Bitrix) ── */}
       <div
         style={{
           background: color,
-          borderRadius: '10px 10px 0 0',
-          padding: '5px 10px',
+          padding: '6px 20px 6px 12px',
+          clipPath: 'polygon(0 0, calc(100% - 14px) 0, 100% 50%, calc(100% - 14px) 100%, 0 100%)',
+          borderRadius: '8px 0 0 0',
         }}
       >
         <div className="flex items-center justify-between gap-1 min-h-[20px]">
@@ -105,21 +106,22 @@ export function KanbanColumn({
         </div>
       </div>
 
-      {/* ── Sub-header: valor em destaque, sem fundo pintado ── */}
+      {/* ── Valor monetário: centralizado, maior, sem negrito ── */}
       <div
         style={{
           background: 'rgba(255,255,255,0.05)',
           borderLeft: '0.5px solid rgba(255,255,255,0.08)',
           borderRight: '0.5px solid rgba(255,255,255,0.08)',
-          padding: '8px 12px 6px',
+          padding: '10px 12px 8px',
+          textAlign: 'center',
         }}
       >
-        <p className="text-[15px] font-semibold text-white leading-tight">
-          {total > 0 ? `${formatCurrencyShort(total)}/mês` : <span className="text-white/35 text-[13px]">—</span>}
+        <p style={{ fontSize: '17px', fontWeight: 400, color: 'rgba(255,255,255,0.92)', letterSpacing: '-0.3px' }}>
+          {total > 0 ? `${formatCurrencyShort(total)}/mês` : <span style={{ color: 'rgba(255,255,255,0.3)', fontSize: '14px' }}>—</span>}
         </p>
       </div>
 
-      {/* ── Drop zone / cards ── */}
+      {/* ── Cards / drop zone ── */}
       <div
         className="kanban-col-body flex-1 overflow-y-auto transition-all duration-150"
         style={{
@@ -141,8 +143,8 @@ export function KanbanColumn({
       {/* ── Adicionar lead ── */}
       <button
         onClick={() => onAddLead?.(id)}
-        className="mt-1.5 flex items-center gap-1.5 rounded-lg px-2.5 py-2 text-[11px] text-white/50 transition-all hover:bg-white/[0.07] hover:text-white/80"
-        style={{ border: '0.5px dashed rgba(255,255,255,0.15)' }}
+        className="mt-1.5 flex items-center gap-1.5 rounded-lg px-2.5 py-2 text-[11px] text-white/60 transition-all hover:bg-white/[0.07] hover:text-white/85"
+        style={{ border: '0.5px dashed rgba(255,255,255,0.18)' }}
       >
         <Plus size={12} strokeWidth={2} />
         Adicionar lead
