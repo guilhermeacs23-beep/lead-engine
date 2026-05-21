@@ -45,12 +45,12 @@ export function Sidebar() {
         expanded ? 'justify-between' : 'flex-col'
       )}>
         <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg overflow-hidden"
-          style={{ background: 'rgba(255,255,255,0.10)' }}>
+          style={{ background: 'rgba(255,255,255,0.95)', borderRadius: '8px' }}>
           <img
             src="/logo-engine.png"
             alt="Lead Engine"
             className="h-6 w-6 object-contain"
-            style={{ filter: 'brightness(0) invert(1)' }}
+
           />
         </div>
         {expanded && (
