@@ -29,9 +29,9 @@ export default function LoginPage() {
 
   return (
     <div
-      className="relative flex min-h-screen items-center justify-center overflow-hidden"
+      className="relative flex min-h-screen items-center justify-end overflow-hidden"
       style={{
-        backgroundImage: 'url(/bg-login.png)',
+        backgroundImage: 'url(/telainicia.jpg)',
         backgroundSize: 'cover',
         backgroundPosition: 'center',
       }}
@@ -46,9 +46,9 @@ export default function LoginPage() {
         </p>
       </div>
 
-      {/* Card — branco, leve blur */}
+      {/* Card — branco, deslocado para a direita */}
       <div
-        className="relative z-10 w-full max-w-[400px] rounded-2xl px-10 py-10 mx-4"
+        className="relative z-10 w-full max-w-[400px] rounded-2xl px-10 py-10 mr-16 mt-0"
         style={{
           background: 'rgba(255,255,255,0.92)',
           backdropFilter: 'blur(24px)',
@@ -139,7 +139,4 @@ export default function LoginPage() {
             Criar conta
           </Link>
         </p>
-      </div>
-    </div>
-  )
-}
+      </di
