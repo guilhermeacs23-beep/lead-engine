@@ -9,117 +9,85 @@
   --glass-hover: rgba(255, 255, 255, 0.10);
 }
 
-* {
-  box-sizing: border-box;
-}
+* { box-sizing: border-box; }
 
-html, body {
-  height: 100%;
-  margin: 0;
-  padding: 0;
-}
+html, body { height: 100%; margin: 0; padding: 0; }
 
 body {
   background: var(--bg-primary);
-  color: rgba(255, 255, 255, 0.95);
+  color: rgba(255, 255, 255, 1);
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   -webkit-font-smoothing: antialiased;
+  font-size: 15px;
 }
 
-/* Scrollbar estilizada */
-::-webkit-scrollbar {
-  width: 4px;
-  height: 4px;
-}
-::-webkit-scrollbar-track {
-  background: transparent;
-}
-::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.15);
-  border-radius: 4px;
-}
-::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.25);
-}
+/* Scrollbar */
+::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.18); border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.30); }
 
-/* Glass card base */
 @layer components {
-  .glass {
-    @apply backdrop-blur-glass border border-white/10 bg-white/[0.06];
-  }
-
-  .glass-hover {
-    @apply transition-all duration-150 hover:bg-white/10 hover:border-white/20;
-  }
-
-  .glass-card {
-    @apply glass rounded-xl p-4 shadow-card;
-  }
-
+  .glass { @apply backdrop-blur-glass border border-white/10 bg-white/[0.06]; }
+  .glass-hover { @apply transition-all duration-150 hover:bg-white/10 hover:border-white/20; }
+  .glass-card { @apply glass rounded-xl p-4 shadow-card; }
   .glass-topbar {
     @apply backdrop-blur-glass bg-white/[0.05] border-b border-white/10;
     box-shadow: 0 1px 0 rgba(255, 255, 255, 0.04);
   }
 
   .btn-primary {
-    @apply bg-gradient-to-r from-indigo-500 to-violet-500 text-white rounded-lg px-4 py-2 text-sm font-medium
+    @apply bg-gradient-to-r from-indigo-500 to-violet-500 text-white rounded-lg px-4 py-2 text-sm font-semibold
            transition-all duration-150 hover:opacity-90 active:scale-95;
     box-shadow: 0 0 20px rgba(99, 102, 241, 0.3);
   }
 
   .btn-ghost {
-    @apply bg-white/[0.06] border border-white/10 text-white/75 rounded-lg px-3 py-1.5 text-sm
-           transition-all duration-150 hover:bg-white/10 hover:text-white/95;
+    @apply bg-white/[0.06] border border-white/15 text-white rounded-lg px-3 py-1.5 text-sm
+           transition-all duration-150 hover:bg-white/10 hover:text-white;
   }
 
   .nav-item {
-    @apply flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm text-white/70 cursor-pointer
-           transition-all duration-150 hover:bg-white/[0.07] hover:text-white/95;
+    @apply flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm text-white cursor-pointer
+           transition-all duration-150 hover:bg-white/[0.07] hover:text-white;
   }
 
-  .nav-item-active {
-    @apply bg-indigo-500/20 text-indigo-300 font-medium;
-  }
+  .nav-item-active { @apply bg-indigo-500/20 text-indigo-200 font-semibold; }
 
-  .kanban-col-head {
-    @apply rounded-t-xl px-3.5 py-2.5;
-  }
-
+  /* Kanban: body da coluna */
   .kanban-col-body {
     @apply rounded-b-xl p-2 flex flex-col gap-2;
-    background: rgba(255, 255, 255, 0.05);
-    backdrop-filter: blur(16px);
+    background: rgba(255, 255, 255, 0.04);
     border: 0.5px solid rgba(255, 255, 255, 0.08);
     border-top: none;
   }
 
+  /* Lead cards — fundo branco, texto escuro */
   .lead-card {
-    @apply rounded-xl p-3 cursor-pointer transition-all duration-150;
-    background: rgba(255, 255, 255, 0.96);
-    border: 1px solid #e8edf3;
-    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+    @apply rounded-xl p-3.5 cursor-pointer transition-all duration-150;
+    background: rgba(255, 255, 255, 0.97);
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.10);
   }
-
   .lead-card:hover {
     background: #ffffff;
-    border-color: #d0d7e2;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.14);
-    transform: translateY(-1px);
+    border-color: #c7d2e0;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.16);
+    transform: translateY(-2px);
   }
 
-  .score-badge {
-    @apply text-xs px-1.5 py-0.5 rounded-md font-medium;
-  }
+  .score-badge { @apply text-xs px-2 py-0.5 rounded-md font-bold; }
 
+  /* Tags nos cards */
   .tag {
-    @apply text-[10px] px-2 py-0.5 rounded-lg;
+    @apply text-[11px] px-2 py-0.5 rounded-lg font-medium;
     background: #f1f5f9;
-    border: 1px solid #e2e8f0;
-    color: #64748b;
+    border: 1px solid #dde3ed;
+    color: #475569;
   }
 }
 
-/* Background themes */
+/* Backgrounds */
 .bg-cosmos   { background: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%); }
 .bg-ocean    { background: linear-gradient(135deg, #1a1a2e 0%, #16213e 40%, #0f3460 100%); }
 .bg-carbon   { background: linear-gradient(135deg, #0d1117 0%, #161b22 50%, #0d1117 100%); }
