@@ -48,28 +48,30 @@ export function KanbanColumn({
   }
 
   return (
-    <div className="flex w-[220px] flex-shrink-0 flex-col">
+    <div className="flex w-[220px] flex-shrink-0 flex-col gap-2">
 
-      {/* ── Header: faixa colorida + título + valor ── */}
+      {/* ── Coluna inteira como UM bloco unificado ── */}
       <div
         style={{
-          borderRadius: '10px 10px 0 0',
+          borderRadius: 12,
           overflow: 'hidden',
-          border: `1px solid ${color}`,
-          borderBottom: 'none',
+          border: `1px solid rgba(255,255,255,0.10)`,
+          outline: isDragOver ? `2px dashed ${color}` : '2px dashed transparent',
+          outlineOffset: 2,
+          transition: 'outline 0.15s',
         }}
       >
-        {/* Barra colorida fina no topo */}
-        <div style={{ background: color, height: 6 }} />
+        {/* Barra colorida top */}
+        <div style={{ background: color, height: 5 }} />
 
-        {/* Área do título e valor */}
+        {/* Título + valor */}
         <div
           style={{
-            background: 'rgba(255,255,255,0.07)',
+            background: 'rgba(255,255,255,0.06)',
+            borderBottom: '1px solid rgba(255,255,255,0.07)',
             padding: '8px 10px 10px',
           }}
         >
-          {/* Linha do título */}
           <div className="flex items-center justify-between gap-1">
             {editing ? (
               <input
@@ -94,8 +96,8 @@ export function KanbanColumn({
 
             <div className="flex items-center gap-1 flex-shrink-0">
               <span
-                className="rounded px-1.5 py-0.5 text-[10px] font-semibold text-white"
-                style={{ background: color + 'aa' }}
+                className="rounded-full px-1.5 py-0.5 text-[10px] font-semibold text-white"
+                style={{ background: color }}
               >
                 {leads.length}
               </span>
@@ -105,18 +107,12 @@ export function KanbanColumn({
                 </button>
               ) : !fixed ? (
                 <>
-                  <button
-                    onClick={() => { setEditTitle(title); setEditing(true) }}
-                    className="text-white/40 hover:text-white/80 transition-colors"
-                    title="Renomear"
-                  >
+                  <button onClick={() => { setEditTitle(title); setEditing(true) }}
+                    className="text-white/35 hover:text-white/80 transition-colors" title="Renomear">
                     <Pencil size={10} strokeWidth={2} />
                   </button>
-                  <button
-                    onClick={() => onDelete?.(id)}
-                    className="text-white/40 hover:text-red-400 transition-colors"
-                    title="Excluir etapa"
-                  >
+                  <button onClick={() => onDelete?.(id)}
+                    className="text-white/35 hover:text-red-400 transition-colors" title="Excluir etapa">
                     <Trash2 size={10} strokeWidth={2} />
                   </button>
                 </>
@@ -124,42 +120,37 @@ export function KanbanColumn({
             </div>
           </div>
 
-          {/* Valor */}
-          <p
-            className="mt-1.5 text-center"
-            style={{ fontSize: '19px', fontWeight: 400, color: 'rgba(255,255,255,0.92)', letterSpacing: '-0.3px' }}
-          >
+          <p className="mt-2 text-center"
+            style={{ fontSize: 19, fontWeight: 400, color: 'rgba(255,255,255,0.92)', letterSpacing: '-0.3px' }}>
             {total > 0
               ? `${formatCurrencyShort(total)}/mês`
-              : <span style={{ color: 'rgba(255,255,255,0.25)', fontSize: 14 }}>—</span>}
+              : <span style={{ color: 'rgba(255,255,255,0.2)', fontSize: 13 }}>—</span>}
           </p>
+        </div>
+
+        {/* Cards */}
+        <div
+          className="flex flex-col gap-2 overflow-y-auto p-2"
+          style={{
+            minHeight: 60,
+            background: isDragOver ? `${color}12` : 'rgba(255,255,255,0.03)',
+            transition: 'background 0.15s',
+          }}
+          onDragOver={handleDragOver}
+          onDragLeave={handleDragLeave}
+          onDrop={handleDrop}
+        >
+          {leads.map((lead) => (
+            <LeadCard key={lead.id} lead={lead} onClick={onLeadClick} />
+          ))}
         </div>
       </div>
 
-      {/* ── Cards ── */}
-      <div
-        className="kanban-col-body flex-1 overflow-y-auto transition-all duration-150"
-        style={{
-          minHeight: 80,
-          borderRadius: '0 0 10px 10px',
-          outline: isDragOver ? `2px dashed ${color}` : '2px dashed transparent',
-          outlineOffset: '-3px',
-          background: isDragOver ? `${color}18` : undefined,
-        }}
-        onDragOver={handleDragOver}
-        onDragLeave={handleDragLeave}
-        onDrop={handleDrop}
-      >
-        {leads.map((lead) => (
-          <LeadCard key={lead.id} lead={lead} onClick={onLeadClick} />
-        ))}
-      </div>
-
-      {/* ── Adicionar lead ── */}
+      {/* Adicionar lead — fora do wrapper, abaixo */}
       <button
         onClick={() => onAddLead?.(id)}
-        className="mt-1.5 flex items-center gap-1.5 rounded-lg px-2.5 py-2 text-[11px] text-white/55 transition-all hover:bg-white/[0.07] hover:text-white/80"
-        style={{ border: '0.5px dashed rgba(255,255,255,0.18)' }}
+        className="flex items-center gap-1.5 rounded-lg px-2.5 py-2 text-[11px] text-white/50 transition-all hover:bg-white/[0.07] hover:text-white/80"
+        style={{ border: '0.5px dashed rgba(255,255,255,0.15)' }}
       >
         <Plus size={12} strokeWidth={2} />
         Adicionar lead
