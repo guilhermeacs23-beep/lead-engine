@@ -1,4 +1,5 @@
 'use client'
+import { useState } from 'react'
 import { Lead, LeadStatus } from '@/types'
 import { LeadCard } from './lead-card'
 import { formatCurrencyShort } from '@/lib/utils'
@@ -19,10 +20,33 @@ export function KanbanColumn({
   id, title, color, leads, onAddLead, onLeadClick, onMoveCard
 }: KanbanColumnProps) {
   const total = leads.reduce((sum, l) => sum + (l.valor_estimado ?? 0), 0)
+  const [isDragOver, setIsDragOver] = useState(false)
+
+  function handleDragOver(e: React.DragEvent) {
+    e.preventDefault()
+    e.dataTransfer.dropEffect = 'move'
+    setIsDragOver(true)
+  }
+
+  function handleDragLeave(e: React.DragEvent) {
+    // Only clear if leaving the column entirely (not entering a child)
+    if (!e.currentTarget.contains(e.relatedTarget as Node)) {
+      setIsDragOver(false)
+    }
+  }
+
+  function handleDrop(e: React.DragEvent) {
+    e.preventDefault()
+    setIsDragOver(false)
+    const leadId = e.dataTransfer.getData('leadId')
+    if (leadId) {
+      onMoveCard?.(leadId, id)
+    }
+  }
 
   return (
     <div className="flex w-[210px] flex-shrink-0 flex-col">
-      {/* Header glassmorphism */}
+      {/* Header */}
       <div className="kanban-col-head">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-1.5">
@@ -39,8 +63,20 @@ export function KanbanColumn({
         </p>
       </div>
 
-      {/* Body */}
-      <div className="kanban-col-body flex-1 overflow-y-auto" style={{ minHeight: 80 }}>
+      {/* Drop zone body */}
+      <div
+        className="kanban-col-body flex-1 overflow-y-auto transition-all duration-150"
+        style={{
+          minHeight: 80,
+          outline: isDragOver ? `2px dashed ${color}` : '2px dashed transparent',
+          outlineOffset: '-4px',
+          borderRadius: 12,
+          background: isDragOver ? `${color}12` : undefined,
+        }}
+        onDragOver={handleDragOver}
+        onDragLeave={handleDragLeave}
+        onDrop={handleDrop}
+      >
         {leads.map((lead) => (
           <LeadCard key={lead.id} lead={lead} onClick={onLeadClick} />
         ))}
