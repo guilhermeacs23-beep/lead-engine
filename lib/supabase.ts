@@ -1,14 +1,14 @@
-import { createClient } from '@supabase/supabase-js'
+import { createBrowserClient } from '@supabase/ssr'
 
 const supabaseUrl  = process.env.NEXT_PUBLIC_SUPABASE_URL!
 const supabaseAnon = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 
-export const supabase = createClient(supabaseUrl, supabaseAnon)
+export const supabase = createBrowserClient(supabaseUrl, supabaseAnon)
 
 // Tenant fixo por enquanto (antes de implementar auth completo)
 export const TENANT_ID = '00000000-0000-0000-0000-000000000001'
 
-// -- Leads ----------------------------------------------------
+// ── Leads ────────────────────────────────────────────────────
 
 export async function fetchLeads(filters?: {
   segmento?: string
@@ -88,7 +88,7 @@ export async function fetchDashboardMetrics() {
   }
 }
 
-// -- Funil / Insights ----------------------------------------
+// ── Funil / Insights ─────────────────────────────────────────
 
 const FUNNEL_STEPS = ['novo', 'contactado', 'proposta', 'negociando', 'fechado'] as const
 
@@ -152,7 +152,7 @@ export async function fetchActivitiesStats() {
   return { total: data.length, por_tipo }
 }
 
-// -- Tipos do banco
+// ── Tipos do banco
 export type Database = {
   public: {
     Tables: {
