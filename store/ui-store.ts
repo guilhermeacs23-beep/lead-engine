@@ -9,38 +9,30 @@ type BgTheme =
 export interface KanbanColumn {
   id: string
   title: string
-  color: string   // pode ser hex ou CSS gradient string
+  color: string
   fixed?: boolean
 }
 
-// Gradientes frio → quente para as colunas padrão
 export const DEFAULT_COLUMNS: KanbanColumn[] = [
-  { id: 'novo',       title: 'Novo Lead',         color: 'linear-gradient(135deg,#6366f1,#818cf8)' },
-  { id: 'contactado', title: 'Contactado',         color: 'linear-gradient(135deg,#3b82f6,#06b6d4)' },
-  { id: 'proposta',   title: 'Proposta',           color: 'linear-gradient(135deg,#f59e0b,#fb923c)' },
-  { id: 'negociando', title: 'Negociando',         color: 'linear-gradient(135deg,#f97316,#ec4899)' },
-  { id: 'fechado',    title: 'Finalizado Fechado', color: 'linear-gradient(135deg,#10b981,#34d399)', fixed: true },
-  { id: 'perdido',    title: 'Finalizado Perdido', color: 'linear-gradient(135deg,#ef4444,#f43f5e)', fixed: true },
+  { id: 'novo',       title: 'Novo Lead',         color: '#7c3aed' },
+  { id: 'contactado', title: 'Contactado',         color: '#2563eb' },
+  { id: 'proposta',   title: 'Proposta',           color: '#d97706' },
+  { id: 'negociando', title: 'Negociando',         color: '#db2777' },
+  { id: 'fechado',    title: 'Finalizado Fechado', color: '#059669', fixed: true },
+  { id: 'perdido',    title: 'Finalizado Perdido', color: '#dc2626', fixed: true },
 ]
 
-// Paleta de gradientes disponíveis para o usuário escolher
-export const GRADIENT_PRESETS = [
-  'linear-gradient(135deg,#6366f1,#818cf8)',   // indigo
-  'linear-gradient(135deg,#3b82f6,#06b6d4)',   // azul-ciano
-  'linear-gradient(135deg,#06b6d4,#10b981)',   // ciano-verde
-  'linear-gradient(135deg,#10b981,#84cc16)',   // verde-lima
-  'linear-gradient(135deg,#f59e0b,#fb923c)',   // âmbar-laranja
-  'linear-gradient(135deg,#f97316,#ef4444)',   // laranja-vermelho
-  'linear-gradient(135deg,#ec4899,#f43f5e)',   // rosa-vermelho
-  'linear-gradient(135deg,#a855f7,#ec4899)',   // roxo-rosa
-  'linear-gradient(135deg,#0ea5e9,#6366f1)',   // céu-índigo
-  'linear-gradient(135deg,#34d399,#06b6d4)',   // esmeralda-ciano
-  'linear-gradient(135deg,#fbbf24,#f472b6)',   // amarelo-rosa
-  'linear-gradient(135deg,#64748b,#94a3b8)',   // cinza neutro
+// Paleta sólida estilo PowerPoint — 6 colunas × 4 linhas
+export const COLOR_PALETTE = [
+  '#ef4444', '#f97316', '#f59e0b', '#eab308', '#84cc16', '#22c55e',
+  '#10b981', '#14b8a6', '#06b6d4', '#0ea5e9', '#3b82f6', '#6366f1',
+  '#8b5cf6', '#a855f7', '#d946ef', '#ec4899', '#f43f5e', '#fb923c',
+  '#64748b', '#475569', '#7c3aed', '#2563eb', '#0369a1', '#059669',
 ]
 
-// Mantido para compatibilidade com o formulário de nova coluna
-export const COLUMN_COLOR_OPTIONS = GRADIENT_PRESETS
+// Alias para compatibilidade
+export const GRADIENT_PRESETS = COLOR_PALETTE
+export const COLUMN_COLOR_OPTIONS = COLOR_PALETTE
 
 interface UIStore {
   bgTheme: BgTheme
