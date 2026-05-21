@@ -47,8 +47,8 @@ export default function DashboardPage() {
 
   if (loading) {
     return (
-      <div className="flex h-full items-center justify-center gap-2 text-sm text-white/30">
-        <Loader2 size={18} className="animate-spin" />Carregando Insights…
+      <div className="flex h-full items-center justify-center gap-2 text-base text-white/50">
+        <Loader2 size={20} className="animate-spin" />Carregando Insights…
       </div>
     )
   }
@@ -88,12 +88,12 @@ export default function DashboardPage() {
       {/* KPIs */}
       <div className="grid grid-cols-4 gap-3">
         {METRIC_CARDS.map((m) => (
-          <div key={m.label} className="rounded-xl p-4"
+          <div key={m.label} className="rounded-xl p-5"
             style={{ background: 'rgba(255,255,255,0.06)', border: '0.5px solid rgba(255,255,255,0.10)' }}>
-            <p className="mb-1.5 text-[11px] text-white/50">{m.label}</p>
-            <p className="text-2xl font-medium text-white/95">{m.value}</p>
-            <p className={`mt-1 flex items-center gap-1 text-[11px] ${m.up ? 'text-emerald-400' : 'text-red-400'}`}>
-              {m.up ? <TrendingUp size={11} /> : <TrendingDown size={11} />}
+            <p className="mb-2 text-[13px] font-medium text-white">{m.label}</p>
+            <p className="text-3xl font-semibold text-white">{m.value}</p>
+            <p className={`mt-1.5 flex items-center gap-1 text-[13px] font-medium ${m.up ? 'text-emerald-400' : 'text-red-400'}`}>
+              {m.up ? <TrendingUp size={13} /> : <TrendingDown size={13} />}
               {m.delta}
             </p>
           </div>
@@ -103,15 +103,15 @@ export default function DashboardPage() {
       {/* Saude do funil */}
       <div className="rounded-xl p-5" style={{ background: 'rgba(255,255,255,0.05)', border: '0.5px solid rgba(255,255,255,0.10)' }}>
         <div className="mb-4 flex items-center gap-2">
-          <Target size={14} className="text-indigo-400" strokeWidth={1.5} />
-          <p className="text-[13px] font-medium text-white/80">Saúde do funil</p>
-          <span className="ml-auto text-[11px] text-white/35">
-            Taxa de ganho: <span className="text-white/70">{metrics?.taxa_conversao ?? 0}%</span>
+          <Target size={16} className="text-indigo-400" strokeWidth={1.5} />
+          <p className="text-[15px] font-semibold text-white">Saúde do funil</p>
+          <span className="ml-auto text-[13px] text-white/70">
+            Taxa de ganho: <span className="font-semibold text-white">{metrics?.taxa_conversao ?? 0}%</span>
           </span>
         </div>
 
         {funnel.length === 0 ? (
-          <p className="py-6 text-center text-xs text-white/30">Nenhum lead no pipeline ainda</p>
+          <p className="py-6 text-center text-sm text-white/50">Nenhum lead no pipeline ainda</p>
         ) : (
           <div className="flex items-end gap-0">
             {funnel.map((step, i) => {
@@ -122,7 +122,7 @@ export default function DashboardPage() {
                   {/* Conversion arrow between steps */}
                   <div className="flex w-full items-center justify-center">
                     {i > 0 && (
-                      <span className="rounded-full px-2 py-0.5 text-[10px] font-medium"
+                      <span className="rounded-full px-2 py-0.5 text-[12px] font-semibold"
                         style={{ background: `${color}20`, color }}>
                         {step.pct_conversao}%
                       </span>
@@ -130,7 +130,7 @@ export default function DashboardPage() {
                   </div>
 
                   {/* Count above bar */}
-                  <span className="text-[13px] font-medium text-white/80">{step.count}</span>
+                  <span className="text-[15px] font-semibold text-white">{step.count}</span>
 
                   {/* Bar */}
                   <div className="relative w-full overflow-hidden rounded-t-lg"
@@ -141,10 +141,10 @@ export default function DashboardPage() {
 
                   {/* Label */}
                   <div className="flex flex-col items-center gap-0.5">
-                    <div className="h-1.5 w-1.5 rounded-full" style={{ background: color }} />
-                    <span className="text-[10px] text-white/50">{STATUS_LABELS[step.step]}</span>
+                    <div className="h-2 w-2 rounded-full" style={{ background: color }} />
+                    <span className="text-[12px] font-medium text-white">{STATUS_LABELS[step.step]}</span>
                     {step.valor > 0 && (
-                      <span className="text-[10px] font-medium" style={{ color }}>
+                      <span className="text-[12px] font-semibold" style={{ color }}>
                         {formatCurrencyShort(step.valor)}
                       </span>
                     )}
@@ -162,24 +162,24 @@ export default function DashboardPage() {
         {/* Leads recentes */}
         <div className="glass-card flex flex-col overflow-hidden">
           <div className="mb-3 flex items-center gap-2">
-            <BarChart2 size={13} className="text-indigo-400" strokeWidth={1.5} />
-            <p className="text-[13px] font-medium text-white/80">Leads recentes</p>
+            <BarChart2 size={15} className="text-indigo-400" strokeWidth={1.5} />
+            <p className="text-[15px] font-semibold text-white">Leads recentes</p>
           </div>
           {recent.length === 0 ? (
-            <p className="py-4 text-center text-xs text-white/30">Nenhum lead ainda</p>
+            <p className="py-4 text-center text-sm text-white/50">Nenhum lead ainda</p>
           ) : recent.map((lead) => (
             <div key={lead.id}
-              className="flex items-center gap-2 border-b py-2"
+              className="flex items-center gap-2 border-b py-2.5"
               style={{ borderColor: 'rgba(255,255,255,0.06)' }}>
-              <div className="h-1.5 w-1.5 flex-shrink-0 rounded-full"
+              <div className="h-2 w-2 flex-shrink-0 rounded-full"
                 style={{ background: STATUS_COLORS[lead.status] ?? '#94a3b8' }} />
               <div className="flex-1 min-w-0">
-                <p className="truncate text-[11px] font-medium text-white/85">{lead.empresa}</p>
-                <p className="truncate text-[10px] text-white/40">
+                <p className="truncate text-[13px] font-semibold text-white">{lead.empresa}</p>
+                <p className="truncate text-[12px] text-white/70">
                   {SEGMENT_LABELS[lead.segmento] ?? lead.segmento} · {lead.cidade}
                 </p>
               </div>
-              <span className="shrink-0 rounded-md px-1.5 py-0.5 text-[9px]"
+              <span className="shrink-0 rounded-md px-2 py-0.5 text-[11px] font-medium"
                 style={{ color: STATUS_COLORS[lead.status], background: `${STATUS_COLORS[lead.status]}20` }}>
                 {STATUS_LABELS[lead.status] ?? lead.status}
               </span>
@@ -190,19 +190,19 @@ export default function DashboardPage() {
         {/* Fontes de leads */}
         <div className="glass-card flex flex-col">
           <div className="mb-3 flex items-center gap-2">
-            <Activity size={13} className="text-indigo-400" strokeWidth={1.5} />
-            <p className="text-[13px] font-medium text-white/80">Fontes de leads</p>
+            <Activity size={15} className="text-indigo-400" strokeWidth={1.5} />
+            <p className="text-[15px] font-semibold text-white">Fontes de leads</p>
           </div>
           <div className="flex flex-col gap-3">
             {(metrics?.por_fonte ?? []).map(({ fonte, pct }: { fonte: string; pct: number }) => {
               const src = SOURCE_LABELS[fonte]
               return (
-                <div key={fonte} className="flex flex-col gap-1">
+                <div key={fonte} className="flex flex-col gap-1.5">
                   <div className="flex items-center justify-between">
-                    <span className="text-[11px] text-white/55">{src?.label ?? fonte}</span>
-                    <span className="text-[11px] font-medium text-white/80">{pct}%</span>
+                    <span className="text-[13px] font-medium text-white">{src?.label ?? fonte}</span>
+                    <span className="text-[13px] font-semibold text-white">{pct}%</span>
                   </div>
-                  <div className="h-1.5 w-full overflow-hidden rounded-full"
+                  <div className="h-2 w-full overflow-hidden rounded-full"
                     style={{ background: 'rgba(255,255,255,0.08)' }}>
                     <div className="h-full rounded-full transition-all duration-500"
                       style={{ width: `${pct}%`, background: src?.color ?? '#6366f1' }} />
@@ -211,7 +211,7 @@ export default function DashboardPage() {
               )
             })}
             {(!metrics?.por_fonte || metrics.por_fonte.length === 0) && (
-              <p className="py-4 text-center text-xs text-white/30">Sem dados de fontes</p>
+              <p className="py-4 text-center text-sm text-white/50">Sem dados de fontes</p>
             )}
           </div>
         </div>
@@ -219,9 +219,9 @@ export default function DashboardPage() {
         {/* Status de atividades */}
         <div className="glass-card flex flex-col">
           <div className="mb-3 flex items-center gap-2">
-            <Activity size={13} className="text-indigo-400" strokeWidth={1.5} />
-            <p className="text-[13px] font-medium text-white/80">Atividades</p>
-            <span className="ml-auto rounded-full px-2 py-0.5 text-[10px] text-white/50"
+            <Activity size={15} className="text-indigo-400" strokeWidth={1.5} />
+            <p className="text-[15px] font-semibold text-white">Atividades</p>
+            <span className="ml-auto rounded-full px-2 py-0.5 text-[12px] font-medium text-white"
               style={{ background: 'rgba(255,255,255,0.08)' }}>
               {activities.total} total
             </span>
@@ -229,23 +229,23 @@ export default function DashboardPage() {
 
           {activities.total === 0 ? (
             <div className="flex flex-1 flex-col items-center justify-center gap-2 py-4">
-              <p className="text-xs text-white/30">Nenhuma atividade registrada</p>
-              <p className="text-[10px] text-white/20">As atividades aparecerão aqui quando os vendedores registrarem ligações, e-mails e reuniões</p>
+              <p className="text-sm text-white/60">Nenhuma atividade registrada</p>
+              <p className="text-[12px] text-white/40 text-center">As atividades aparecerão aqui quando os vendedores registrarem ligações, e-mails e reuniões</p>
             </div>
           ) : (
             <div className="flex flex-col gap-3">
               {activities.por_tipo.map(({ tipo, count, color }: { tipo: string; count: number; color: string }) => {
                 const pct = activities.total > 0 ? Math.round((count / activities.total) * 100) : 0
                 return (
-                  <div key={tipo} className="flex flex-col gap-1">
+                  <div key={tipo} className="flex flex-col gap-1.5">
                     <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-1.5">
-                        <div className="h-1.5 w-1.5 rounded-full" style={{ background: color }} />
-                        <span className="text-[11px] text-white/55">{TIPO_LABELS[tipo] ?? tipo}</span>
+                      <div className="flex items-center gap-2">
+                        <div className="h-2 w-2 rounded-full" style={{ background: color }} />
+                        <span className="text-[13px] font-medium text-white">{TIPO_LABELS[tipo] ?? tipo}</span>
                       </div>
-                      <span className="text-[11px] font-medium text-white/80">{count}</span>
+                      <span className="text-[13px] font-semibold text-white">{count}</span>
                     </div>
-                    <div className="h-1.5 w-full overflow-hidden rounded-full"
+                    <div className="h-2 w-full overflow-hidden rounded-full"
                       style={{ background: 'rgba(255,255,255,0.08)' }}>
                       <div className="h-full rounded-full transition-all duration-500"
                         style={{ width: `${pct}%`, background: color }} />
