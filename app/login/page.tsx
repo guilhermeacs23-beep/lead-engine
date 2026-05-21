@@ -1,13 +1,11 @@
 'use client'
 import React from 'react'
 import { useState } from 'react'
-import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { supabase } from '@/lib/supabase'
 import { Mail, Lock, Loader2, AlertCircle } from 'lucide-react'
 
 export default function LoginPage() {
-  const router = useRouter()
   const [email,   setEmail]   = useState('')
   const [senha,   setSenha]   = useState('')
   const [loading, setLoading] = useState(false)
@@ -24,7 +22,6 @@ export default function LoginPage() {
       return
     }
     window.location.href = '/dashboard'
-    
   }
 
   return (
@@ -36,40 +33,30 @@ export default function LoginPage() {
         backgroundPosition: 'center',
       }}
     >
-      {/* overlay muito sutil para não escurecer demais o fundo claro */}
-      <div className="absolute inset-0" style={{ background: 'rgba(240,245,255,0.25)' }} />
+      <div className="absolute inset-0" style={{ background: 'rgba(10,10,30,0.35)' }} />
 
-      {/* branding no canto inferior esquerdo — estilo Bitrix */}
       <div className="absolute bottom-10 left-12 z-10">
-        <p className="text-sm font-medium" style={{ color: 'rgba(30,40,80,0.55)' }}>
+        <p className="text-sm font-medium" style={{ color: 'rgba(255,255,255,0.6)' }}>
           Plataforma de prospecção inteligente
         </p>
       </div>
 
-      {/* Card — branco, deslocado para a direita */}
+      {/* Card deslocado para a direita */}
       <div
-        className="relative z-10 w-full max-w-[400px] rounded-2xl px-10 py-10 mr-16 mt-0"
+        className="relative z-10 w-full max-w-[400px] rounded-2xl px-10 py-10 mr-16"
         style={{
-          background: 'rgba(255,255,255,0.92)',
+          background: 'rgba(255,255,255,0.93)',
           backdropFilter: 'blur(24px)',
-          boxShadow: '0 20px 60px rgba(0,0,0,0.18), 0 4px 16px rgba(0,0,0,0.08)',
+          boxShadow: '0 20px 60px rgba(0,0,0,0.25), 0 4px 16px rgba(0,0,0,0.10)',
           border: '0.5px solid rgba(255,255,255,0.9)',
         }}
       >
         {/* Logo + nome */}
         <div className="mb-8 flex flex-col items-center gap-3">
-          <img
-            src="/logo-engine.png"
-            alt="Lead Engine"
-            className="h-14 w-14 object-contain"
-          />
+          <img src="/logo-engine.png" alt="Lead Engine" className="h-14 w-14 object-contain" />
           <div className="text-center">
-            <h1 className="text-xl font-bold tracking-tight" style={{ color: '#0f172a' }}>
-              Lead Engine
-            </h1>
-            <p className="mt-0.5 text-sm" style={{ color: '#64748b' }}>
-              Acesse sua conta
-            </p>
+            <h1 className="text-xl font-bold tracking-tight" style={{ color: '#0f172a' }}>Lead Engine</h1>
+            <p className="mt-0.5 text-sm" style={{ color: '#64748b' }}>Acesse sua conta</p>
           </div>
         </div>
 
@@ -84,9 +71,7 @@ export default function LoginPage() {
 
         <form onSubmit={handleLogin} className="flex flex-col gap-4">
           <div>
-            <label className="mb-1.5 block text-xs font-medium" style={{ color: '#475569' }}>
-              E-mail
-            </label>
+            <label className="mb-1.5 block text-xs font-medium" style={{ color: '#475569' }}>E-mail</label>
             <div className="flex items-center gap-2.5 rounded-xl px-3.5 py-3"
               style={{ background: '#f8fafc', border: '1px solid #e2e8f0' }}>
               <Mail size={14} strokeWidth={1.5} style={{ color: '#94a3b8' }} />
@@ -100,9 +85,7 @@ export default function LoginPage() {
           </div>
 
           <div>
-            <label className="mb-1.5 block text-xs font-medium" style={{ color: '#475569' }}>
-              Senha
-            </label>
+            <label className="mb-1.5 block text-xs font-medium" style={{ color: '#475569' }}>Senha</label>
             <div className="flex items-center gap-2.5 rounded-xl px-3.5 py-3"
               style={{ background: '#f8fafc', border: '1px solid #e2e8f0' }}>
               <Lock size={14} strokeWidth={1.5} style={{ color: '#94a3b8' }} />
@@ -118,10 +101,7 @@ export default function LoginPage() {
           <button
             type="submit" disabled={loading}
             className="mt-1 flex items-center justify-center gap-2 rounded-xl py-3 text-sm font-semibold text-white transition-all disabled:opacity-50"
-            style={{
-              background: 'linear-gradient(135deg, #1e3a8a, #1d4ed8)',
-              boxShadow: '0 4px 16px rgba(29,78,216,0.35)',
-            }}
+            style={{ background: 'linear-gradient(135deg, #1e3a8a, #1d4ed8)', boxShadow: '0 4px 16px rgba(29,78,216,0.35)' }}
           >
             {loading ? <><Loader2 size={15} className="animate-spin" />Entrando…</> : 'Entrar'}
           </button>
@@ -139,4 +119,7 @@ export default function LoginPage() {
             Criar conta
           </Link>
         </p>
-      </di
+      </div>
+    </div>
+  )
+}
