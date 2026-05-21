@@ -5,7 +5,6 @@ import { persist } from 'zustand/middleware'
 type BgTheme =
   | 'bg-cosmos' | 'bg-ocean' | 'bg-carbon' | 'bg-nebula' | 'bg-abyss'
   | 'bg-forest' | 'bg-amber' | 'bg-violet' | 'bg-gold'   | 'bg-navy'
-  | 'bg-arctic' | 'bg-pearl'
 
 interface UIStore {
   bgTheme: BgTheme
