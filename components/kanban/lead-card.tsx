@@ -1,5 +1,4 @@
 'use client'
-import React from 'react'
 import { Lead } from '@/types'
 import { formatCurrencyShort, getScoreColor } from '@/lib/utils'
 import { SOURCE_LABELS, SEGMENT_LABELS, LABEL_COLORS } from '@/lib/mock-data'
@@ -16,8 +15,29 @@ export function LeadCard({ lead, onClick }: LeadCardProps) {
   const segment = SEGMENT_LABELS[lead.segmento]
   const labelGradient = LABEL_COLORS[lead.status]
 
+  function handleDragStart(e: React.DragEvent) {
+    e.dataTransfer.setData('leadId', lead.id)
+    e.dataTransfer.effectAllowed = 'move'
+    // Slight delay so the ghost image renders before opacity change
+    setTimeout(() => {
+      const el = e.target as HTMLElement
+      el.style.opacity = '0.4'
+    }, 0)
+  }
+
+  function handleDragEnd(e: React.DragEvent) {
+    const el = e.target as HTMLElement
+    el.style.opacity = '1'
+  }
+
   return (
-    <div className="lead-card group" onClick={() => onClick?.(lead)}>
+    <div
+      className="lead-card group cursor-grab active:cursor-grabbing"
+      draggable
+      onDragStart={handleDragStart}
+      onDragEnd={handleDragEnd}
+      onClick={() => onClick?.(lead)}
+    >
       {/* Label colorida */}
       <div className="mb-2.5 h-[2.5px] w-3/5 rounded-full" style={{ background: labelGradient }} />
 
