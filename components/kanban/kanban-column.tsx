@@ -47,16 +47,16 @@ export function KanbanColumn({
 
   return (
     <div className="flex w-[210px] flex-shrink-0 flex-col">
-      {/* Colored header strip — Bitrix style */}
+
+      {/* ── Faixa colorida estreita (Bitrix style) ── */}
       <div
-        className="kanban-col-head"
         style={{
           background: color,
           borderRadius: '10px 10px 0 0',
+          padding: '5px 10px',
         }}
       >
-        {/* Title row */}
-        <div className="flex items-center justify-between gap-1 min-h-[22px]">
+        <div className="flex items-center justify-between gap-1 min-h-[20px]">
           {editing ? (
             <input
               autoFocus
@@ -68,7 +68,7 @@ export function KanbanColumn({
             />
           ) : (
             <span
-              className="flex-1 truncate text-[11px] font-semibold text-white leading-tight"
+              className="flex-1 truncate text-[11px] font-bold text-white uppercase tracking-wide leading-tight"
               onDoubleClick={() => !fixed && setEditing(true)}
             >
               {title}
@@ -76,7 +76,7 @@ export function KanbanColumn({
           )}
 
           <div className="flex items-center gap-1 flex-shrink-0">
-            <span className="rounded px-1.5 py-0.5 text-[10px] font-medium text-white bg-black/15">
+            <span className="rounded px-1.5 py-0.5 text-[10px] font-semibold text-white bg-black/20">
               {leads.length}
             </span>
             {editing ? (
@@ -87,14 +87,14 @@ export function KanbanColumn({
               <>
                 <button
                   onClick={() => { setEditTitle(title); setEditing(true) }}
-                  className="text-white/60 hover:text-white transition-colors"
+                  className="text-white/70 hover:text-white transition-colors"
                   title="Renomear"
                 >
                   <Pencil size={10} strokeWidth={2} />
                 </button>
                 <button
                   onClick={() => onDelete?.(id)}
-                  className="text-white/60 hover:text-white transition-colors"
+                  className="text-white/70 hover:text-white transition-colors"
                   title="Excluir etapa"
                 >
                   <Trash2 size={10} strokeWidth={2} />
@@ -103,14 +103,23 @@ export function KanbanColumn({
             ) : null}
           </div>
         </div>
+      </div>
 
-        {/* Total value */}
-        <p className="mt-1 text-[12px] font-medium text-white/85">
-          {total > 0 ? `${formatCurrencyShort(total)}/mês` : '—'}
+      {/* ── Sub-header: valor em destaque, sem fundo pintado ── */}
+      <div
+        style={{
+          background: 'rgba(255,255,255,0.05)',
+          borderLeft: '0.5px solid rgba(255,255,255,0.08)',
+          borderRight: '0.5px solid rgba(255,255,255,0.08)',
+          padding: '8px 12px 6px',
+        }}
+      >
+        <p className="text-[15px] font-semibold text-white leading-tight">
+          {total > 0 ? `${formatCurrencyShort(total)}/mês` : <span className="text-white/35 text-[13px]">—</span>}
         </p>
       </div>
 
-      {/* Drop zone */}
+      {/* ── Drop zone / cards ── */}
       <div
         className="kanban-col-body flex-1 overflow-y-auto transition-all duration-150"
         style={{
@@ -129,11 +138,11 @@ export function KanbanColumn({
         ))}
       </div>
 
-      {/* Add button */}
+      {/* ── Adicionar lead ── */}
       <button
         onClick={() => onAddLead?.(id)}
-        className="mt-1.5 flex items-center gap-1.5 rounded-lg px-2.5 py-2 text-[11px] text-white/35 transition-all hover:bg-white/[0.07] hover:text-white/60"
-        style={{ border: '0.5px dashed rgba(255,255,255,0.12)' }}
+        className="mt-1.5 flex items-center gap-1.5 rounded-lg px-2.5 py-2 text-[11px] text-white/50 transition-all hover:bg-white/[0.07] hover:text-white/80"
+        style={{ border: '0.5px dashed rgba(255,255,255,0.15)' }}
       >
         <Plus size={12} strokeWidth={2} />
         Adicionar lead
