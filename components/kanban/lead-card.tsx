@@ -1,7 +1,7 @@
 'use client'
 import { Lead } from '@/types'
 import { formatCurrencyShort, getScoreColor } from '@/lib/utils'
-import { SOURCE_LABELS, SEGMENT_LABELS, LABEL_COLORS } from '@/lib/mock-data'
+import { SOURCE_LABELS, SEGMENT_LABELS } from '@/lib/mock-data'
 import { Mail, Clock } from 'lucide-react'
 
 interface LeadCardProps {
@@ -9,25 +9,38 @@ interface LeadCardProps {
   onClick?: (lead: Lead) => void
 }
 
+const STATUS_GRADIENT: Record<string, string> = {
+  novo:       'linear-gradient(90deg, #6366f1, #a78bfa)',
+  contactado: 'linear-gradient(90deg, #3b82f6, #60a5fa)',
+  proposta:   'linear-gradient(90deg, #f59e0b, #fbbf24)',
+  negociando: 'linear-gradient(90deg, #ec4899, #f472b6)',
+  fechado:    'linear-gradient(90deg, #10b981, #34d399)',
+  perdido:    'linear-gradient(90deg, #ef4444, #f87171)',
+}
+
+const STATUS_VALUE_COLOR: Record<string, string> = {
+  novo:       '#6366f1',
+  contactado: '#3b82f6',
+  proposta:   '#f59e0b',
+  negociando: '#ec4899',
+  fechado:    '#10b981',
+  perdido:    '#ef4444',
+}
+
 export function LeadCard({ lead, onClick }: LeadCardProps) {
-  const score = getScoreColor(lead.score_ia)
+  const score  = getScoreColor(lead.score_ia)
   const source = SOURCE_LABELS[lead.fonte]
-  const segment = SEGMENT_LABELS[lead.segmento]
-  const labelGradient = LABEL_COLORS[lead.status]
+  const segment = SEGMENT_LABELS[lead.segmento] ?? lead.segmento
+  const labelGradient = STATUS_GRADIENT[lead.status] ?? 'linear-gradient(90deg,#94a3b8,#cbd5e1)'
+  const valueColor    = STATUS_VALUE_COLOR[lead.status] ?? '#6366f1'
 
   function handleDragStart(e: React.DragEvent) {
     e.dataTransfer.setData('leadId', lead.id)
     e.dataTransfer.effectAllowed = 'move'
-    // Slight delay so the ghost image renders before opacity change
-    setTimeout(() => {
-      const el = e.target as HTMLElement
-      el.style.opacity = '0.4'
-    }, 0)
+    setTimeout(() => { (e.target as HTMLElement).style.opacity = '0.4' }, 0)
   }
-
   function handleDragEnd(e: React.DragEvent) {
-    const el = e.target as HTMLElement
-    el.style.opacity = '1'
+    (e.target as HTMLElement).style.opacity = '1'
   }
 
   return (
@@ -38,18 +51,18 @@ export function LeadCard({ lead, onClick }: LeadCardProps) {
       onDragEnd={handleDragEnd}
       onClick={() => onClick?.(lead)}
     >
-      {/* Label colorida */}
-      <div className="mb-2.5 h-[2.5px] w-3/5 rounded-full" style={{ background: labelGradient }} />
+      {/* Colored top strip */}
+      <div className="mb-2.5 h-[3px] w-3/5 rounded-full" style={{ background: labelGradient }} />
 
-      {/* Nome da empresa */}
-      <p className="text-[12px] font-medium text-white/92 leading-tight">{lead.empresa}</p>
-      <p className="mt-0.5 mb-2.5 text-[10px] text-white/40">
+      {/* Company name */}
+      <p className="text-[12px] font-semibold leading-tight text-slate-800">{lead.empresa}</p>
+      <p className="mt-0.5 mb-2.5 text-[10px] text-slate-400">
         {lead.contato_nome} · {lead.contato_cargo}
       </p>
 
-      {/* Valor estimado */}
+      {/* Value */}
       {lead.valor_estimado && (
-        <p className="mb-2 text-[13px] font-medium" style={{ color: getColumnColor(lead.status) }}>
+        <p className="mb-2 text-[13px] font-semibold" style={{ color: valueColor }}>
           {formatCurrencyShort(lead.valor_estimado)}/mês
         </p>
       )}
@@ -62,52 +75,22 @@ export function LeadCard({ lead, onClick }: LeadCardProps) {
             {source.label}
           </span>
         )}
-        <span
-          className="score-badge ml-auto"
-          style={{ color: score.color, background: score.bg }}
-        >
+        <span className="score-badge ml-auto" style={{ color: score.color, background: score.bg }}>
           {lead.score_ia}
         </span>
       </div>
 
       {/* Footer */}
-      <div className="mt-2.5 flex items-center justify-between border-t pt-2"
-        style={{ borderColor: 'rgba(255,255,255,0.07)' }}>
-        <div className="flex items-center gap-2">
-          <span className="kicon flex items-center gap-1 text-[10px] text-white/30">
-            <Mail size={11} strokeWidth={1.5} />
-            {Math.floor(Math.random() * 8) + 1}
-          </span>
-          <span className="kicon flex items-center gap-1 text-[10px] text-white/30">
-            <Clock size={11} strokeWidth={1.5} />
-            {Math.floor(Math.random() * 5) + 1}d
-          </span>
-        </div>
-
-        {lead.responsavel_iniciais && (
-          <div
-            className="flex h-5 w-5 items-center justify-center rounded-full text-[9px] font-medium"
-            style={{
-              background: `${lead.responsavel_cor}33`,
-              color: lead.responsavel_cor,
-              border: `1.5px solid ${lead.responsavel_cor}44`,
-            }}
-          >
-            {lead.responsavel_iniciais}
-          </div>
-        )}
+      <div className="mt-2.5 flex items-center gap-2 border-t pt-2" style={{ borderColor: '#f1f5f9' }}>
+        <span className="flex items-center gap-1 text-[10px] text-slate-400">
+          <Mail size={11} strokeWidth={1.5} />
+          {Math.floor(Math.random() * 8) + 1}
+        </span>
+        <span className="flex items-center gap-1 text-[10px] text-slate-400">
+          <Clock size={11} strokeWidth={1.5} />
+          {Math.floor(Math.random() * 5) + 1}d
+        </span>
       </div>
     </div>
   )
-}
-
-function getColumnColor(status: string): string {
-  const map: Record<string, string> = {
-    novo:        '#818cf8',
-    contactado:  '#60a5fa',
-    proposta:    '#fbbf24',
-    negociando:  '#f472b6',
-    fechado:     '#34d399',
-  }
-  return map[status] ?? '#818cf8'
 }
