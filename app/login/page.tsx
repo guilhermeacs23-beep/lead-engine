@@ -31,7 +31,7 @@ export default function LoginPage() {
     <div
       className="relative flex min-h-screen items-center justify-center overflow-hidden"
       style={{
-        backgroundImage: 'url(/bg-login.jpg)',
+        backgroundImage: 'url(/bg-login.png)',
         backgroundSize: 'cover',
         backgroundPosition: 'center',
       }}
