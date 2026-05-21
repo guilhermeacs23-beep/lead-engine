@@ -10,6 +10,7 @@ interface KanbanColumnProps {
   title: string
   color: string
   fixed?: boolean
+  index?: number      // 0 = primeira coluna (sem recorte esquerdo)
   leads: Lead[]
   onAddLead?: (status: string) => void
   onLeadClick?: (lead: Lead) => void
@@ -18,13 +19,25 @@ interface KanbanColumnProps {
   onRename?: (id: string, title: string) => void
 }
 
+const NOTCH = 14  // profundidade da seta/recorte em px
+
 export function KanbanColumn({
-  id, title, color, fixed, leads, onAddLead, onLeadClick, onMoveCard, onDelete, onRename
+  id, title, color, fixed, index = 0, leads,
+  onAddLead, onLeadClick, onMoveCard, onDelete, onRename
 }: KanbanColumnProps) {
   const total = leads.reduce((sum, l) => sum + (l.valor_estimado ?? 0), 0)
   const [isDragOver, setIsDragOver] = useState(false)
-  const [editing, setEditing] = useState(false)
-  const [editTitle, setEditTitle] = useState(title)
+  const [editing, setEditing]       = useState(false)
+  const [editTitle, setEditTitle]   = useState(title)
+
+  // Primeira coluna: só seta à direita
+  // Demais: recorte à esquerda + seta à direita (breadcrumb)
+  const clipPath = index === 0
+    ? `polygon(0 0, calc(100% - ${NOTCH}px) 0, 100% 50%, calc(100% - ${NOTCH}px) 100%, 0 100%)`
+    : `polygon(${NOTCH}px 0, calc(100% - ${NOTCH}px) 0, 100% 50%, calc(100% - ${NOTCH}px) 100%, ${NOTCH}px 100%, 0 50%)`
+
+  const paddingLeft  = index === 0 ? 12 : NOTCH + 10
+  const paddingRight = NOTCH + 10
 
   function handleDragOver(e: React.DragEvent) {
     e.preventDefault()
@@ -48,17 +61,18 @@ export function KanbanColumn({
   return (
     <div className="flex w-[220px] flex-shrink-0 flex-col">
 
-      {/* ── Header ÚNICO em seta — título + valor numa peça só ── */}
+      {/* ── Header breadcrumb: peça única, encaixa com a do lado ── */}
       <div
         style={{
           background: color,
-          /* seta apontando direita, encaixada ao corpo abaixo */
-          clipPath: 'polygon(0 0, calc(100% - 16px) 0, 100% 50%, calc(100% - 16px) 100%, 0 100%)',
-          padding: '8px 28px 10px 12px',
-          marginBottom: 0,
+          clipPath,
+          paddingTop: 8,
+          paddingBottom: 10,
+          paddingLeft,
+          paddingRight,
         }}
       >
-        {/* Linha do título */}
+        {/* Título */}
         <div className="flex items-center justify-between gap-1">
           {editing ? (
             <input
@@ -110,18 +124,18 @@ export function KanbanColumn({
           </div>
         </div>
 
-        {/* Valor monetário — dentro do mesmo bloco */}
+        {/* Valor monetário — maior, centralizado, sem negrito */}
         <p
           className="mt-2 text-center"
-          style={{ fontSize: '16px', fontWeight: 400, color: 'rgba(255,255,255,0.95)', letterSpacing: '-0.2px' }}
+          style={{ fontSize: '20px', fontWeight: 400, color: 'rgba(255,255,255,0.95)', letterSpacing: '-0.3px' }}
         >
           {total > 0
             ? `${formatCurrencyShort(total)}/mês`
-            : <span style={{ opacity: 0.4 }}>—</span>}
+            : <span style={{ opacity: 0.4, fontSize: 14 }}>—</span>}
         </p>
       </div>
 
-      {/* ── Cards / drop zone — conectado direto ao header ── */}
+      {/* ── Cards / drop zone ── */}
       <div
         className="kanban-col-body flex-1 overflow-y-auto transition-all duration-150"
         style={{
