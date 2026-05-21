@@ -130,4 +130,11 @@ export function Sidebar() {
         </div>
         {expanded && (
           <div className="min-w-0 flex-1">
-            <p className="truncate text-xs font-medium text-white
+            <p className="truncate text-xs font-medium text-white/80">Guilherme</p>
+            <p className="truncate text-[10px] text-white/40">Admin</p>
+          </div>
+        )}
+      </div>
+    </aside>
+  )
+}
