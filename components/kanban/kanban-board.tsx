@@ -3,7 +3,7 @@ import React, { useState, useEffect, useCallback } from 'react'
 import { Lead } from '@/types'
 import { KanbanColumn } from './kanban-column'
 import { fetchLeadsByStatus, updateLeadStatus } from '@/lib/supabase'
-import { useUIStore, COLUMN_COLOR_OPTIONS } from '@/store/ui-store'
+import { useUIStore, GRADIENT_PRESETS } from '@/store/ui-store'
 import { Kanban, List, Calendar, Map, Filter, Sparkles, Loader2, Plus, X } from 'lucide-react'
 
 const VIEW_TABS = [
@@ -18,11 +18,11 @@ export function KanbanBoard() {
   const [view,    setView]    = useState('kanban')
   const [loading, setLoading] = useState(true)
 
-  const { columns, addColumn, removeColumn, renameColumn } = useUIStore()
+  const { columns, addColumn, removeColumn, renameColumn, changeColumnColor } = useUIStore()
 
   const [adding,   setAdding]   = useState(false)
   const [newTitle, setNewTitle] = useState('')
-  const [newColor, setNewColor] = useState(COLUMN_COLOR_OPTIONS[4])
+  const [newColor, setNewColor] = useState(GRADIENT_PRESETS[0])
 
   const load = useCallback(async () => {
     setLoading(true)
@@ -47,7 +47,7 @@ export function KanbanBoard() {
     const id = newTitle.toLowerCase().replace(/\s+/g, '_').replace(/[^a-z0-9_]/g, '')
     addColumn({ id, title: newTitle.trim(), color: newColor })
     setNewTitle('')
-    setNewColor(COLUMN_COLOR_OPTIONS[4])
+    setNewColor(GRADIENT_PRESETS[0])
     setAdding(false)
   }
 
@@ -106,7 +106,7 @@ export function KanbanBoard() {
           <Loader2 size={18} className="animate-spin" />Carregando pipeline…
         </div>
       ) : (
-        <div className="flex flex-1 gap-0.5 overflow-x-auto overflow-y-hidden p-4 items-start">
+        <div className="flex flex-1 gap-3 overflow-x-auto overflow-y-hidden p-4 items-start">
           {columns.map((col, idx) => (
             <KanbanColumn
               key={col.id}
@@ -119,10 +119,11 @@ export function KanbanBoard() {
               onMoveCard={handleMoveCard}
               onDelete={handleDeleteColumn}
               onRename={renameColumn}
+              onColorChange={changeColumnColor}
             />
           ))}
 
-          {/* Add column button / form */}
+          {/* Nova etapa */}
           {!adding ? (
             <button
               onClick={() => setAdding(true)}
@@ -134,7 +135,7 @@ export function KanbanBoard() {
             </button>
           ) : (
             <div
-              className="flex w-[210px] flex-shrink-0 flex-col gap-3 rounded-xl p-3"
+              className="flex w-[220px] flex-shrink-0 flex-col gap-3 rounded-xl p-3"
               style={{ background: 'rgba(255,255,255,0.07)', border: '0.5px solid rgba(255,255,255,0.15)', alignSelf: 'flex-start' }}
             >
               <div className="flex items-center justify-between">
@@ -154,16 +155,20 @@ export function KanbanBoard() {
                 style={{ background: 'rgba(255,255,255,0.08)', border: '0.5px solid rgba(255,255,255,0.15)' }}
               />
 
-              <div className="flex flex-wrap gap-1.5">
-                {COLUMN_COLOR_OPTIONS.map(c => (
+              {/* Seletor de gradiente */}
+              <div className="grid grid-cols-6 gap-1.5">
+                {GRADIENT_PRESETS.map(g => (
                   <button
-                    key={c}
-                    onClick={() => setNewColor(c)}
-                    className="h-5 w-5 rounded-full transition-all"
+                    key={g}
+                    onClick={() => setNewColor(g)}
                     style={{
-                      background: c,
-                      outline: newColor === c ? '2px solid white' : '2px solid transparent',
-                      outlineOffset: '1px',
+                      height: 24,
+                      borderRadius: 5,
+                      background: g,
+                      outline: newColor === g ? '2px solid white' : '2px solid transparent',
+                      outlineOffset: 1,
+                      transform: newColor === g ? 'scale(1.12)' : 'scale(1)',
+                      transition: 'all 0.1s',
                     }}
                   />
                 ))}
