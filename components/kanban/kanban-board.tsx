@@ -108,14 +108,15 @@ export function KanbanBoard() {
           <Loader2 size={18} className="animate-spin" />Carregando pipeline…
         </div>
       ) : (
-        <div className="flex flex-1 gap-3.5 overflow-x-auto overflow-y-hidden p-4 items-start">
-          {columns.map((col) => (
+        <div className="flex flex-1 gap-0.5 overflow-x-auto overflow-y-hidden p-4 items-start">
+          {columns.map((col, idx) => (
             <KanbanColumn
               key={col.id}
               id={col.id}
               title={col.title}
               color={col.color}
               fixed={col.fixed}
+              index={idx}
               leads={getLeadsByStatus(col.id)}
               onMoveCard={handleMoveCard}
               onDelete={handleDeleteColumn}
@@ -181,8 +182,4 @@ export function KanbanBoard() {
               </button>
             </div>
           )}
-        </div>
-      )}
-    </div>
-  )
-}
+        </
