@@ -3,8 +3,8 @@ import React, { useState, useRef, useEffect } from 'react'
 import { Lead } from '@/types'
 import { LeadCard } from './lead-card'
 import { formatCurrencyShort } from '@/lib/utils'
-import { Plus, Trash2, Pencil, Check, X, Palette } from 'lucide-react'
-import { GRADIENT_PRESETS } from '@/store/ui-store'
+import { Plus, Trash2, Pencil, Check, X } from 'lucide-react'
+import { COLOR_PALETTE } from '@/store/ui-store'
 
 interface KanbanColumnProps {
   id: string
@@ -21,18 +21,11 @@ interface KanbanColumnProps {
   onColorChange?: (id: string, color: string) => void
 }
 
-/** Extrai o primeiro hex do CSS background (gradient ou solid) */
-function firstColor(bg: string): string {
-  const m = bg.match(/#[0-9a-fA-F]{3,6}/)
-  return m ? m[0] : '#6366f1'
-}
-
 export function KanbanColumn({
   id, title, color, fixed, index = 0, leads,
   onAddLead, onLeadClick, onMoveCard, onDelete, onRename, onColorChange
 }: KanbanColumnProps) {
   const total = leads.reduce((sum, l) => sum + (l.valor_estimado ?? 0), 0)
-  const solid = firstColor(color)
 
   const [isDragOver, setIsDragOver] = useState(false)
   const [editOpen,   setEditOpen]   = useState(false)
@@ -40,35 +33,35 @@ export function KanbanColumn({
   const [editColor,  setEditColor]  = useState(color)
   const panelRef = useRef<HTMLDivElement>(null)
 
-  // Fecha painel ao clicar fora
   useEffect(() => {
     if (!editOpen) return
     function handler(e: MouseEvent) {
-      if (panelRef.current && !panelRef.current.contains(e.target as Node)) {
-        setEditOpen(false)
-      }
+      if (panelRef.current && !panelRef.current.contains(e.target as Node)) setEditOpen(false)
     }
     document.addEventListener('mousedown', handler)
     return () => document.removeEventListener('mousedown', handler)
   }, [editOpen])
 
+  function openEdit() {
+    setEditTitle(title)
+    setEditColor(color)
+    setEditOpen(true)
+  }
+
   function handleSave() {
     if (editTitle.trim()) onRename?.(id, editTitle.trim())
-    if (editColor !== color) onColorChange?.(id, editColor)
+    onColorChange?.(id, editColor)   // sempre aplica — sem comparação que pode falhar
     setEditOpen(false)
   }
 
   function handleDragOver(e: React.DragEvent) {
-    e.preventDefault()
-    e.dataTransfer.dropEffect = 'move'
-    setIsDragOver(true)
+    e.preventDefault(); e.dataTransfer.dropEffect = 'move'; setIsDragOver(true)
   }
   function handleDragLeave(e: React.DragEvent) {
     if (!e.currentTarget.contains(e.relatedTarget as Node)) setIsDragOver(false)
   }
   function handleDrop(e: React.DragEvent) {
-    e.preventDefault()
-    setIsDragOver(false)
+    e.preventDefault(); setIsDragOver(false)
     const leadId = e.dataTransfer.getData('leadId')
     if (leadId) onMoveCard?.(leadId, id)
   }
@@ -76,147 +69,146 @@ export function KanbanColumn({
   return (
     <div className="flex w-[220px] flex-shrink-0 flex-col gap-2">
 
-      {/* ── Wrapper único: header colorido + cards ── */}
+      {/* ── Wrapper único com overflow hidden — tudo compartilha os cantos ── */}
       <div
         style={{
           borderRadius: 12,
-          overflow: 'hidden',
-          border: isDragOver ? `2px dashed ${solid}` : '1px solid rgba(255,255,255,0.09)',
+          overflow: 'visible',   // permite painel flutuar fora
+          border: isDragOver ? `2px dashed ${color}` : '1px solid rgba(255,255,255,0.09)',
           transition: 'border 0.15s',
+          position: 'relative',
         }}
       >
-        {/* Header colorido alto — título DENTRO da cor */}
-        <div style={{ background: color, position: 'relative' }}>
-          <div style={{ padding: '14px 12px 12px' }}>
-            {/* Linha título + ações */}
-            <div className="flex items-center justify-between gap-1.5">
-              <span className="flex-1 truncate text-[12px] font-bold text-white uppercase tracking-wide drop-shadow-sm">
-                {title}
+        {/* Header colorido com título dentro */}
+        <div
+          style={{
+            background: color,
+            borderRadius: '11px 11px 0 0',
+            padding: '14px 12px 14px',
+          }}
+        >
+          {/* Título + ícones */}
+          <div className="flex items-center justify-between gap-1.5">
+            <span className="flex-1 truncate text-[12px] font-bold text-white uppercase tracking-wide">
+              {title}
+            </span>
+            <div className="flex items-center gap-1 flex-shrink-0">
+              <span className="rounded-full px-1.5 py-0.5 text-[10px] font-bold text-white"
+                style={{ background: 'rgba(0,0,0,0.25)' }}>
+                {leads.length}
               </span>
-              <div className="flex items-center gap-1 flex-shrink-0">
-                <span
-                  className="rounded-full px-1.5 py-0.5 text-[10px] font-bold text-white"
-                  style={{ background: 'rgba(0,0,0,0.22)' }}
-                >
-                  {leads.length}
-                </span>
-                {!fixed && (
-                  <button
-                    onClick={() => { setEditTitle(title); setEditColor(color); setEditOpen(v => !v) }}
-                    className="rounded p-0.5 text-white/60 hover:bg-white/20 hover:text-white transition-all"
-                    title="Editar etapa"
-                  >
-                    <Pencil size={11} strokeWidth={2} />
-                  </button>
-                )}
-                {!fixed && (
-                  <button
-                    onClick={() => onDelete?.(id)}
-                    className="rounded p-0.5 text-white/60 hover:bg-white/20 hover:text-red-300 transition-all"
-                    title="Excluir etapa"
-                  >
-                    <Trash2 size={11} strokeWidth={2} />
-                  </button>
-                )}
-              </div>
+              {!fixed && (
+                <button onClick={openEdit}
+                  className="rounded p-0.5 text-white/60 hover:bg-white/20 hover:text-white transition-all"
+                  title="Editar cor / nome">
+                  <Pencil size={11} strokeWidth={2} />
+                </button>
+              )}
+              {!fixed && (
+                <button onClick={() => onDelete?.(id)}
+                  className="rounded p-0.5 text-white/60 hover:bg-white/20 hover:text-red-200 transition-all"
+                  title="Excluir etapa">
+                  <Trash2 size={11} strokeWidth={2} />
+                </button>
+              )}
             </div>
-
-            {/* Valor monetário — branco, sem fundo extra */}
-            <p
-              className="mt-2"
-              style={{
-                fontSize: 20,
-                fontWeight: 300,
-                color: 'rgba(255,255,255,0.95)',
-                letterSpacing: '-0.4px',
-                textShadow: '0 1px 4px rgba(0,0,0,0.2)',
-              }}
-            >
-              {total > 0
-                ? `${formatCurrencyShort(total)}/mês`
-                : <span style={{ opacity: 0.4, fontSize: 14 }}>—</span>}
-            </p>
           </div>
 
-          {/* Painel de edição — abre abaixo do header, dentro do colored bg */}
-          {editOpen && (
-            <div
-              ref={panelRef}
-              style={{
-                position: 'absolute',
-                top: '100%',
-                left: 0,
-                right: 0,
-                zIndex: 50,
-                background: 'rgba(15,15,35,0.97)',
-                backdropFilter: 'blur(16px)',
-                border: '1px solid rgba(255,255,255,0.12)',
-                borderRadius: '0 0 10px 10px',
-                padding: 12,
-                boxShadow: '0 12px 40px rgba(0,0,0,0.5)',
-              }}
-            >
-              {/* Input de nome */}
-              <p className="mb-1.5 text-[10px] font-medium text-white/50 uppercase tracking-wide">Nome</p>
-              <input
-                autoFocus
-                value={editTitle}
-                onChange={e => setEditTitle(e.target.value)}
-                onKeyDown={e => { if (e.key === 'Enter') handleSave() }}
-                className="w-full rounded-lg px-3 py-2 text-sm text-white outline-none mb-3"
-                style={{ background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.15)' }}
-              />
-
-              {/* Paleta de gradientes */}
-              <p className="mb-2 text-[10px] font-medium text-white/50 uppercase tracking-wide flex items-center gap-1">
-                <Palette size={10} />Cor / Gradiente
-              </p>
-              <div className="grid grid-cols-6 gap-1.5 mb-3">
-                {GRADIENT_PRESETS.map((g) => (
-                  <button
-                    key={g}
-                    onClick={() => setEditColor(g)}
-                    title={g}
-                    style={{
-                      height: 28,
-                      borderRadius: 6,
-                      background: g,
-                      outline: editColor === g ? '2px solid white' : '2px solid transparent',
-                      outlineOffset: 1,
-                      transition: 'outline 0.1s, transform 0.1s',
-                      transform: editColor === g ? 'scale(1.1)' : 'scale(1)',
-                    }}
-                  />
-                ))}
-              </div>
-
-              {/* Botões */}
-              <div className="flex gap-2">
-                <button
-                  onClick={handleSave}
-                  className="flex-1 flex items-center justify-center gap-1.5 rounded-lg py-2 text-xs font-semibold text-white transition-all hover:opacity-90"
-                  style={{ background: editColor }}
-                >
-                  <Check size={12} strokeWidth={2.5} />
-                  Salvar
-                </button>
-                <button
-                  onClick={() => setEditOpen(false)}
-                  className="rounded-lg px-3 py-2 text-xs text-white/50 hover:bg-white/10 transition-all"
-                >
-                  <X size={12} strokeWidth={2} />
-                </button>
-              </div>
-            </div>
-          )}
+          {/* Valor — branco puro, centralizado, sem herdar cor */}
+          <p style={{
+            marginTop: 10,
+            fontSize: 20,
+            fontWeight: 300,
+            color: '#ffffff',
+            textAlign: 'center',
+            letterSpacing: '-0.4px',
+            textShadow: '0 1px 6px rgba(0,0,0,0.3)',
+          }}>
+            {total > 0
+              ? `${formatCurrencyShort(total)}/mês`
+              : <span style={{ opacity: 0.35, fontSize: 14 }}>—</span>}
+          </p>
         </div>
+
+        {/* Painel de edição flutuante */}
+        {editOpen && (
+          <div ref={panelRef} style={{
+            position: 'absolute',
+            top: '100%',
+            left: 0,
+            right: 0,
+            zIndex: 100,
+            marginTop: 4,
+            background: 'rgba(15,12,40,0.98)',
+            backdropFilter: 'blur(20px)',
+            border: '1px solid rgba(255,255,255,0.14)',
+            borderRadius: 10,
+            padding: 14,
+            boxShadow: '0 16px 48px rgba(0,0,0,0.6)',
+          }}>
+            {/* Nome */}
+            <p className="mb-1 text-[10px] font-semibold text-white/40 uppercase tracking-wider">Nome da etapa</p>
+            <input
+              autoFocus
+              value={editTitle}
+              onChange={e => setEditTitle(e.target.value)}
+              onKeyDown={e => { if (e.key === 'Enter') handleSave() }}
+              className="w-full rounded-lg px-3 py-2 text-sm text-white outline-none mb-3"
+              style={{ background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.14)' }}
+            />
+
+            {/* Paleta de cores sólidas */}
+            <p className="mb-2 text-[10px] font-semibold text-white/40 uppercase tracking-wider">Cor da coluna</p>
+            <div className="grid grid-cols-6 gap-2 mb-4">
+              {COLOR_PALETTE.map((c) => (
+                <button
+                  key={c}
+                  onClick={() => setEditColor(c)}
+                  title={c}
+                  style={{
+                    width: 28,
+                    height: 28,
+                    borderRadius: '50%',
+                    background: c,
+                    outline: editColor === c ? `3px solid ${c}` : '2px solid transparent',
+                    outlineOffset: 2,
+                    transform: editColor === c ? 'scale(1.2)' : 'scale(1)',
+                    transition: 'all 0.12s ease',
+                    boxShadow: editColor === c ? `0 0 10px ${c}88` : 'none',
+                  }}
+                />
+              ))}
+            </div>
+
+            {/* Preview da cor selecionada */}
+            <div className="mb-3 flex items-center gap-2 rounded-lg px-3 py-2"
+              style={{ background: editColor + '22', border: `1px solid ${editColor}44` }}>
+              <div style={{ width: 16, height: 16, borderRadius: 4, background: editColor, flexShrink: 0 }} />
+              <span className="text-xs text-white/70 font-mono">{editColor}</span>
+            </div>
+
+            {/* Botões */}
+            <div className="flex gap-2">
+              <button onClick={handleSave}
+                className="flex-1 flex items-center justify-center gap-1.5 rounded-lg py-2 text-xs font-semibold text-white"
+                style={{ background: editColor, boxShadow: `0 4px 14px ${editColor}55` }}>
+                <Check size={12} strokeWidth={2.5} /> Salvar
+              </button>
+              <button onClick={() => setEditOpen(false)}
+                className="rounded-lg px-3 py-2 text-xs text-white/40 hover:bg-white/10 transition-all">
+                <X size={12} strokeWidth={2} />
+              </button>
+            </div>
+          </div>
+        )}
 
         {/* Cards */}
         <div
           className="flex flex-col gap-2 overflow-y-auto p-2"
           style={{
             minHeight: 60,
-            background: isDragOver ? `${solid}12` : 'rgba(255,255,255,0.03)',
+            borderRadius: '0 0 11px 11px',
+            background: isDragOver ? `${color}15` : 'rgba(255,255,255,0.03)',
             transition: 'background 0.15s',
           }}
           onDragOver={handleDragOver}
@@ -230,13 +222,10 @@ export function KanbanColumn({
       </div>
 
       {/* Adicionar lead */}
-      <button
-        onClick={() => onAddLead?.(id)}
+      <button onClick={() => onAddLead?.(id)}
         className="flex items-center gap-1.5 rounded-lg px-2.5 py-2 text-[11px] text-white/50 transition-all hover:bg-white/[0.07] hover:text-white/80"
-        style={{ border: '0.5px dashed rgba(255,255,255,0.15)' }}
-      >
-        <Plus size={12} strokeWidth={2} />
-        Adicionar lead
+        style={{ border: '0.5px dashed rgba(255,255,255,0.15)' }}>
+        <Plus size={12} strokeWidth={2} /> Adicionar lead
       </button>
     </div>
   )
