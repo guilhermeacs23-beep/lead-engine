@@ -22,22 +22,8 @@ export async function middleware(req: NextRequest) {
     }
   )
 
-  const { data: { session } } = await supabase.auth.getSession()
-
-  const isAuthPage = req.nextUrl.pathname.startsWith('/login') ||
-                     req.nextUrl.pathname.startsWith('/cadastro')
-
-  // Sem sessão tentando acessar área protegida → login
-  if (!session && !isAuthPage) {
-    const loginUrl = new URL('/login', req.url)
-    return NextResponse.redirect(loginUrl)
-  }
-
-  // Com sessão tentando acessar login/cadastro → dashboard
-  if (session && isAuthPage) {
-    const dashboardUrl = new URL('/dashboard', req.url)
-    return NextResponse.redirect(dashboardUrl)
-  }
+  // Apenas atualiza a sessão nos cookies (refresh token se necessário)
+  await supabase.auth.getUser()
 
   return res
 }
