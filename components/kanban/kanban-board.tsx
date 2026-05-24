@@ -8,6 +8,7 @@ import { formatCurrencyShort } from '@/lib/utils'
 import { getScoreColor } from '@/lib/utils'
 import { SOURCE_LABELS, SEGMENT_LABELS } from '@/lib/mock-data'
 import { Kanban, List, Calendar, Map, Filter, Sparkles, Loader2, Plus, X, ChevronUp, ChevronDown } from 'lucide-react'
+import { LeadDrawer } from '@/components/ui/lead-drawer'
 
 const VIEW_TABS = [
   { id: 'kanban',     label: 'Kanban',     Icon: Kanban   },
@@ -38,6 +39,8 @@ export function KanbanBoard() {
 
   const { columns, addColumn, removeColumn, renameColumn, changeColumnColor } = useUIStore()
 
+  const [selectedLead, setSelectedLead] = useState<Lead | null>(null)
+
   const [adding,   setAdding]   = useState(false)
   const [newTitle, setNewTitle] = useState('')
   const [newColor, setNewColor] = useState(GRADIENT_PRESETS[0])
@@ -58,6 +61,11 @@ export function KanbanBoard() {
   async function handleMoveCard(leadId: string, newStatus: string) {
     setLeads(prev => prev.map(l => l.id === leadId ? { ...l, status: newStatus as any } : l))
     await updateLeadStatus(leadId, newStatus)
+  }
+
+  function handleDrawerStageChange(leadId: string, newStatus: string) {
+    setLeads(prev => prev.map(l => l.id === leadId ? { ...l, status: newStatus as any } : l))
+    setSelectedLead(prev => prev?.id === leadId ? { ...prev, status: newStatus as any } : prev)
   }
 
   function handleAddColumn() {
@@ -165,6 +173,7 @@ export function KanbanBoard() {
               onDelete={handleDeleteColumn}
               onRename={renameColumn}
               onColorChange={changeColumnColor}
+              onLeadClick={setSelectedLead}
             />
           ))}
 
@@ -271,7 +280,8 @@ export function KanbanBoard() {
                 return (
                   <div
                     key={lead.id}
-                    className="grid items-center px-4 py-3.5 text-sm transition-all hover:bg-white/[0.04]"
+                    onClick={() => setSelectedLead(lead)}
+                    className="grid cursor-pointer items-center px-4 py-3.5 text-sm transition-all hover:bg-white/[0.06]"
                     style={{
                       gridTemplateColumns: '2fr 1.2fr 1fr 0.8fr 0.7fr 0.7fr',
                       borderBottom: '0.5px solid rgba(255,255,255,0.06)',
@@ -339,17 +349,4 @@ export function KanbanBoard() {
         /* ── CALENDÁRIO / MAPA (placeholder) ── */
         <div className="flex flex-1 items-center justify-center flex-col gap-3">
           <div className="rounded-2xl p-5"
-            style={{ background: 'rgba(99,102,241,0.10)', border: '0.5px solid rgba(99,102,241,0.25)' }}>
-            {view === 'calendario'
-              ? <Calendar size={32} strokeWidth={1.2} className="text-indigo-300" />
-              : <Map size={32} strokeWidth={1.2} className="text-indigo-300" />}
-          </div>
-          <p className="text-[15px] font-semibold text-white">
-            {view === 'calendario' ? 'Calendário de atividades' : 'Mapa logístico'}
-          </p>
-          <p className="text-sm text-white/50">Em desenvolvimento</p>
-        </div>
-      )}
-    </div>
-  )
-}
+            style={{ background: 'rgba(99,102,241,0.10)', border: '0.5px solid rgba(99,
