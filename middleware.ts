@@ -2,20 +2,6 @@ import { createServerClient } from '@supabase/ssr'
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 
-// Rotas protegidas (requerem autenticação)
-const PROTECTED = [
-  '/dashboard',
-  '/pipeline',
-  '/leads',
-  '/relatorios',
-  '/mapa',
-  '/automacoes',
-  '/configuracoes',
-]
-
-// Rotas públicas (redireciona para /dashboard se já autenticado)
-const AUTH_ROUTES = ['/login', '/cadastro']
-
 export async function middleware(req: NextRequest) {
   const res = NextResponse.next({
     request: { headers: req.headers },
@@ -36,25 +22,26 @@ export async function middleware(req: NextRequest) {
     }
   )
 
-  const { data: { user } } = await supabase.auth.getUser()
-  const pathname = req.nextUrl.pathname
+  // Atualiza a sessão nos cookies (refresh token se necessário)
+  const { data: { session } } = await supabase.auth.getSession()
 
-  const isProtected  = PROTECTED.some(p => pathname.startsWith(p))
-  const isAuthRoute  = AUTH_ROUTES.some(p => pathname.startsWith(p))
-  const isRoot       = pathname === '/'
+  const pathname    = req.nextUrl.pathname
+  const isProtected = [
+    '/dashboard', '/pipeline', '/leads', '/relatorios',
+    '/mapa', '/automacoes', '/configuracoes',
+  ].some(p => pathname.startsWith(p))
 
-  // Não autenticado tentando acessar rota protegida → /login
-  if (!user && isProtected) {
+  // Redireciona / para dashboard ou login
+  if (pathname === '/') {
     const url = req.nextUrl.clone()
-    url.pathname = '/login'
-    url.searchParams.set('next', pathname)
+    url.pathname = session ? '/dashboard' : '/login'
     return NextResponse.redirect(url)
   }
 
-  // Já autenticado tentando acessar /login, /cadastro ou / → /dashboard
-  if (user && (isAuthRoute || isRoot)) {
+  // Rota protegida sem sessão → login
+  if (!session && isProtected) {
     const url = req.nextUrl.clone()
-    url.pathname = '/dashboard'
+    url.pathname = '/login'
     return NextResponse.redirect(url)
   }
 
