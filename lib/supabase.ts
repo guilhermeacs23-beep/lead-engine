@@ -152,39 +152,38 @@ export async function fetchActivitiesStats() {
   return { total: data.length, por_tipo }
 }
 
-// ── Tipos do banco
-export type Database = {
-  public: {
-    Tables: {
-      leads: {
-        Row: {
-          id: string
-          empresa: string
-          contato_nome: string
-          contato_cargo: string
-          telefone: string | null
-          email: string | null
-          cidade: string
-          estado: string
-          segmento: string
-          cnae: string | null
-          website: string | null
-          score_ia: number
-          observacoes: string | null
-          status: string
-          fonte: string
-          valor_estimado: number | null
-          responsavel_id: string | null
-          ia_resumo: string | null
-          ia_abordagem: string | null
-          ia_produtos: string | null
-          tenant_id: string
-          created_at: string
-          updated_at: string
-        }
-        Insert: Omit<Database['public']['Tables']['leads']['Row'], 'id' | 'created_at' | 'updated_at'>
-        Update: Partial<Database['public']['Tables']['leads']['Insert']>
-      }
-    }
-  }
+// ── Atividades ────────────────────────────────────────────────
+
+export interface Activity {
+  id: string
+  lead_id: string
+  tenant_id: string
+  autor_id: string | null
+  autor_nome?: string | null
+  tipo: 'nota' | 'ligacao' | 'email' | 'reuniao' | 'proposta' | 'status'
+  descricao: string
+  created_at: string
 }
+
+export async function fetchActivities(leadId: string): Promise<Activity[]> {
+  const { data, error } = await supabase
+    .from('atividades')
+    .select('*, profiles(nome)')
+    .eq('lead_id', leadId)
+    .order('created_at', { ascending: false })
+
+  if (error) { console.error('fetchActivities:', error); return [] }
+
+  return (data ?? []).map((a: any) => ({
+    ...a,
+    autor_nome: a.profiles?.nome ?? null,
+  }))
+}
+
+export async function addActivity(
+  leadId: string,
+  tipo: Activity['tipo'],
+  descricao: string,
+  autorId?: string,
+): Promise<boolean> {
+  const { error } = await supabase
