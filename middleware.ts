@@ -22,26 +22,13 @@ export async function middleware(req: NextRequest) {
     }
   )
 
-  // Atualiza a sessão nos cookies (refresh token se necessário)
-  const { data: { session } } = await supabase.auth.getSession()
+  // Atualiza/renova a sessão nos cookies
+  await supabase.auth.getSession()
 
-  const pathname    = req.nextUrl.pathname
-  const isProtected = [
-    '/dashboard', '/pipeline', '/leads', '/relatorios',
-    '/mapa', '/automacoes', '/configuracoes',
-  ].some(p => pathname.startsWith(p))
-
-  // Redireciona / para dashboard ou login
-  if (pathname === '/') {
+  // Redireciona raiz para dashboard
+  if (req.nextUrl.pathname === '/') {
     const url = req.nextUrl.clone()
-    url.pathname = session ? '/dashboard' : '/login'
-    return NextResponse.redirect(url)
-  }
-
-  // Rota protegida sem sessão → login
-  if (!session && isProtected) {
-    const url = req.nextUrl.clone()
-    url.pathname = '/login'
+    url.pathname = '/dashboard'
     return NextResponse.redirect(url)
   }
 
