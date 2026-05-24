@@ -412,3 +412,32 @@ export async function fetchNotifications(): Promise<{ items: Notification[]; tot
 
   return { items, total: items.length }
 }
+
+// ── Calendário ────────────────────────────────────────────────
+
+export async function fetchCalendarActivities(year: number, month: number) {
+  const start = new Date(year, month, 1).toISOString()
+  const end   = new Date(year, month + 1, 0, 23, 59, 59).toISOString()
+
+  const { data, error } = await supabase
+    .from('atividades')
+    .select('*, leads(empresa, contato_nome)')
+    .eq('tenant_id', TENANT_ID)
+    .gte('created_at', start)
+    .lte('created_at', end)
+    .order('created_at')
+
+  if (error) { console.error('fetchCalendarActivities:', error); return [] }
+
+  return (data ?? []).map((a: any) => ({
+    id:         a.id,
+    lead_id:    a.lead_id,
+    tipo:       a.tipo,
+    descricao:  a.descricao,
+    empresa:    a.leads?.empresa    ?? 'Lead',
+    contato:    a.leads?.contato_nome ?? '',
+    created_at: a.created_at,
+    dia:        a.created_at.slice(8, 10),   // "DD"
+    dataKey:    a.created_at.slice(0, 10),   // "YYYY-MM-DD"
+  }))
+}
