@@ -205,3 +205,210 @@ export async function addActivity(
   if (error) { console.error('addActivity:', error); return false }
   return true
 }
+
+// ── Criar lead manualmente ────────────────────────────────────
+
+export async function createLead(data: {
+  empresa: string
+  contato_nome: string
+  contato_cargo: string
+  telefone?: string
+  email?: string
+  cidade: string
+  estado: string
+  segmento: string
+  fonte: string
+  valor_estimado?: number
+  website?: string
+  status?: string
+}): Promise<boolean> {
+  const { error } = await supabase
+    .from('leads')
+    .insert({
+      ...data,
+      tenant_id:  TENANT_ID,
+      status:     data.status ?? 'novo',
+      score_ia:   70,
+    })
+  if (error) { console.error('createLead:', error); return false }
+  return true
+}
+
+// ── Busca global ──────────────────────────────────────────────
+
+export async function searchLeads(query: string) {
+  if (!query.trim()) return []
+  const { data, error } = await supabase
+    .from('leads')
+    .select('id, empresa, contato_nome, cidade, estado, status, score_ia, valor_estimado')
+    .eq('tenant_id', TENANT_ID)
+    .or(`empresa.ilike.%${query}%,contato_nome.ilike.%${query}%,cidade.ilike.%${query}%`)
+    .limit(8)
+  if (error) { console.error('searchLeads:', error); return [] }
+  return data ?? []
+}
+
+// ── Perfis da equipe ─────────────────────────────────────────
+
+export async function fetchProfiles() {
+  const { data, error } = await supabase
+    .from('profiles')
+    .select('*')
+    .eq('tenant_id', TENANT_ID)
+    .order('created_at')
+  if (error) { console.error('fetchProfiles:', error); return [] }
+  return data ?? []
+}
+
+export async function updateProfile(id: string, fields: { nome?: string; cor?: string }) {
+  const { error } = await supabase.from('profiles').update(fields).eq('id', id)
+  return !error
+}
+
+// ── Dados para Relatórios ─────────────────────────────────────
+
+const SEG_COLORS: Record<string, string> = {
+  agronegocio:  '#34d399',
+  varejo:       '#60a5fa',
+  industria:    '#818cf8',
+  farmaceutico: '#f472b6',
+  moda:         '#fbbf24',
+  construcao:   '#f97316',
+  alimentos:    '#a78bfa',
+  logistica:    '#0ea5e9',
+  tecnologia:   '#94a3b8',
+}
+
+const SRC_COLORS: Record<string, string> = {
+  linkedin:  '#0ea5e9',
+  google:    '#34d399',
+  cnpj:      '#f59e0b',
+  indicacao: '#a78bfa',
+  apollo:    '#f472b6',
+}
+
+const MES_LABELS = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez']
+
+export async function fetchReportData() {
+  const { data, error } = await supabase
+    .from('leads')
+    .select('*')
+    .eq('tenant_id', TENANT_ID)
+
+  if (error || !data) return null
+
+  // Monthly trend (last 5 months)
+  const now = new Date()
+  const months = Array.from({ length: 5 }, (_, i) => {
+    const d = new Date(now.getFullYear(), now.getMonth() - (4 - i), 1)
+    return {
+      key: `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`,
+      mes: MES_LABELS[d.getMonth()],
+      pipeline: 0, fechado: 0, leads: 0,
+    }
+  })
+
+  data.forEach(l => {
+    const d = new Date(l.created_at)
+    const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`
+    const m = months.find(x => x.key === key)
+    if (m) {
+      m.leads++
+      m.pipeline += l.valor_estimado ?? 0
+      if (l.status === 'fechado') m.fechado += l.valor_estimado ?? 0
+    }
+  })
+
+  // Segment breakdown
+  const segMap: Record<string, number> = {}
+  data.forEach(l => { segMap[l.segmento] = (segMap[l.segmento] ?? 0) + 1 })
+  const total = data.length || 1
+  const segmentos = Object.entries(segMap)
+    .sort((a, b) => b[1] - a[1]).slice(0, 6)
+    .map(([seg, n]) => ({
+      label: seg,
+      pct:   Math.round((n / total) * 100),
+      color: SEG_COLORS[seg] ?? '#94a3b8',
+    }))
+
+  // Source breakdown
+  const srcMap: Record<string, number> = {}
+  data.forEach(l => { srcMap[l.fonte] = (srcMap[l.fonte] ?? 0) + 1 })
+  const fontes = Object.entries(srcMap)
+    .sort((a, b) => b[1] - a[1])
+    .map(([fonte, n]) => ({
+      fonte,
+      pct:   Math.round((n / total) * 100),
+      color: SRC_COLORS[fonte] ?? '#94a3b8',
+    }))
+
+  // KPIs
+  const pipeline = data.filter(l => !['fechado','perdido'].includes(l.status))
+  const fechados  = data.filter(l => l.status === 'fechado')
+  const mesAtual  = data.filter(l => new Date(l.created_at).getMonth() === now.getMonth())
+
+  return {
+    months,
+    segmentos,
+    fontes,
+    total_leads:      data.length,
+    valor_pipeline:   pipeline.reduce((s, l) => s + (l.valor_estimado ?? 0), 0),
+    valor_fechado:    fechados.reduce((s, l) => s + (l.valor_estimado ?? 0), 0),
+    leads_mes:        mesAtual.length,
+    fechados_mes:     fechados.length,
+    taxa_conversao:   data.length > 0 ? Math.round((fechados.length / data.length) * 1000) / 10 : 0,
+    rawLeads:         data,
+  }
+}
+
+// ── Notificações ──────────────────────────────────────────────
+
+export interface Notification {
+  id: string
+  tipo: 'novo_lead' | 'follow_up'
+  empresa: string
+  descricao: string
+  created_at: string
+}
+
+export async function fetchNotifications(): Promise<{ items: Notification[]; total: number }> {
+  const oneDayAgo   = new Date(Date.now() - 24  * 60 * 60 * 1000).toISOString()
+  const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString()
+
+  const [{ data: novos }, { data: atrasados }] = await Promise.all([
+    supabase
+      .from('leads')
+      .select('id, empresa, contato_nome, created_at')
+      .eq('tenant_id', TENANT_ID)
+      .gte('created_at', oneDayAgo)
+      .order('created_at', { ascending: false })
+      .limit(5),
+    supabase
+      .from('leads')
+      .select('id, empresa, contato_nome, status, updated_at')
+      .eq('tenant_id', TENANT_ID)
+      .in('status', ['contactado', 'proposta'])
+      .lte('updated_at', sevenDaysAgo)
+      .order('updated_at', { ascending: true })
+      .limit(5),
+  ])
+
+  const items: Notification[] = [
+    ...(novos ?? []).map((l: any) => ({
+      id:         l.id,
+      tipo:       'novo_lead' as const,
+      empresa:    l.empresa,
+      descricao:  `${l.contato_nome} — lead novo`,
+      created_at: l.created_at,
+    })),
+    ...(atrasados ?? []).map((l: any) => ({
+      id:         l.id,
+      tipo:       'follow_up' as const,
+      empresa:    l.empresa,
+      descricao:  `${l.status} · sem atualização há +7 dias`,
+      created_at: l.updated_at,
+    })),
+  ]
+
+  return { items, total: items.length }
+}
