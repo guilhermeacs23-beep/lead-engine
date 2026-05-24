@@ -5,7 +5,6 @@ const supabaseAnon = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 
 export const supabase = createBrowserClient(supabaseUrl, supabaseAnon)
 
-// Tenant fixo por enquanto (antes de implementar auth completo)
 export const TENANT_ID = '00000000-0000-0000-0000-000000000001'
 
 // ── Leads ────────────────────────────────────────────────────
@@ -22,10 +21,10 @@ export async function fetchLeads(filters?: {
     .eq('tenant_id', TENANT_ID)
     .order('score_ia', { ascending: false })
 
-  if (filters?.segmento)                      q = q.eq('segmento', filters.segmento)
+  if (filters?.segmento)                           q = q.eq('segmento', filters.segmento)
   if (filters?.estado && filters.estado !== 'Todos') q = q.eq('estado', filters.estado)
-  if (filters?.fontes?.length)                q = q.in('fonte', filters.fontes)
-  if (filters?.query)                         q = q.ilike('empresa', `%${filters.query}%`)
+  if (filters?.fontes?.length)                     q = q.in('fonte', filters.fontes)
+  if (filters?.query)                              q = q.ilike('empresa', `%${filters.query}%`)
 
   const { data, error } = await q
   if (error) { console.error('fetchLeads:', error); return [] }
@@ -43,13 +42,22 @@ export async function fetchLeadsByStatus() {
   return data ?? []
 }
 
-export async function updateLeadStatus(id: string, status: string) {
+export async function updateLeadStatus(id: string, status: string): Promise<boolean> {
   const { error } = await supabase
     .from('leads')
     .update({ status })
     .eq('id', id)
-  if (error) console.error('updateLeadStatus:', error)
-  return !error
+  if (error) { console.error('updateLeadStatus:', error); return false }
+  return true
+}
+
+export async function saveLeadNotes(id: string, observacoes: string): Promise<boolean> {
+  const { error } = await supabase
+    .from('leads')
+    .update({ observacoes })
+    .eq('id', id)
+  if (error) { console.error('saveLeadNotes:', error); return false }
+  return true
 }
 
 export async function fetchDashboardMetrics() {
@@ -66,7 +74,6 @@ export async function fetchDashboardMetrics() {
   const pipeline  = data.filter(l => !['fechado', 'perdido'].includes(l.status))
   const conversao = data.length > 0 ? (fechados.length / data.length) * 100 : 0
 
-  // Contagem por fonte
   const fonteCounts: Record<string, number> = {}
   data.forEach(l => { fonteCounts[l.fonte] = (fonteCounts[l.fonte] ?? 0) + 1 })
   const total = data.length || 1
@@ -88,7 +95,7 @@ export async function fetchDashboardMetrics() {
   }
 }
 
-// ── Funil / Insights ─────────────────────────────────────────
+// ── Funil ─────────────────────────────────────────────────────
 
 const FUNNEL_STEPS = ['novo', 'contactado', 'proposta', 'negociando', 'fechado'] as const
 
@@ -187,3 +194,14 @@ export async function addActivity(
   autorId?: string,
 ): Promise<boolean> {
   const { error } = await supabase
+    .from('atividades')
+    .insert({
+      lead_id:   leadId,
+      tenant_id: TENANT_ID,
+      tipo,
+      descricao,
+      autor_id:  autorId ?? null,
+    })
+  if (error) { console.error('addActivity:', error); return false }
+  return true
+}
