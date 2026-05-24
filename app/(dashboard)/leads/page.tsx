@@ -5,6 +5,7 @@ import { fetchLeads } from '@/lib/supabase'
 import { SOURCE_LABELS, SEGMENT_LABELS } from '@/lib/mock-data'
 import { getScoreColor } from '@/lib/utils'
 import { LeadDrawer } from '@/components/ui/lead-drawer'
+import { AddLeadModal } from '@/components/ui/add-lead-modal'
 import { Search, Sparkles, Plus, Filter, Loader2 } from 'lucide-react'
 
 const SEGMENTS = [
@@ -28,13 +29,14 @@ const SOURCES = [
 ]
 
 export default function LeadsPage() {
-  const [leads,       setLeads]       = useState<any[]>([])
-  const [loading,     setLoading]     = useState(true)
-  const [segment,     setSegment]     = useState('')
-  const [state,       setState]       = useState('Todos')
-  const [sources,     setSources]     = useState(['linkedin', 'google', 'cnpj', 'indicacao'])
-  const [query,       setQuery]       = useState('')
+  const [leads,        setLeads]        = useState<any[]>([])
+  const [loading,      setLoading]      = useState(true)
+  const [segment,      setSegment]      = useState('')
+  const [state,        setState]        = useState('Todos')
+  const [sources,      setSources]      = useState(['linkedin', 'google', 'cnpj', 'indicacao'])
+  const [query,        setQuery]        = useState('')
   const [selectedLead, setSelectedLead] = useState<any | null>(null)
+  const [addOpen,      setAddOpen]      = useState(false)
 
   const load = useCallback(async () => {
     setLoading(true)
@@ -51,6 +53,7 @@ export default function LeadsPage() {
   return (
     <div className="flex h-full flex-col overflow-auto p-5">
       <LeadDrawer lead={selectedLead} onClose={() => setSelectedLead(null)} />
+      <AddLeadModal open={addOpen} onClose={() => setAddOpen(false)} onCreated={load} />
 
       {/* Filtros */}
       <div className="mb-4 grid grid-cols-3 gap-3">
@@ -102,8 +105,9 @@ export default function LeadsPage() {
           <button className="btn-ghost flex items-center gap-1.5 text-sm">
             <Filter size={13} strokeWidth={1.5} />Filtros
           </button>
-          <button className="btn-primary flex items-center gap-1.5 text-sm">
-            <Sparkles size={13} strokeWidth={1.5} />Importar todos
+          <button onClick={() => setAddOpen(true)}
+            className="btn-primary flex items-center gap-1.5 text-sm">
+            <Plus size={13} strokeWidth={1.5} />Adicionar Lead
           </button>
         </div>
       </div>
