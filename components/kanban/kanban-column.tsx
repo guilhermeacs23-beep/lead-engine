@@ -3,8 +3,20 @@ import React, { useState, useRef, useEffect } from 'react'
 import { Lead } from '@/types'
 import { LeadCard } from './lead-card'
 import { formatCurrencyShort } from '@/lib/utils'
-import { Plus, Trash2, Pencil, Check, X } from 'lucide-react'
-import { COLOR_PALETTE } from '@/store/ui-store'
+import { Plus, Pencil, Check, X } from 'lucide-react'
+
+// Bitrix-style full color palette (9 rows × 10 cols)
+const BITRIX_PALETTE = [
+  '#9BE0E0','#9BD4E0','#9BC8E0','#9BBCE0','#9BB0E0','#9BA4E0','#B09BE0','#C49BE0','#D89BE0','#EAB0D8',
+  '#4DC9C9','#4DBDCE','#4DB1D4','#4DA5DA','#4D99E0','#7B7DE0','#A07DE0','#C47DE0','#E07DB0','#E07D8C',
+  '#00BCD4','#03A9F4','#2196F3','#3F51B5','#673AB7','#9C27B0','#E91E63','#F44336','#FF5722','#FF9800',
+  '#00E5FF','#00B0FF','#2979FF','#3D5AFE','#651FFF','#D500F9','#FF1744','#FF3D00','#FF6D00','#FFAB00',
+  '#00BFA5','#00C853','#64DD17','#AEEA00','#FFD600','#FFAB40','#FF6E40','#E53935','#D81B60','#8D6E63',
+  '#00897B','#43A047','#7CB342','#C0CA33','#FDD835','#FFB300','#FB8C00','#F4511E','#C62828','#AD1457',
+  '#00695C','#2E7D32','#558B2F','#9E9D24','#F9A825','#FF8F00','#E65100','#B71C1C','#880E4F','#4A148C',
+  '#607D8B','#546E7A','#455A64','#37474F','#263238','#212121','#424242','#616161','#9E9E9E','#BDBDBD',
+  '#B0BEC5','#CFD8DC','#ECEFF1','#F5F5F5','#FAFAFA','#FFFFFF','#1A237E','#0D47A1','#01579B','#006064',
+]
 
 interface KanbanColumnProps {
   id: string; title: string; color: string; fixed?: boolean; index?: number
@@ -15,17 +27,20 @@ interface KanbanColumnProps {
   onDelete?: (id: string) => void
   onRename?: (id: string, title: string) => void
   onColorChange?: (id: string, color: string) => void
+  onAddColumnAfter?: (afterId: string) => void
 }
 
 export function KanbanColumn({
   id, title, color, fixed, index = 0, leads,
-  onAddLead, onLeadClick, onMoveCard, onDelete, onRename, onColorChange
+  onAddLead, onLeadClick, onMoveCard, onDelete, onRename, onColorChange, onAddColumnAfter
 }: KanbanColumnProps) {
   const total = leads.reduce((sum, l) => sum + (l.valor_estimado ?? 0), 0)
-  const [isDragOver, setIsDragOver] = useState(false)
-  const [editOpen,   setEditOpen]   = useState(false)
-  const [editTitle,  setEditTitle]  = useState(title)
-  const [editColor,  setEditColor]  = useState(color)
+  const [isDragOver,  setIsDragOver]  = useState(false)
+  const [editOpen,    setEditOpen]    = useState(false)
+  const [editTitle,   setEditTitle]   = useState(title)
+  const [editColor,   setEditColor]   = useState(color)
+  const [hdrHover,    setHdrHover]    = useState(false)
+  const [customColor, setCustomColor] = useState('')
   const panelRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -37,10 +52,11 @@ export function KanbanColumn({
     return () => document.removeEventListener('mousedown', handler)
   }, [editOpen])
 
-  function openEdit() { setEditTitle(title); setEditColor(color); setEditOpen(true) }
+  function openEdit() { setEditTitle(title); setEditColor(color); setCustomColor(''); setEditOpen(true) }
   function handleSave() {
+    const finalColor = customColor.match(/^#[0-9a-fA-F]{6}$/) ? customColor : editColor
     if (editTitle.trim()) onRename?.(id, editTitle.trim())
-    onColorChange?.(id, editColor)
+    onColorChange?.(id, finalColor)
     setEditOpen(false)
   }
   function handleDragOver(e: React.DragEvent) { e.preventDefault(); e.dataTransfer.dropEffect = 'move'; setIsDragOver(true) }
@@ -51,137 +67,169 @@ export function KanbanColumn({
     if (leadId) onMoveCard?.(leadId, id)
   }
 
+  const previewColor = customColor.match(/^#[0-9a-fA-F]{6}$/) ? customColor : editColor
+
   return (
-    <div className="flex w-[230px] flex-shrink-0 flex-col gap-2" style={{ position: 'relative' }}>
+    <div className="flex w-[240px] flex-shrink-0 flex-col" style={{ position: 'relative' }}>
 
-      {/* ── Wrapper coluna ── */}
-      <div style={{
-        borderRadius: 12,
-        border: isDragOver ? `2px dashed ${color}` : '1px solid rgba(255,255,255,0.10)',
-        overflow: 'visible',
-        position: 'relative',
-        transition: 'border 0.15s',
-      }}>
-
-        {/* ── Faixa colorida APENAS com o título ── */}
-        <div style={{
+      {/* ── Header colorido estilo Bitrix ── */}
+      <div
+        onMouseEnter={() => setHdrHover(true)}
+        onMouseLeave={() => { setHdrHover(false) }}
+        style={{
           background: color,
-          borderRadius: '11px 11px 0 0',
-          padding: '10px 12px',
-        }}>
-          <div className="flex items-center justify-between gap-2">
-            <span className="truncate text-[13px] font-bold text-white uppercase tracking-wider drop-shadow">
-              {title}
-            </span>
-            <div className="flex items-center gap-1.5 flex-shrink-0">
-              <span className="rounded-full px-2 py-0.5 text-[11px] font-bold text-white"
-                style={{ background: 'rgba(0,0,0,0.28)' }}>
-                {leads.length}
-              </span>
-              {!fixed && (
-                <button onClick={openEdit}
-                  className="rounded p-0.5 text-white/70 hover:bg-white/25 hover:text-white transition-all"
-                  title="Editar cor / nome">
-                  <Pencil size={12} strokeWidth={2} />
-                </button>
-              )}
-              {!fixed && (
-                <button onClick={() => onDelete?.(id)}
-                  className="rounded p-0.5 text-white/70 hover:bg-white/25 hover:text-red-200 transition-all"
-                  title="Excluir etapa">
-                  <Trash2 size={12} strokeWidth={2} />
-                </button>
-              )}
-            </div>
-          </div>
-        </div>
-
-        {/* ── Valor monetário: fora da cor, fundo escuro, branco grande ── */}
-        <div style={{
-          background: 'rgba(255,255,255,0.06)',
-          borderBottom: '1px solid rgba(255,255,255,0.07)',
-          padding: '12px 12px 14px',
-          textAlign: 'center',
-        }}>
-          <p style={{ fontSize: 22, fontWeight: 300, color: '#ffffff', letterSpacing: '-0.5px' }}>
-            {total > 0
-              ? `${formatCurrencyShort(total)}/mês`
-              : <span style={{ color: 'rgba(255,255,255,0.25)', fontSize: 15 }}>—</span>}
-          </p>
-        </div>
-
-        {/* ── Painel de edição flutuante ── */}
-        {editOpen && (
-          <div ref={panelRef} style={{
-            position: 'absolute', top: 'calc(100% + 6px)', left: 0, right: 0, zIndex: 100,
-            background: 'rgba(12,10,35,0.98)', backdropFilter: 'blur(20px)',
-            border: '1px solid rgba(255,255,255,0.15)', borderRadius: 10, padding: 14,
-            boxShadow: '0 20px 60px rgba(0,0,0,0.7)',
-          }}>
-            <p className="mb-1 text-[11px] font-semibold text-white/50 uppercase tracking-wider">Nome da etapa</p>
+          borderRadius: editOpen ? '10px 10px 0 0' : '10px 10px 0 0',
+          padding: '9px 10px',
+          position: 'relative',
+          transition: 'filter 0.15s',
+          filter: hdrHover ? 'brightness(1.08)' : 'brightness(1)',
+        }}
+      >
+        <div className="flex items-center gap-2">
+          {/* Título + count */}
+          {editOpen ? (
             <input autoFocus value={editTitle}
               onChange={e => setEditTitle(e.target.value)}
               onKeyDown={e => { if (e.key === 'Enter') handleSave() }}
-              className="w-full rounded-lg px-3 py-2 text-sm text-white outline-none mb-4"
-              style={{ background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.15)' }}
+              className="flex-1 rounded px-2 py-0.5 text-[13px] font-bold text-white outline-none"
+              style={{ background: 'rgba(0,0,0,0.25)', border: '1.5px solid rgba(255,255,255,0.5)' }}
             />
+          ) : (
+            <span className="flex-1 truncate text-[13px] font-bold text-white uppercase tracking-wide drop-shadow">
+              {title}
+            </span>
+          )}
 
-            <p className="mb-2 text-[11px] font-semibold text-white/50 uppercase tracking-wider">Cor da coluna</p>
-            <div className="grid grid-cols-6 gap-2 mb-3">
-              {COLOR_PALETTE.map((c) => (
-                <button key={c} onClick={() => setEditColor(c)}
-                  style={{
-                    width: 30, height: 30, borderRadius: '50%', background: c,
-                    outline: editColor === c ? `3px solid ${c}` : '2px solid transparent',
-                    outlineOffset: 2,
-                    transform: editColor === c ? 'scale(1.22)' : 'scale(1)',
-                    transition: 'all 0.12s ease',
-                    boxShadow: editColor === c ? `0 0 12px ${c}99` : 'none',
-                  }}
-                />
-              ))}
-            </div>
+          <div className="flex items-center gap-1 flex-shrink-0">
+            <span className="rounded-full px-2 py-0.5 text-[11px] font-bold text-white"
+              style={{ background: 'rgba(0,0,0,0.28)' }}>
+              {leads.length}
+            </span>
 
-            {/* Preview */}
-            <div className="mb-3 flex items-center gap-2 rounded-lg px-3 py-2"
-              style={{ background: editColor + '22', border: `1px solid ${editColor}55` }}>
-              <div style={{ width: 14, height: 14, borderRadius: 4, background: editColor, flexShrink: 0 }} />
-              <span className="text-xs text-white font-mono">{editColor}</span>
-            </div>
-
-            <div className="flex gap-2">
-              <button onClick={handleSave}
-                className="flex-1 flex items-center justify-center gap-1.5 rounded-lg py-2 text-sm font-bold text-white"
-                style={{ background: editColor, boxShadow: `0 4px 16px ${editColor}66` }}>
-                <Check size={13} strokeWidth={2.5} /> Salvar
+            {/* Botão lápis — aparece no hover OU quando editando */}
+            {!fixed && (hdrHover || editOpen) && (
+              <button
+                onClick={editOpen ? handleSave : openEdit}
+                className="rounded p-1 text-white/80 hover:bg-white/25 hover:text-white transition-all"
+                title={editOpen ? 'Salvar' : 'Editar nome/cor'}
+              >
+                {editOpen ? <Check size={12} strokeWidth={2.5} /> : <Pencil size={12} strokeWidth={2} />}
               </button>
+            )}
+            {editOpen && (
               <button onClick={() => setEditOpen(false)}
-                className="rounded-lg px-3 py-2 text-white/40 hover:bg-white/10 transition-all">
-                <X size={13} strokeWidth={2} />
+                className="rounded p-1 text-white/60 hover:bg-white/20 hover:text-white transition-all">
+                <X size={12} strokeWidth={2} />
               </button>
-            </div>
-          </div>
-        )}
+            )}
 
-        {/* ── Cards ── */}
-        <div className="flex flex-col gap-2 overflow-y-auto p-2"
-          style={{
-            minHeight: 60, borderRadius: '0 0 11px 11px',
-            background: isDragOver ? `${color}15` : 'rgba(255,255,255,0.025)',
-            transition: 'background 0.15s',
-          }}
-          onDragOver={handleDragOver} onDragLeave={handleDragLeave} onDrop={handleDrop}>
-          {leads.map((lead) => (
-            <LeadCard key={lead.id} lead={lead} onClick={onLeadClick} />
-          ))}
+            {/* + para adicionar nova coluna APÓS esta — aparece no hover */}
+            {!editOpen && hdrHover && (
+              <button
+                onClick={() => onAddColumnAfter?.(id)}
+                className="rounded p-1 text-white/80 hover:bg-white/25 hover:text-white transition-all"
+                title="Adicionar etapa após esta"
+              >
+                <Plus size={12} strokeWidth={2.5} />
+              </button>
+            )}
+          </div>
         </div>
       </div>
 
-      {/* Adicionar lead */}
+      {/* ── Color picker estilo Bitrix (aparece ao editar) ── */}
+      {editOpen && (
+        <div ref={panelRef} style={{
+          position: 'absolute', top: 44, left: 0, zIndex: 200, width: 260,
+          background: '#fff',
+          border: '1px solid #d0d7de',
+          borderRadius: '0 0 10px 10px',
+          boxShadow: '0 8px 32px rgba(0,0,0,0.18)',
+          padding: '10px',
+        }}>
+          {/* Grid de cores */}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(10,1fr)', gap: 3, marginBottom: 8 }}>
+            {BITRIX_PALETTE.map((c) => (
+              <button key={c} onClick={() => { setEditColor(c); setCustomColor('') }}
+                style={{
+                  width: 20, height: 20, borderRadius: 3, background: c, border: 'none',
+                  cursor: 'pointer',
+                  outline: editColor === c && !customColor ? '2.5px solid #333' : '1px solid rgba(0,0,0,0.08)',
+                  outlineOffset: 1,
+                  transform: editColor === c && !customColor ? 'scale(1.2)' : 'scale(1)',
+                  transition: 'all 0.1s',
+                }}
+              />
+            ))}
+          </div>
+
+          {/* Preview + custom color input */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, borderTop: '1px solid #eee', paddingTop: 8 }}>
+            <div style={{
+              width: 36, height: 24, borderRadius: 4, background: previewColor,
+              border: '1px solid #d0d7de', flexShrink: 0,
+            }} />
+            <input
+              value={customColor}
+              onChange={e => setCustomColor(e.target.value)}
+              placeholder="Cor personalizada"
+              className="flex-1 text-[12px] text-gray-600 outline-none"
+              style={{ border: 'none', background: 'transparent' }}
+              maxLength={7}
+            />
+            <button onClick={handleSave}
+              className="rounded px-3 py-1 text-[12px] font-semibold text-white"
+              style={{ background: previewColor, border: 'none', cursor: 'pointer', flexShrink: 0 }}>
+              OK
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* ── Valor monetário ── */}
+      <div style={{
+        background: 'rgba(255,255,255,0.06)',
+        borderBottom: '1px solid rgba(255,255,255,0.07)',
+        padding: '10px 12px 12px',
+        textAlign: 'center',
+      }}>
+        <p style={{ fontSize: 20, fontWeight: 300, color: '#ffffff', letterSpacing: '-0.5px' }}>
+          {total > 0
+            ? `${formatCurrencyShort(total)}/mês`
+            : <span style={{ color: 'rgba(255,255,255,0.25)', fontSize: 14 }}>R$0</span>}
+        </p>
+      </div>
+
+      {/* ── Cards ── */}
+      <div
+        className="flex flex-col gap-2 overflow-y-auto p-2"
+        style={{
+          minHeight: 60,
+          background: isDragOver ? `${color}18` : 'rgba(255,255,255,0.025)',
+          transition: 'background 0.15s',
+          border: isDragOver ? `2px dashed ${color}` : '1px solid rgba(255,255,255,0.08)',
+          borderTop: 'none',
+          borderBottom: 'none',
+        }}
+        onDragOver={handleDragOver} onDragLeave={handleDragLeave} onDrop={handleDrop}
+      >
+        {leads.map((lead) => (
+          <LeadCard key={lead.id} lead={lead} onClick={onLeadClick} />
+        ))}
+      </div>
+
+      {/* ── + Adicionar lead — DENTRO da coluna, abaixo do último card ── */}
       <button onClick={() => onAddLead?.(id)}
-        className="flex items-center gap-1.5 rounded-lg px-3 py-2 text-xs text-white/60 transition-all hover:bg-white/[0.07] hover:text-white"
-        style={{ border: '0.5px dashed rgba(255,255,255,0.18)' }}>
-        <Plus size={13} strokeWidth={2} /> Adicionar lead
+        className="flex items-center justify-center gap-1.5 py-2.5 text-xs text-white/40 transition-all hover:bg-white/[0.07] hover:text-white/70"
+        style={{
+          border: '1px solid rgba(255,255,255,0.08)',
+          borderTop: '1px solid rgba(255,255,255,0.06)',
+          borderRadius: '0 0 10px 10px',
+          background: 'rgba(255,255,255,0.02)',
+        }}
+      >
+        <Plus size={12} strokeWidth={2} />
+        Adicionar
       </button>
     </div>
   )
