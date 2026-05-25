@@ -149,6 +149,7 @@ export function BackgroundProvider() {
           />
         )}
         <video
+          key={bg.src ?? bg.id}
           ref={videoRef}
           src={bg.src}
           autoPlay
@@ -156,6 +157,7 @@ export function BackgroundProvider() {
           loop
           playsInline
           onCanPlay={() => setVideoReady(true)}
+          onError={() => setVideoReady(false)}
           style={{
             width: '100%',
             height: '100%',
