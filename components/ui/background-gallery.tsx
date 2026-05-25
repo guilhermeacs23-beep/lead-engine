@@ -78,7 +78,7 @@ function BgCard({
       onMouseLeave={() => setHovered(false)}
       className="relative rounded-xl overflow-hidden cursor-pointer group"
       style={{
-        aspectRatio: '16/9',
+        aspectRatio: '4/3',
         border: isActive
           ? '2px solid #6366f1'
           : '2px solid rgba(255,255,255,0.10)',
@@ -92,9 +92,7 @@ function BgCard({
       {/* Preview */}
       {bg.type === 'video' && bg.src ? (
         <>
-          <div
-            style={{ position: 'absolute', inset: 0, background: bg.preview }}
-          />
+          <div style={{ position: 'absolute', inset: 0, background: bg.preview }} />
           <video
             ref={videoRef}
             src={bg.src}
@@ -103,43 +101,33 @@ function BgCard({
             playsInline
             preload="metadata"
             style={{
-              position: 'absolute',
-              inset: 0,
-              width: '100%',
-              height: '100%',
+              position: 'absolute', inset: 0,
+              width: '100%', height: '100%',
               objectFit: 'cover',
               opacity: hovered ? 1 : 0,
               transition: 'opacity 0.4s ease',
             }}
           />
           {!hovered && (
-            <div
-              style={{
-                position: 'absolute',
-                inset: 0,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-              }}
-            >
-              <div
-                style={{
-                  width: 28,
-                  height: 28,
-                  borderRadius: '50%',
-                  background: 'rgba(255,255,255,0.18)',
-                  backdropFilter: 'blur(6px)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                }}
-              >
+            <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <div style={{ width: 28, height: 28, borderRadius: '50%', background: 'rgba(255,255,255,0.18)', backdropFilter: 'blur(6px)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 <Play size={12} fill="white" stroke="white" />
               </div>
             </div>
           )}
         </>
+      ) : bg.type === 'image' && bg.src ? (
+        /* Foto real — usa backgroundImage com a URL */
+        <div
+          style={{
+            position: 'absolute', inset: 0,
+            backgroundImage: `url(${bg.src})`,
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+          }}
+        />
       ) : (
+        /* CSS gradient ou animated */
         <div
           className={bg.cssClass ?? ''}
           style={
@@ -422,7 +410,7 @@ export function BackgroundGallery({ open, onClose }: Props) {
             overflowY: 'auto',
             padding: '16px 24px',
             display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))',
+            gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))',
             gap: 12,
             alignContent: 'start',
           }}
