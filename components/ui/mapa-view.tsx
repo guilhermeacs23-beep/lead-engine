@@ -93,6 +93,16 @@ export function MapaView() {
       attribution: '© OpenStreetMap © CARTO', subdomains: 'abcd', maxZoom: 19,
     }).addTo(map)
     mapRef.current = map
+    // Force Leaflet to recalculate size (needed when rendered inside a tab)
+    setTimeout(() => map.invalidateSize(), 150)
+  }, [mapReady])
+
+  // Re-invalidate size whenever mapReady flips (tab switch)
+  useEffect(() => {
+    if (!mapRef.current || !mapReady) return
+    const t1 = setTimeout(() => mapRef.current?.invalidateSize(), 100)
+    const t2 = setTimeout(() => mapRef.current?.invalidateSize(), 500)
+    return () => { clearTimeout(t1); clearTimeout(t2) }
   }, [mapReady])
 
   // Plot markers
@@ -163,7 +173,7 @@ export function MapaView() {
 
       {/* ── MAP ── */}
       <div className="relative flex-1">
-        <div ref={mapEl} className="h-full w-full" style={{ background: '#0c0a1e' }} />
+        <div ref={mapEl} className="h-full w-full" style={{ background: '#0c0a1e', minHeight: 400 }} />
 
         {/* Funnel legend overlay */}
         <div className="absolute bottom-10 left-4 z-[1000] rounded-xl p-3"
@@ -235,11 +245,11 @@ export function MapaView() {
                     <p className="truncate text-[11px] text-white/45">{lead.contato_nome}</p>
                     <div className="mt-0.5 flex items-center gap-2">
                       <span className="rounded-md px-1.5 py-0.5 text-[10px] font-semibold"
-                        style={{ color: cfg.color, background: `${cfg.color}18` }}>
+                        style={{ color: 'rgba(255,255,255,0.70)', background: 'rgba(255,255,255,0.10)' }}>
                         {cfg.label}
                       </span>
                       {lead.valor_estimado > 0 && (
-                        <span className="text-[10px] font-medium text-emerald-400">
+                        <span className="text-[10px] font-medium text-white/60">
                           {formatCurrencyShort(lead.valor_estimado)}
                         </span>
                       )}
@@ -254,8 +264,7 @@ export function MapaView() {
                   </div>
 
                   {/* Score */}
-                  <span className="shrink-0 text-[12px] font-bold"
-                    style={{ color: getScoreColor(lead.score_ia ?? 0).color }}>
+                  <span className="shrink-0 text-[12px] font-bold text-white/70">
                     {lead.score_ia}
                   </span>
                 </button>
