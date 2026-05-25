@@ -353,3 +353,184 @@ body {
 .bg-violet  { background: linear-gradient(135deg,#1a0020 0%,#2d0035 40%,#0d0015 100%); }
 .bg-gold    { background: linear-gradient(135deg,#1a1500 0%,#2d2400 40%,#0d0c00 100%); }
 .bg-navy    { background: linear-gradient(135deg,#001a2d 0%,#00263d 40%,#000d1a 100%); }
+
+/* ══════════════════════════════════════════════
+   AMBIENT BACKGROUND SYSTEM — Animated Gradients
+   bg-anim-* classes: use background-size 400%
+   animated via bg-position keyframes
+══════════════════════════════════════════════ */
+
+/* ── Keyframes ─────────────────────────────── */
+@keyframes bgShift {
+  0%   { background-position: 0%   50%; }
+  50%  { background-position: 100% 50%; }
+  100% { background-position: 0%   50%; }
+}
+@keyframes bgShiftFast {
+  0%   { background-position: 0%   0%;   }
+  33%  { background-position: 100% 0%;   }
+  66%  { background-position: 50%  100%; }
+  100% { background-position: 0%   0%;   }
+}
+@keyframes bgShiftSlow {
+  0%   { background-position: 0%   20%; }
+  50%  { background-position: 80%  80%; }
+  100% { background-position: 0%   20%; }
+}
+
+/* ── Dark Themes ───────────────────────────── */
+
+.bg-anim-cosmos {
+  background: linear-gradient(
+    135deg,
+    #0f0c29 0%, #302b63 25%, #1a1040 50%, #24243e 75%, #0f0c29 100%
+  );
+  background-size: 400% 400%;
+  animation: bgShift 18s ease infinite;
+}
+
+.bg-anim-midnight {
+  background: linear-gradient(
+    120deg,
+    #000428 0%, #004e92 25%, #000c1a 50%, #001a3a 75%, #000428 100%
+  );
+  background-size: 400% 400%;
+  animation: bgShift 22s ease infinite;
+}
+
+.bg-anim-carbon {
+  background: linear-gradient(
+    145deg,
+    #0d1117 0%, #1c2128 20%, #2d333b 40%, #161b22 60%, #0d1117 100%
+  );
+  background-size: 400% 400%;
+  animation: bgShiftSlow 30s ease infinite;
+}
+
+.bg-anim-abyss {
+  background: linear-gradient(
+    160deg,
+    #020610 0%, #0a1628 25%, #05112a 50%, #0d2137 75%, #020610 100%
+  );
+  background-size: 400% 400%;
+  animation: bgShift 25s ease infinite;
+}
+
+.bg-anim-nebula {
+  background: linear-gradient(
+    135deg,
+    #1a0533 0%, #3d0d6e 20%, #12052e 40%, #6d1a8c 60%, #0a0a1a 80%, #1a0533 100%
+  );
+  background-size: 400% 400%;
+  animation: bgShiftFast 15s ease infinite;
+}
+
+/* ── Colorful Themes ───────────────────────── */
+
+.bg-anim-aurora {
+  background: linear-gradient(
+    135deg,
+    #0a2e1a 0%, #0d4f2e 15%, #1a6644 30%, #0f3d5c 45%,
+    #1a2e5c 60%, #2d1a5c 75%, #0a1a3d 90%, #0a2e1a 100%
+  );
+  background-size: 400% 400%;
+  animation: bgShiftFast 12s ease infinite;
+}
+
+.bg-anim-sunset {
+  background: linear-gradient(
+    135deg,
+    #1a0533 0%, #5c1a2e 20%, #8c2a0d 35%, #c4461a 50%,
+    #8c3a0a 65%, #5c1a0f 80%, #1a0a1a 100%
+  );
+  background-size: 400% 400%;
+  animation: bgShift 16s ease infinite;
+}
+
+.bg-anim-violet {
+  background: linear-gradient(
+    135deg,
+    #0d001a 0%, #2d0050 20%, #5c0080 40%, #3d0066 60%,
+    #1a0033 80%, #0d001a 100%
+  );
+  background-size: 400% 400%;
+  animation: bgShift 20s ease infinite;
+}
+
+.bg-anim-ocean {
+  background: linear-gradient(
+    135deg,
+    #001a2e 0%, #003d5c 20%, #005c8a 40%, #0080b3 55%,
+    #004466 70%, #001a33 85%, #001a2e 100%
+  );
+  background-size: 400% 400%;
+  animation: bgShift 18s ease infinite;
+}
+
+/* ── Light Themes ──────────────────────────── */
+
+.bg-anim-frost {
+  background: linear-gradient(
+    135deg,
+    #e8f4fd 0%, #d0e8fa 20%, #c0dff7 40%, #ddeef9 60%,
+    #eaf5fd 80%, #f0f8ff 100%
+  );
+  background-size: 400% 400%;
+  animation: bgShiftSlow 25s ease infinite;
+}
+
+.bg-anim-sakura {
+  background: linear-gradient(
+    135deg,
+    #fff0f5 0%, #ffe4ef 20%, #ffd6e7 40%, #ffebf3 60%,
+    #fff5f8 80%, #fff0f5 100%
+  );
+  background-size: 400% 400%;
+  animation: bgShiftSlow 28s ease infinite;
+}
+
+.bg-anim-parchment {
+  background: linear-gradient(
+    135deg,
+    #faf4e8 0%, #f5ead5 20%, #ecdcc0 40%, #f7eedc 60%,
+    #faf5ea 80%, #fdf9f0 100%
+  );
+  background-size: 400% 400%;
+  animation: bgShiftSlow 32s ease infinite;
+}
+
+/* ── Video Fallback (shown while video loads) ─ */
+.bg-video-clouds-fallback {
+  background: linear-gradient(135deg, #c9d6ff 0%, #e2e2e2 50%, #c9d6ff 100%);
+}
+.bg-video-stars-fallback {
+  background: linear-gradient(135deg, #020614 0%, #0a0a2e 50%, #020614 100%);
+}
+.bg-video-aurora-fallback {
+  background: linear-gradient(135deg, #0a2e1a 0%, #1a2e5c 50%, #2d1a5c 100%);
+}
+
+/* ── Background Provider Root Layer ──────────── */
+.bg-layer {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+.bg-layer video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.bg-overlay {
+  position: absolute;
+  inset: 0;
+}
+/* Particles canvas container */
+.bg-particles-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
