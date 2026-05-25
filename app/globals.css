@@ -617,3 +617,11 @@ body {
 [data-contrast="light"] .section-label {
   color: rgba(18,17,31,0.45) !important;
 }
+
+/* btn-primary always white regardless of contrast mode */
+[data-contrast="light"] .btn-primary {
+  color: #FFFFFF !important;
+}
+[data-contrast="light"] .btn-primary:hover {
+  color: #FFFFFF !important;
+}
