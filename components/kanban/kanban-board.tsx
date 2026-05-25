@@ -318,6 +318,7 @@ export function KanbanBoard() {
               onRename={renameColumn}
               onColorChange={changeColumnColor}
               onLeadClick={(lead) => setSelectedLead(lead)}
+              onAddColumnAfter={(afterId) => { setAdding(true); setNewTitle('') }}
             />
           ))}
           {!adding ? (
@@ -365,104 +366,139 @@ export function KanbanBoard() {
 
       ) : view === 'lista' ? (
 
-        /* ── LISTA ── */
-        <div className="flex-1 overflow-auto p-4">
-          <div className="overflow-hidden rounded-xl" style={{ border: '0.5px solid rgba(255,255,255,0.10)' }}>
+        /* ── LISTA (Bitrix style) ── */
+        <div className="flex-1 overflow-auto" style={{ background: '#f5f6f8' }}>
+          <div className="min-w-[900px]">
             {/* Cabeçalho */}
-            <div className="grid items-center px-4 py-3 text-[13px] font-semibold text-white"
-              style={{
-                gridTemplateColumns: '2fr 1.2fr 1fr 0.8fr 0.7fr 0.8fr',
-                background: 'rgba(255,255,255,0.07)',
-                borderBottom: '0.5px solid rgba(255,255,255,0.10)',
-              }}>
+            <div className="flex items-center gap-0 text-[12px] font-semibold text-gray-500 uppercase tracking-wide px-4 py-2.5"
+              style={{ background: '#fff', borderBottom: '1.5px solid #e5e7eb' }}>
+              <div style={{ width: 32, flexShrink: 0 }} />
               {([
-                ['empresa',        'Empresa'   ],
-                ['status',         'Etapa'     ],
-                ['segmento',       'Segmento'  ],
-                ['valor_estimado', 'Valor/mês' ],
-                ['score_ia',       'Score IA'  ],
-              ] as [SortKey, string][]).map(([k, label]) => (
-                <button key={k} onClick={() => handleSort(k)}
-                  className="flex items-center gap-1 hover:text-indigo-300 transition-colors">
-                  {label} <SortIcon k={k} />
-                </button>
+                ['empresa',        'Negócio',      '220px'],
+                ['status',         'Fase',         '200px'],
+                [null,             'Atividade',    '190px'],
+                [null,             'Cliente',      '160px'],
+                ['valor_estimado', 'Montante',     '110px'],
+                [null,             'Responsável',  '140px'],
+                [null,             'Criado',        '100px'],
+              ] as [string|null, string, string][]).map(([k, label, w]) => (
+                <div key={label} style={{ minWidth: w, flex: w === '220px' ? 1 : undefined }}>
+                  {k ? (
+                    <button onClick={() => handleSort(k as SortKey)}
+                      className="flex items-center gap-1 hover:text-indigo-600 transition-colors">
+                      {label} <SortIcon k={k as SortKey} />
+                    </button>
+                  ) : (
+                    <span>{label}</span>
+                  )}
+                </div>
               ))}
-              <span>Contato</span>
             </div>
 
+            {/* Linhas */}
             {sortedLeads.length === 0 ? (
-              <div className="py-16 text-center text-sm text-white/40">Nenhum lead no pipeline</div>
-            ) : sortedLeads.map(lead => {
-              const score  = getScoreColor((lead as any).score_ia)
-              const source = SOURCE_LABELS[(lead as any).fonte]
-              const status = STATUS_LABELS[(lead as any).status] ?? (lead as any).status
-              const color  = STATUS_COLORS[(lead as any).status] ?? '#94a3b8'
+              <div className="py-20 text-center text-sm text-gray-400 bg-white">Nenhum lead no pipeline</div>
+            ) : sortedLeads.map((lead, i) => {
+              const score   = getScoreColor((lead as any).score_ia)
+              const status  = STATUS_LABELS[(lead as any).status] ?? (lead as any).status
+              const color   = STATUS_COLORS[(lead as any).status] ?? '#94a3b8'
+              const stageOrder = ['novo','contactado','proposta','negociando','fechado','perdido']
+              const stageIdx   = stageOrder.indexOf((lead as any).status)
+              const totalStages = 6
+              const pct = stageIdx >= 0 ? Math.round(((stageIdx + 1) / totalStages) * 100) : 0
+              const createdAt = (lead as any).created_at
+                ? new Date((lead as any).created_at).toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit',year:'2-digit'})
+                : '—'
               return (
                 <div key={lead.id}
                   onClick={() => setSelectedLead(lead)}
                   onMouseEnter={(e) => showHover(lead, e, 'row')}
                   onMouseLeave={hideHover}
-                  className="grid cursor-pointer items-center px-4 py-3.5 text-sm transition-all hover:bg-white/[0.05]"
+                  className="flex items-center gap-0 px-4 py-3 cursor-pointer transition-colors text-sm"
                   style={{
-                    gridTemplateColumns: '2fr 1.2fr 1fr 0.8fr 0.7fr 0.8fr',
-                    borderBottom: '0.5px solid rgba(255,255,255,0.06)',
+                    background: '#fff',
+                    borderBottom: '1px solid #e9ebee',
                   }}
+                  onMouseOver={e => (e.currentTarget as HTMLElement).style.background='#f0f2f5'}
+                  onMouseOut={e => (e.currentTarget as HTMLElement).style.background='#fff'}
                 >
-                  {/* Empresa */}
-                  <div>
-                    <p className="font-semibold text-white">{(lead as any).empresa}</p>
-                    <p className="mt-0.5 text-[12px] text-white/50">{(lead as any).cidade}, {(lead as any).estado}</p>
+                  {/* Checkbox */}
+                  <div style={{ width: 32, flexShrink: 0 }}>
+                    <div className="w-4 h-4 rounded border-2 border-gray-300 hover:border-indigo-500 transition-colors" />
                   </div>
 
-                  {/* Etapa */}
-                  <span className="w-fit rounded-lg px-2.5 py-1 text-[12px] font-semibold"
-                    style={{ color, background: `${color}20` }}>
-                    {status}
-                  </span>
+                  {/* Negócio */}
+                  <div style={{ flex: 1, minWidth: '220px', marginRight: 8 }}>
+                    <p className="font-semibold text-indigo-600 hover:underline leading-snug">
+                      {(lead as any).empresa}
+                    </p>
+                    <p className="text-[11px] text-gray-400 mt-0.5">Vendas</p>
+                  </div>
 
-                  {/* Segmento */}
-                  <span className="font-medium text-white">
-                    {SEGMENT_LABELS[(lead as any).segmento] ?? (lead as any).segmento}
-                  </span>
-
-                  {/* Valor */}
-                  <span className="font-bold text-white">
-                    {(lead as any).valor_estimado ? `${formatCurrencyShort((lead as any).valor_estimado)}/mês` : '—'}
-                  </span>
-
-                  {/* Score */}
-                  <div className="flex items-center gap-2">
-                    <div className="flex-1 overflow-hidden rounded-full" style={{ height: 5, background: 'rgba(255,255,255,0.10)' }}>
-                      <div className="h-full rounded-full" style={{ width: `${(lead as any).score_ia}%`, background: score.color }} />
+                  {/* Fase — barra de progresso estilo Bitrix */}
+                  <div style={{ minWidth: '200px', paddingRight: 12 }}>
+                    <div className="flex gap-0.5 mb-1" style={{ height: 5 }}>
+                      {stageOrder.slice(0, totalStages - 1).map((s, si) => (
+                        <div key={s} style={{
+                          flex: 1, height: '100%',
+                          background: si <= stageIdx && (lead as any).status !== 'perdido'
+                            ? STATUS_COLORS[s] ?? '#94a3b8'
+                            : (lead as any).status === 'perdido' ? '#ef4444' : '#e5e7eb',
+                          borderRadius: si === 0 ? '3px 0 0 3px' : si === totalStages - 2 ? '0 3px 3px 0' : 0,
+                        }} />
+                      ))}
                     </div>
-                    <span className="min-w-[28px] text-right text-[13px] font-bold" style={{ color: score.color }}>
-                      {(lead as any).score_ia}
-                    </span>
+                    <p className="text-[12px] font-medium" style={{ color }}>{status}</p>
                   </div>
 
-                  {/* Contato — hover separado */}
-                  <div
+                  {/* Atividade */}
+                  <div style={{ minWidth: '190px', paddingRight: 12 }}>
+                    <p className="text-[12px] text-gray-400 italic">Nenhuma atividade</p>
+                  </div>
+
+                  {/* Cliente */}
+                  <div style={{ minWidth: '160px', paddingRight: 12 }}
                     onClick={(e) => { e.stopPropagation(); setSelectedLead(lead) }}
                     onMouseEnter={(e) => { e.stopPropagation(); showHover(lead, e, 'contact') }}
-                    onMouseLeave={(e) => { e.stopPropagation(); hideHover() }}
-                    className="cursor-pointer"
-                  >
-                    <p className="text-[13px] font-semibold text-indigo-300 hover:underline">
+                    onMouseLeave={(e) => { e.stopPropagation(); hideHover() }}>
+                    <p className="text-[12px] font-semibold text-indigo-600 hover:underline cursor-pointer">
                       {(lead as any).contato_nome}
                     </p>
-                    <p className="text-[11px] text-white/45">{(lead as any).contato_cargo}</p>
+                  </div>
+
+                  {/* Montante */}
+                  <div style={{ minWidth: '110px', paddingRight: 12 }}>
+                    <p className="text-[13px] font-bold text-gray-800">
+                      {(lead as any).valor_estimado ? formatCurrencyShort((lead as any).valor_estimado) : 'R$ 0'}
+                    </p>
+                  </div>
+
+                  {/* Responsável */}
+                  <div style={{ minWidth: '140px', paddingRight: 12 }}>
+                    <div className="flex items-center gap-1.5">
+                      <div className="w-6 h-6 rounded-full bg-indigo-500 flex items-center justify-center text-[10px] font-bold text-white flex-shrink-0">
+                        G
+                      </div>
+                      <span className="text-[12px] text-gray-600 truncate">Guilherme</span>
+                    </div>
+                  </div>
+
+                  {/* Criado */}
+                  <div style={{ minWidth: '100px' }}>
+                    <p className="text-[12px] text-gray-500">{createdAt}</p>
                   </div>
                 </div>
               )
             })}
-          </div>
 
-          {/* Rodapé */}
-          <div className="mt-3 flex items-center justify-between px-1">
-            <span className="text-[13px] text-white/60">{sortedLeads.length} leads no pipeline</span>
-            <span className="text-[13px] font-semibold text-white">
-              Total: {formatCurrencyShort(sortedLeads.reduce((s, l) => s + ((l as any).valor_estimado ?? 0), 0))}/mês
-            </span>
+            {/* Rodapé */}
+            <div className="flex items-center justify-between px-5 py-3 text-[12px]"
+              style={{ background: '#fff', borderTop: '1.5px solid #e5e7eb', color: '#6b7280' }}>
+              <span>Selecionado: 0 / {sortedLeads.length} &nbsp; <strong className="text-gray-800">Total: MOSTRAR QUANTIDADE</strong></span>
+              <span className="font-semibold text-gray-800">
+                {formatCurrencyShort(sortedLeads.reduce((s, l) => s + ((l as any).valor_estimado ?? 0), 0))}
+              </span>
+            </div>
           </div>
         </div>
 
