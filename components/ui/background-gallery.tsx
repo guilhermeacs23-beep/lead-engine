@@ -91,10 +91,22 @@ function BgCard({
       {/* Preview */}
       {bg.type === 'video' && bg.src ? (
         <>
-          <div style={{ position: 'absolute', inset: 0, background: bg.preview }} />
+          {/* Thumbnail: poster image if available, else gradient fallback */}
+          <div
+            style={{
+              position: 'absolute', inset: 0,
+              background: bg.poster ? undefined : bg.preview,
+              backgroundImage: bg.poster ? `url(${bg.poster})` : undefined,
+              backgroundSize: 'cover',
+              backgroundPosition: 'center',
+              opacity: hovered ? 0 : 1,
+              transition: 'opacity 0.4s ease',
+            }}
+          />
           <video
             ref={videoRef}
             src={bg.src}
+            poster={bg.poster ?? undefined}
             muted
             loop
             playsInline
