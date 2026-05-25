@@ -13,6 +13,7 @@ import {
   Phone, Mail, Building2, TrendingUp,
 } from 'lucide-react'
 import { Map as MapIcon } from 'lucide-react'
+import { CalendarioView } from '@/components/ui/calendario-view'
 
 const VIEW_TABS = [
   { id: 'kanban',     label: 'Kanban',     Icon: Kanban   },
@@ -466,19 +467,24 @@ export function KanbanBoard() {
 
       ) : (
 
-        /* ── CALENDÁRIO / MAPA ── */
-        <div className="flex flex-1 items-center justify-center flex-col gap-3">
+        /* ── CALENDÁRIO ── */
+        view === 'calendario' ? (
+          <CalendarioView />
+        ) : (
+        /* ── MAPA ── */
+        <div className="flex flex-1 items-center justify-center flex-col gap-4">
           <div className="rounded-2xl p-5"
             style={{ background: 'rgba(99,102,241,0.10)', border: '0.5px solid rgba(99,102,241,0.25)' }}>
-            {view === 'calendario'
-              ? <Calendar size={32} strokeWidth={1.2} className="text-indigo-300" />
-              : <MapIcon size={32} strokeWidth={1.2} className="text-indigo-300" />}
+            <MapIcon size={32} strokeWidth={1.2} className="text-indigo-300" />
           </div>
-          <p className="text-[15px] font-semibold text-white">
-            {view === 'calendario' ? 'Calendário de atividades' : 'Mapa logístico'}
-          </p>
-          <p className="text-sm text-white/50">Em desenvolvimento</p>
+          <p className="text-[15px] font-semibold text-white">Mapa Logístico</p>
+          <a href="/mapa"
+            className="flex items-center gap-2 rounded-xl px-5 py-2.5 text-sm font-semibold text-white transition-all"
+            style={{ background: 'linear-gradient(135deg,#6366f1,#8b5cf6)', boxShadow: '0 0 20px rgba(99,102,241,0.3)' }}>
+            Abrir mapa completo →
+          </a>
         </div>
+        )
       )}
     </div>
   )
