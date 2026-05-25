@@ -12,6 +12,7 @@ import {
   BgCategory,
   OverlayMode,
 } from '@/store/background-store'
+import type { CustomBackground } from '@/app/api/backgrounds/route'
 
 /* ═══════════════════════════════════════════════════
    BackgroundGallery
@@ -27,7 +28,7 @@ interface Props {
   onClose: () => void
 }
 
-type Tab = 'all' | BgCategory | 'video' | 'photo'
+type Tab = 'all' | BgCategory | 'video' | 'photo' | 'custom'
 
 const TABS: { id: Tab; label: string; Icon: React.ElementType }[] = [
   { id: 'all',      label: 'Todos',    Icon: Sparkles },
@@ -36,6 +37,7 @@ const TABS: { id: Tab; label: string; Icon: React.ElementType }[] = [
   { id: 'abstract', label: 'Abstrato', Icon: Sparkles },
   { id: 'photo',    label: 'Fotos',    Icon: Sun      },
   { id: 'video',    label: 'Vídeo',    Icon: Film     },
+  { id: 'custom',   label: 'Meus Fundos', Icon: Sparkles },
 ]
 
 const OVERLAY_OPTIONS: { value: OverlayMode; label: string }[] = [
@@ -237,15 +239,44 @@ export function BackgroundGallery({ open, onClose }: Props) {
   } = useBackgroundStore()
 
   const [tab, setTab] = useState<Tab>('all')
+  const [customBgs, setCustomBgs] = useState<CustomBackground[]>([])
+  const [customLoading, setCustomLoading] = useState(false)
+
+  // Fetch custom backgrounds when tab opens or user switches to 'custom'
+  useEffect(() => {
+    if (!open) return
+    setCustomLoading(true)
+    fetch('/api/backgrounds')
+      .then(r => r.json())
+      .then(d => setCustomBgs(d.items ?? []))
+      .catch(() => setCustomBgs([]))
+      .finally(() => setCustomLoading(false))
+  }, [open])
 
   if (!open) return null
 
-  const filtered = BACKGROUNDS.filter(bg => {
-    if (tab === 'all') return true
-    if (tab === 'video') return bg.type === 'video'
-    if (tab === 'photo') return bg.type === 'image'
-    return bg.category === tab
-  })
+  // Build combined list: static BACKGROUNDS + custom as BackgroundItem shape
+  const customAsItems: BackgroundItem[] = customBgs.map(c => ({
+    id: c.id,
+    label: c.label,
+    category: 'cinematic' as BgCategory,
+    type: c.type,
+    src: c.src,
+    preview: c.type === 'video'
+      ? 'linear-gradient(135deg,#1a1a2e,#0f172a)'
+      : 'linear-gradient(135deg,#374151,#6b7280)',
+    contrastMode: 'dark' as const,
+    defaultOverlay: c.type === 'video' ? 0.30 : 0.20,
+  }))
+
+  const filtered = tab === 'custom'
+    ? customAsItems
+    : BACKGROUNDS.filter(bg => {
+        if (tab === 'all') return true
+        if (tab === 'video') return bg.type === 'video'
+        if (tab === 'photo') return bg.type === 'image'
+        return bg.category === tab
+      })
 
   const activeBg = BACKGROUNDS.find(b => b.id === activeId)
 
@@ -396,7 +427,22 @@ export function BackgroundGallery({ open, onClose }: Props) {
             alignContent: 'start',
           }}
         >
-          {filtered.length === 0 && (
+          {tab === 'custom' && customLoading && (
+            <div style={{ gridColumn: '1/-1', textAlign: 'center', color: 'rgba(255,255,255,0.40)', fontSize: 13, padding: '32px 0' }}>
+              Carregando seus fundos…
+            </div>
+          )}
+          {tab === 'custom' && !customLoading && filtered.length === 0 && (
+            <div style={{ gridColumn: '1/-1', textAlign: 'center', padding: '32px 24px' }}>
+              <p style={{ color: 'rgba(255,255,255,0.50)', fontSize: 13, marginBottom: 8 }}>
+                Nenhum arquivo encontrado em <code style={{ background: 'rgba(255,255,255,0.10)', borderRadius: 4, padding: '2px 6px', fontSize: 11 }}>public/backgrounds/</code>
+              </p>
+              <p style={{ color: 'rgba(255,255,255,0.30)', fontSize: 11 }}>
+                Adicione imagens (.jpg .png .webp) ou vídeos (.mp4 .webm) e faça git push
+              </p>
+            </div>
+          )}
+          {!(tab === 'custom' && customLoading) && tab !== 'custom' && filtered.length === 0 && (
             <div
               style={{
                 gridColumn: '1/-1',
