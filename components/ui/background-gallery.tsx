@@ -78,7 +78,6 @@ function BgCard({
       onMouseLeave={() => setHovered(false)}
       className="relative rounded-xl overflow-hidden cursor-pointer group"
       style={{
-        aspectRatio: '4/3',
         border: isActive
           ? '2px solid #6366f1'
           : '2px solid rgba(255,255,255,0.10)',
@@ -292,7 +291,7 @@ export function BackgroundGallery({ open, onClose }: Props) {
         onClick={e => e.stopPropagation()}
         style={{
           position: 'relative',
-          width: 'min(820px, 100%)',
+          width: 'min(860px, 100%)',
           maxHeight: '88vh',
           display: 'flex',
           flexDirection: 'column',
@@ -410,8 +409,9 @@ export function BackgroundGallery({ open, onClose }: Props) {
             overflowY: 'auto',
             padding: '16px 24px',
             display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))',
-            gap: 12,
+            gridTemplateColumns: 'repeat(3, 1fr)',
+            gridAutoRows: '140px',
+            gap: 10,
             alignContent: 'start',
           }}
         >
