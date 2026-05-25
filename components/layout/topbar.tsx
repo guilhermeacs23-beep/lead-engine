@@ -73,12 +73,8 @@ export function Topbar() {
       <AddLeadModal open={addLeadOpen} onClose={() => setAddLeadOpen(false)} onCreated={() => {}} />
       <LeadDrawer lead={selectedLead} onClose={() => setSelectedLead(null)} />
 
-      <header className="flex h-[52px] items-center gap-2 px-3 sm:px-5"
-        style={{
-          background: 'rgba(255,255,255,0.05)',
-          backdropFilter: 'blur(24px) saturate(180%)',
-          borderBottom: '0.5px solid rgba(255,255,255,0.10)',
-        }}>
+      <header className="glass-topbar flex h-[52px] items-center gap-2 px-3 sm:px-5"
+        style={{}}>
 
         {/* Brand — desktop only */}
         <span className="mr-1 hidden text-sm font-medium text-white/90 lg:block">Lead Engine</span>
