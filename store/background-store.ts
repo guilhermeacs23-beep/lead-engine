@@ -175,6 +175,75 @@ export const BACKGROUNDS: BackgroundItem[] = [
     isNew: true,
   },
 
+  /* ── Gradientes Vibrantes ── */
+  {
+    id: 'neon-pulse',
+    label: 'Neon Pulse', category: 'abstract', type: 'css-animated', contrastMode: 'dark', defaultOverlay: 0.22, isNew: true,
+    preview: 'linear-gradient(135deg,#00d2ff,#7b2ff7,#ff006e)',
+    cssClass: 'bg-anim-neon',
+  },
+  {
+    id: 'electric',
+    label: 'Electric', category: 'abstract', type: 'css-animated', contrastMode: 'dark', defaultOverlay: 0.20, isNew: true,
+    preview: 'linear-gradient(135deg,#00f5a0,#00d9f5,#0044ff)',
+    cssClass: 'bg-anim-electric',
+  },
+  {
+    id: 'fire-gradient',
+    label: 'Fire', category: 'abstract', type: 'css-animated', contrastMode: 'dark', defaultOverlay: 0.28, isNew: true,
+    preview: 'linear-gradient(135deg,#ff0000,#ff6600,#ffcc00)',
+    cssClass: 'bg-anim-fire',
+  },
+  {
+    id: 'royal-mesh',
+    label: 'Royal', category: 'abstract', type: 'css-animated', contrastMode: 'dark', defaultOverlay: 0.22, isNew: true,
+    preview: 'linear-gradient(135deg,#1a0038,#6600cc,#cc9900)',
+    cssClass: 'bg-anim-royal',
+  },
+  {
+    id: 'candy',
+    label: 'Candy', category: 'abstract', type: 'css-animated', contrastMode: 'dark', defaultOverlay: 0.18, isNew: true,
+    preview: 'linear-gradient(135deg,#f953c6,#b91d73,#fc4a1a)',
+    cssClass: 'bg-anim-candy',
+  },
+  {
+    id: 'matrix',
+    label: 'Matrix', category: 'dark', type: 'css-animated', contrastMode: 'dark', defaultOverlay: 0.20, isNew: true,
+    preview: 'linear-gradient(135deg,#000000,#003300,#00ff41)',
+    cssClass: 'bg-anim-matrix',
+  },
+
+  /* ── Vídeos Ambientes (Mixkit CDN — gratuito) ── */
+  {
+    id: 'video-stars',
+    label: 'Galáxia', category: 'cinematic', type: 'video', contrastMode: 'dark', defaultOverlay: 0.30, isNew: true,
+    preview: 'linear-gradient(135deg,#020617,#0f172a,#1e1b4b)',
+    src: 'https://assets.mixkit.co/videos/preview/mixkit-stars-in-space-1610-large.mp4',
+  },
+  {
+    id: 'video-ocean-sunset',
+    label: 'Oceano Sunset', category: 'cinematic', type: 'video', contrastMode: 'dark', defaultOverlay: 0.32, isNew: true,
+    preview: 'linear-gradient(135deg,#0c4a6e,#ea580c,#fbbf24)',
+    src: 'https://assets.mixkit.co/videos/preview/mixkit-aerial-view-of-the-ocean-at-sunset-1048-large.mp4',
+  },
+  {
+    id: 'video-abstract-blue',
+    label: 'Abstrato Azul', category: 'cinematic', type: 'video', contrastMode: 'dark', defaultOverlay: 0.25, isNew: true,
+    preview: 'linear-gradient(135deg,#1e3a8a,#3b82f6,#06b6d4)',
+    src: 'https://assets.mixkit.co/videos/preview/mixkit-smooth-blue-abstract-animation-4165-large.mp4',
+  },
+  {
+    id: 'video-particles',
+    label: 'Partículas', category: 'cinematic', type: 'video', contrastMode: 'dark', defaultOverlay: 0.28, isNew: true,
+    preview: 'linear-gradient(135deg,#0f172a,#312e81,#4c1d95)',
+    src: 'https://assets.mixkit.co/videos/preview/mixkit-white-particles-on-blue-background-4070-large.mp4',
+  },
+  {
+    id: 'video-forest',
+    label: 'Floresta Viva', category: 'cinematic', type: 'video', contrastMode: 'dark', defaultOverlay: 0.35, isNew: true,
+    preview: 'linear-gradient(135deg,#052e16,#166534,#14532d)',
+    src: 'https://assets.mixkit.co/videos/preview/mixkit-forest-stream-in-the-sunlight-529-large.mp4',
+  },
   /* ── Cinemático (video — infra pronta, arquivo em /public/backgrounds/) ── */
   {
     id: 'clouds-video', label: 'Nuvens', category: 'cinematic', type: 'video', contrastMode: 'dark', defaultOverlay: 0.45,
