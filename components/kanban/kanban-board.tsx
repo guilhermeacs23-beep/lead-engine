@@ -258,17 +258,17 @@ export function KanbanBoard() {
       <div
         className="flex h-11 flex-shrink-0 items-center gap-1.5 px-5"
         style={{
-          background: 'rgba(255,255,255,0.04)',
-          backdropFilter: 'blur(16px)',
-          borderBottom: '0.5px solid rgba(255,255,255,0.07)',
+          background: 'rgba(0,0,0,0.18)',
+          backdropFilter: 'blur(20px)',
+          borderBottom: '1px solid rgba(255,255,255,0.10)',
         }}
       >
         {VIEW_TABS.map(({ id, label, Icon }) => (
           <button key={id} onClick={() => setView(id)}
             className={`flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-xs transition-all duration-150
               ${view === id
-                ? 'bg-indigo-500/20 font-medium text-indigo-300'
-                : 'text-white/55 hover:bg-white/[0.06] hover:text-white/80'}`}
+                ? 'bg-white/[0.14] font-semibold text-white border border-white/20'
+                : 'text-white/70 hover:bg-white/[0.10] hover:text-white'}`}
           >
             <Icon size={12} strokeWidth={1.5} />
             {label}
