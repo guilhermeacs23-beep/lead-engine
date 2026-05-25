@@ -1,0 +1,163 @@
+import { create } from 'zustand'
+import { persist } from 'zustand/middleware'
+
+/* ═══════════════════════════════════════════════════
+   AMBIENT BACKGROUND SYSTEM — Store
+   Completamente separado do ThemeStore (cor ≠ fundo)
+═══════════════════════════════════════════════════ */
+
+export type BgType      = 'css-gradient' | 'css-animated' | 'particles' | 'video' | 'image'
+export type BgCategory  = 'dark' | 'light' | 'nature' | 'abstract' | 'cinematic'
+export type OverlayMode = 'auto' | 'none' | 'light' | 'medium' | 'strong'
+export type ContrastMode = 'dark' | 'light'
+
+export interface BackgroundItem {
+  id:          string
+  label:       string
+  category:    BgCategory
+  type:        BgType
+  /** CSS gradient string used as thumbnail and as fallback */
+  preview:     string
+  /** CSS class applied to the background div (for animated gradients) */
+  cssClass?:   string
+  /** For video / static image */
+  src?:        string
+  /** Which text contrast to force: dark=white text, light=dark text */
+  contrastMode: ContrastMode
+  /** Suggested overlay intensity (0–1) */
+  defaultOverlay: number
+  isNew?:      boolean
+}
+
+export const BACKGROUNDS: BackgroundItem[] = [
+  /* ── Dark / Espacial ── */
+  {
+    id: 'cosmos', label: 'Cosmos', category: 'dark', type: 'css-animated', contrastMode: 'dark', defaultOverlay: 0.20,
+    preview: 'linear-gradient(135deg,#0f0c29,#302b63,#24243e)',
+    cssClass: 'bg-anim-cosmos',
+  },
+  {
+    id: 'midnight', label: 'Midnight', category: 'dark', type: 'css-animated', contrastMode: 'dark', defaultOverlay: 0.15,
+    preview: 'linear-gradient(135deg,#0a0a1a,#0f0c29,#1a1040)',
+    cssClass: 'bg-anim-midnight',
+  },
+  {
+    id: 'carbon', label: 'Carbon', category: 'dark', type: 'css-gradient', contrastMode: 'dark', defaultOverlay: 0.10,
+    preview: 'linear-gradient(135deg,#0d1117,#161b22,#0d1117)',
+    cssClass: 'bg-carbon',
+  },
+  {
+    id: 'abyss', label: 'Abismo', category: 'dark', type: 'css-gradient', contrastMode: 'dark', defaultOverlay: 0.12,
+    preview: 'linear-gradient(135deg,#0a1628,#0d2137,#071520)',
+    cssClass: 'bg-abyss',
+  },
+
+  /* ── Abstract / Animados ── */
+  {
+    id: 'nebula', label: 'Nebulosa', category: 'abstract', type: 'css-animated', contrastMode: 'dark', defaultOverlay: 0.28, isNew: true,
+    preview: 'linear-gradient(135deg,#1a0533,#6d28d9,#ec4899,#0f172a)',
+    cssClass: 'bg-anim-nebula',
+  },
+  {
+    id: 'aurora', label: 'Aurora', category: 'abstract', type: 'css-animated', contrastMode: 'dark', defaultOverlay: 0.25, isNew: true,
+    preview: 'linear-gradient(135deg,#042f2e,#065f46,#0891b2,#1e1b4b)',
+    cssClass: 'bg-anim-aurora',
+  },
+  {
+    id: 'sunset', label: 'Sunset', category: 'abstract', type: 'css-animated', contrastMode: 'dark', defaultOverlay: 0.30, isNew: true,
+    preview: 'linear-gradient(135deg,#1a0a00,#7c2d12,#c2410c,#9d174d)',
+    cssClass: 'bg-anim-sunset',
+  },
+  {
+    id: 'violet-dream', label: 'Violet Dream', category: 'abstract', type: 'css-animated', contrastMode: 'dark', defaultOverlay: 0.22, isNew: true,
+    preview: 'linear-gradient(135deg,#1e1b4b,#4c1d95,#6d28d9,#2e1065)',
+    cssClass: 'bg-anim-violet',
+  },
+  {
+    id: 'ocean', label: 'Oceano', category: 'nature', type: 'css-animated', contrastMode: 'dark', defaultOverlay: 0.20,
+    preview: 'linear-gradient(135deg,#0c4a6e,#0369a1,#0ea5e9,#0c4a6e)',
+    cssClass: 'bg-anim-ocean',
+  },
+
+  /* ── Claros ── */
+  {
+    id: 'frost', label: 'Frost', category: 'light', type: 'css-animated', contrastMode: 'light', defaultOverlay: 0.08,
+    preview: 'linear-gradient(135deg,#f0f9ff,#e0f2fe,#f8fafc,#ede9fe)',
+    cssClass: 'bg-anim-frost',
+  },
+  {
+    id: 'sakura', label: 'Sakura', category: 'light', type: 'css-animated', contrastMode: 'light', defaultOverlay: 0.10, isNew: true,
+    preview: 'linear-gradient(135deg,#fdf2f8,#fce7f3,#fbcfe8,#f5d0fe)',
+    cssClass: 'bg-anim-sakura',
+  },
+  {
+    id: 'parchment', label: 'Pergaminho', category: 'light', type: 'css-gradient', contrastMode: 'light', defaultOverlay: 0.05,
+    preview: 'linear-gradient(135deg,#fffbeb,#fef3c7,#fde68a)',
+    cssClass: 'bg-amber',
+  },
+
+  /* ── Cinemático (video — infra pronta, arquivo em /public/backgrounds/) ── */
+  {
+    id: 'clouds-video', label: 'Nuvens', category: 'cinematic', type: 'video', contrastMode: 'dark', defaultOverlay: 0.45,
+    preview: 'linear-gradient(135deg,#64748b,#94a3b8,#cbd5e1)',
+    src: '/backgrounds/clouds.mp4',
+  },
+  {
+    id: 'stars-video', label: 'Estrelas', category: 'cinematic', type: 'video', contrastMode: 'dark', defaultOverlay: 0.35,
+    preview: 'linear-gradient(135deg,#020617,#0f172a,#1e1b4b)',
+    src: '/backgrounds/stars.mp4',
+  },
+  {
+    id: 'aurora-video', label: 'Aurora (vídeo)', category: 'cinematic', type: 'video', contrastMode: 'dark', defaultOverlay: 0.30, isNew: true,
+    preview: 'linear-gradient(135deg,#042f2e,#065f46,#0d9488)',
+    src: '/backgrounds/aurora.mp4',
+  },
+]
+
+export const CATEGORY_LABELS: Record<BgCategory, string> = {
+  dark: 'Escuros', light: 'Claros', nature: 'Natureza',
+  abstract: 'Abstrato', cinematic: 'Cinemático',
+}
+
+interface BackgroundState {
+  activeId:       string
+  overlayMode:    OverlayMode
+  overlayStrength: number     // 0–1 (manual override)
+  motionEnabled:  boolean
+  particlesOn:    boolean
+  /* actions */
+  setBackground:      (id: string) => void
+  setOverlayMode:     (m: OverlayMode) => void
+  setOverlayStrength: (v: number) => void
+  toggleMotion:       () => void
+  toggleParticles:    () => void
+}
+
+export const useBackgroundStore = create<BackgroundState>()(
+  persist(
+    (set) => ({
+      activeId:        'cosmos',
+      overlayMode:     'auto',
+      overlayStrength: 0,
+      motionEnabled:   true,
+      particlesOn:     false,
+
+      setBackground:      (id) => set({ activeId: id }),
+      setOverlayMode:     (m)  => set({ overlayMode: m }),
+      setOverlayStrength: (v)  => set({ overlayStrength: v }),
+      toggleMotion:       ()   => set((s) => ({ motionEnabled: !s.motionEnabled })),
+      toggleParticles:    ()   => set((s) => ({ particlesOn: !s.particlesOn })),
+    }),
+    { name: 'le-background' }
+  )
+)
+
+/** Resolve effective overlay based on bg + mode */
+export function resolveOverlay(bg: BackgroundItem, mode: OverlayMode, manualStrength: number): number {
+  if (mode === 'none') return 0
+  if (mode !== 'auto') {
+    const fixed = { light: 0.20, medium: 0.38, strong: 0.55 }
+    return fixed[mode] ?? 0.30
+  }
+  return manualStrength > 0 ? manualStrength : bg.defaultOverlay
+}
