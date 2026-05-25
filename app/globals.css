@@ -142,7 +142,7 @@ body {
 
   /* ── Sidebar glass ── */
   .glass-sidebar {
-    background: rgba(8, 6, 24, 0.85);
+    background: rgba(6, 4, 18, 0.58);
     backdrop-filter: var(--blur-xl);
     -webkit-backdrop-filter: var(--blur-xl);
     border-right: 1px solid var(--border-glass-md);
@@ -151,7 +151,7 @@ body {
 
   /* ── Topbar glass ── */
   .glass-topbar {
-    background: rgba(12, 9, 30, 0.75);
+    background: rgba(8, 6, 20, 0.52);
     backdrop-filter: var(--blur-lg);
     -webkit-backdrop-filter: var(--blur-lg);
     border-bottom: 1px solid var(--border-glass-md);
