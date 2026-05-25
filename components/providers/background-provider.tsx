@@ -22,6 +22,13 @@ export function BackgroundProvider() {
 
   const overlay = resolveOverlay(bg, overlayMode, overlayStrength)
 
+  /* ── Sync contrastMode → data-contrast on <html> ─ */
+  useEffect(() => {
+    const mode = bg?.contrastMode ?? 'dark'
+    document.documentElement.setAttribute('data-contrast', mode)
+    return () => document.documentElement.removeAttribute('data-contrast')
+  }, [bg?.contrastMode])
+
   /* ── Pause / resume video on tab visibility ─── */
   useEffect(() => {
     if (bg?.type !== 'video') return
