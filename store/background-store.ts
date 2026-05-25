@@ -22,6 +22,8 @@ export interface BackgroundItem {
   cssClass?:   string
   /** For video / static image */
   src?:        string
+  /** Poster/thumbnail image URL for video cards */
+  poster?:     string
   /** Which text contrast to force: dark=white text, light=dark text */
   contrastMode: ContrastMode
   /** Suggested overlay intensity (0–1) */
@@ -219,30 +221,35 @@ export const BACKGROUNDS: BackgroundItem[] = [
     label: 'Galáxia', category: 'cinematic', type: 'video', contrastMode: 'dark', defaultOverlay: 0.30, isNew: true,
     preview: 'linear-gradient(135deg,#020617,#0f172a,#1e1b4b)',
     src: 'https://assets.mixkit.co/videos/preview/mixkit-stars-in-space-1610-large.mp4',
+    poster: 'https://assets.mixkit.co/videos/preview/mixkit-stars-in-space-1610-large.jpg',
   },
   {
     id: 'video-ocean-sunset',
     label: 'Oceano Sunset', category: 'cinematic', type: 'video', contrastMode: 'dark', defaultOverlay: 0.32, isNew: true,
     preview: 'linear-gradient(135deg,#0c4a6e,#ea580c,#fbbf24)',
     src: 'https://assets.mixkit.co/videos/preview/mixkit-aerial-view-of-the-ocean-at-sunset-1048-large.mp4',
+    poster: 'https://assets.mixkit.co/videos/preview/mixkit-aerial-view-of-the-ocean-at-sunset-1048-large.jpg',
   },
   {
     id: 'video-abstract-blue',
     label: 'Abstrato Azul', category: 'cinematic', type: 'video', contrastMode: 'dark', defaultOverlay: 0.25, isNew: true,
     preview: 'linear-gradient(135deg,#1e3a8a,#3b82f6,#06b6d4)',
     src: 'https://assets.mixkit.co/videos/preview/mixkit-smooth-blue-abstract-animation-4165-large.mp4',
+    poster: 'https://assets.mixkit.co/videos/preview/mixkit-smooth-blue-abstract-animation-4165-large.jpg',
   },
   {
     id: 'video-particles',
     label: 'Partículas', category: 'cinematic', type: 'video', contrastMode: 'dark', defaultOverlay: 0.28, isNew: true,
     preview: 'linear-gradient(135deg,#0f172a,#312e81,#4c1d95)',
     src: 'https://assets.mixkit.co/videos/preview/mixkit-white-particles-on-blue-background-4070-large.mp4',
+    poster: 'https://assets.mixkit.co/videos/preview/mixkit-white-particles-on-blue-background-4070-large.jpg',
   },
   {
     id: 'video-forest',
     label: 'Floresta Viva', category: 'cinematic', type: 'video', contrastMode: 'dark', defaultOverlay: 0.35, isNew: true,
     preview: 'linear-gradient(135deg,#052e16,#166534,#14532d)',
     src: 'https://assets.mixkit.co/videos/preview/mixkit-forest-stream-in-the-sunlight-529-large.mp4',
+    poster: 'https://assets.mixkit.co/videos/preview/mixkit-forest-stream-in-the-sunlight-529-large.jpg',
   },
   /* ── Cinemático (video — infra pronta, arquivo em /public/backgrounds/) ── */
   {
