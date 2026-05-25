@@ -5,6 +5,8 @@ import { Sidebar } from './sidebar'
 import { Topbar } from './topbar'
 import { AddLeadModal } from '@/components/ui/add-lead-modal'
 import { BackgroundProvider } from '@/components/providers/background-provider'
+import { BackgroundGallery } from '@/components/ui/background-gallery'
+import { useBackgroundStore } from '@/store/background-store'
 import {
   Users, Kanban, LayoutDashboard, Settings, Plus,
 } from 'lucide-react'
@@ -17,6 +19,7 @@ const BOTTOM_TABS = [
 ]
 
 export function AppShell({ children }: { children: React.ReactNode }) {
+  const { galleryOpen, setGalleryOpen } = useBackgroundStore()
   const [addLeadOpen, setAddLeadOpen] = useState(false)
   const pathname = usePathname()
 
@@ -114,6 +117,9 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           )
         })}
       </nav>
+
+      {/* Background Gallery — rendered at root so position:fixed is not broken by backdrop-filter */}
+      <BackgroundGallery open={galleryOpen} onClose={() => setGalleryOpen(false)} />
 
       <AddLeadModal open={addLeadOpen} onClose={() => setAddLeadOpen(false)} onCreated={() => {}} />
     </div>
