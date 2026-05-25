@@ -125,12 +125,16 @@ interface BackgroundState {
   overlayStrength: number     // 0–1 (manual override)
   motionEnabled:  boolean
   particlesOn:    boolean
+  galleryOpen:    boolean
   /* actions */
   setBackground:      (id: string) => void
   setOverlayMode:     (m: OverlayMode) => void
   setOverlayStrength: (v: number) => void
+  setMotionEnabled:   (v: boolean) => void
   toggleMotion:       () => void
   toggleParticles:    () => void
+  setGalleryOpen:     (v: boolean) => void
+  reset:              () => void
 }
 
 export const useBackgroundStore = create<BackgroundState>()(
@@ -141,14 +145,18 @@ export const useBackgroundStore = create<BackgroundState>()(
       overlayStrength: 0,
       motionEnabled:   true,
       particlesOn:     false,
+      galleryOpen:     false,
 
       setBackground:      (id) => set({ activeId: id }),
       setOverlayMode:     (m)  => set({ overlayMode: m }),
       setOverlayStrength: (v)  => set({ overlayStrength: v }),
+      setMotionEnabled:   (v)  => set({ motionEnabled: v }),
       toggleMotion:       ()   => set((s) => ({ motionEnabled: !s.motionEnabled })),
       toggleParticles:    ()   => set((s) => ({ particlesOn: !s.particlesOn })),
+      setGalleryOpen:     (v)  => set({ galleryOpen: v }),
+      reset: () => set({ activeId: 'cosmos', overlayMode: 'auto', overlayStrength: 0, motionEnabled: true }),
     }),
-    { name: 'le-background' }
+    { name: 'le-background', partialize: (s) => ({ activeId: s.activeId, overlayMode: s.overlayMode, overlayStrength: s.overlayStrength, motionEnabled: s.motionEnabled }) }
   )
 )
 
