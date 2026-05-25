@@ -1,9 +1,9 @@
 'use client'
-import { useState, useEffect, useRef, useCallback } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { fetchLeads } from '@/lib/supabase'
 import { SEGMENT_LABELS } from '@/lib/mock-data'
-import { getScoreColor } from '@/lib/utils'
-import { Loader2, X, MapPin, Filter } from 'lucide-react'
+import { getScoreColor, formatCurrencyShort } from '@/lib/utils'
+import { Loader2, X, Filter } from 'lucide-react'
 
 const CITY_COORDS: Record<string, [number, number]> = {
   'São Paulo,SP':              [-23.5505, -46.6333],
@@ -56,14 +56,13 @@ const CITY_COORDS: Record<string, [number, number]> = {
   'Imperatriz,MA':             [ -5.5260, -47.4789],
   'Volta Redonda,RJ':          [-22.5233, -44.1028],
   'Juiz de Fora,MG':           [-21.7611, -43.3496],
+  'Uberlândia,MG':             [-18.9186, -48.2772],
   'Montes Claros,MG':          [-16.7281, -43.8634],
   'São Carlos,SP':             [-21.9974, -47.8916],
   'Piracicaba,SP':             [-22.7253, -47.6492],
   'Jundiaí,SP':                [-23.1857, -46.8977],
-  'Osasco,SP':                 [-23.5329, -46.7919],
   'Guarulhos,SP':              [-23.4543, -46.5337],
   'São Bernardo do Campo,SP':  [-23.6914, -46.5646],
-  'Santo André,SP':            [-23.6639, -46.5383],
 }
 
 const SEG_COLORS: Record<string, string> = {
@@ -71,85 +70,128 @@ const SEG_COLORS: Record<string, string> = {
   farmaceutico: '#f472b6', moda: '#fbbf24', construcao: '#f97316',
   alimentos: '#a78bfa', logistica: '#0ea5e9', tecnologia: '#94a3b8',
 }
-
 const STATUS_COLORS: Record<string, string> = {
   novo:'#818cf8', contactado:'#60a5fa', proposta:'#fbbf24',
   negociando:'#f472b6', fechado:'#34d399', perdido:'#ef4444',
+}
+const STATUS_LABELS: Record<string, string> = {
+  novo:'Novo', contactado:'Contactado', proposta:'Proposta',
+  negociando:'Negociando', fechado:'Fechado', perdido:'Perdido',
+}
+
+// Inject Leaflet tooltip CSS once
+function injectTooltipCSS() {
+  if (document.getElementById('le-tooltip-css')) return
+  const s = document.createElement('style')
+  s.id = 'le-tooltip-css'
+  s.textContent = `
+    .le-tip {
+      background: rgba(10,8,28,0.97) !important;
+      border: 0.5px solid rgba(255,255,255,0.18) !important;
+      border-radius: 12px !important;
+      padding: 0 !important;
+      color: #fff !important;
+      box-shadow: 0 12px 40px rgba(0,0,0,0.7) !important;
+      backdrop-filter: blur(20px);
+      max-width: 240px;
+    }
+    .le-tip::before { display: none !important; }
+    .leaflet-tooltip-top.le-tip::before {
+      display: block !important;
+      border-top-color: rgba(255,255,255,0.18) !important;
+    }
+  `
+  document.head.appendChild(s)
 }
 
 export default function MapaPage() {
   const mapEl      = useRef<HTMLDivElement>(null)
   const mapRef     = useRef<any>(null)
   const markersRef = useRef<any[]>([])
-  const [leads,      setLeads]      = useState<any[]>([])
-  const [loading,    setLoading]    = useState(true)
-  const [mapReady,   setMapReady]   = useState(false)
-  const [filterBy,   setFilterBy]   = useState<'segmento' | 'status'>('segmento')
-  const [selected,   setSelected]   = useState<any | null>(null)
-  const [plotted,    setPlotted]    = useState(0)
+  const [leads,    setLeads]    = useState<any[]>([])
+  const [loading,  setLoading]  = useState(true)
+  const [mapReady, setMapReady] = useState(false)
+  const [filterBy, setFilterBy] = useState<'segmento'|'status'>('segmento')
+  const [selected, setSelected] = useState<any|null>(null)
+  const [plotted,  setPlotted]  = useState(0)
 
-  // Load leads
   useEffect(() => {
-    fetchLeads().then(data => {
-      setLeads(data)
-      setLoading(false)
-    })
+    fetchLeads().then(data => { setLeads(data); setLoading(false) })
   }, [])
 
-  // Load Leaflet
   useEffect(() => {
     if (typeof window === 'undefined') return
     const link = Object.assign(document.createElement('link'), {
       rel: 'stylesheet', href: 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css',
     })
     document.head.appendChild(link)
-
     const script = document.createElement('script')
     script.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js'
-    script.onload = () => setMapReady(true)
+    script.onload = () => { injectTooltipCSS(); setMapReady(true) }
     document.head.appendChild(script)
   }, [])
 
-  // Init map
   useEffect(() => {
     if (!mapReady || !mapEl.current || mapRef.current) return
     const L = (window as any).L
     const map = L.map(mapEl.current, { zoomControl: false }).setView([-14.2, -51.9], 4)
     L.control.zoom({ position: 'bottomright' }).addTo(map)
     L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-      attribution: '© OpenStreetMap © CARTO',
-      subdomains: 'abcd', maxZoom: 19,
+      attribution: '© OpenStreetMap © CARTO', subdomains: 'abcd', maxZoom: 19,
     }).addTo(map)
     mapRef.current = map
   }, [mapReady])
 
-  // Plot markers whenever leads or filterBy changes
   useEffect(() => {
     if (!mapRef.current || !mapReady || leads.length === 0) return
     const L   = (window as any).L
     const map = mapRef.current
-
-    // Remove old markers
     markersRef.current.forEach(m => m.remove())
     markersRef.current = []
-
     let count = 0
+
     leads.forEach(lead => {
       const coords = CITY_COORDS[`${lead.cidade},${lead.estado}`]
       if (!coords) return
-
       const color = filterBy === 'segmento'
         ? (SEG_COLORS[lead.segmento] ?? '#6366f1')
         : (STATUS_COLORS[lead.status] ?? '#6366f1')
-
-      const score = lead.score_ia ?? 60
-      const r     = 5 + Math.round(score / 25)
+      const r = 6 + Math.round((lead.score_ia ?? 60) / 20)
 
       const marker = L.circleMarker(coords, {
-        radius: r, fillColor: color, color: 'rgba(255,255,255,0.6)',
-        weight: 1.5, opacity: 1, fillOpacity: 0.82,
+        radius: r, fillColor: color,
+        color: 'rgba(255,255,255,0.7)', weight: 1.5,
+        opacity: 1, fillOpacity: 0.85,
       }).addTo(map)
 
+      // ── Hover tooltip ──
+      const seg   = SEGMENT_LABELS[lead.segmento] ?? lead.segmento
+      const valor = lead.valor_estimado ? formatCurrencyShort(lead.valor_estimado) + '/mês' : '—'
+      const score = lead.score_ia ?? '—'
+      const scoreColor = getScoreColor(lead.score_ia ?? 0).color
+
+      const tipHtml = `
+        <div style="padding:12px 14px;min-width:190px">
+          <p style="margin:0 0 2px;font-size:14px;font-weight:700;color:#fff;line-height:1.2">${lead.empresa}</p>
+          <p style="margin:0 0 8px;font-size:11px;color:rgba(255,255,255,0.5)">
+            ${lead.contato_nome}${lead.contato_cargo ? ' · ' + lead.contato_cargo : ''}
+          </p>
+          <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+            <span style="font-size:12px;font-weight:600;color:${color}">${seg}</span>
+            <span style="font-size:12px;font-weight:600;color:#34d399">${valor}</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;margin-top:6px">
+            <span style="font-size:11px;color:rgba(255,255,255,0.4)">${lead.cidade}, ${lead.estado}</span>
+            <span style="margin-left:auto;font-size:12px;font-weight:700;color:${scoreColor}">Score ${score}</span>
+          </div>
+        </div>`
+
+      marker.bindTooltip(tipHtml, {
+        direction: 'top', permanent: false, sticky: false,
+        className: 'le-tip', offset: [0, -(r + 4)],
+      })
+
+      // Click → right panel
       marker.on('click', () => setSelected(lead))
       markersRef.current.push(marker)
       count++
@@ -157,39 +199,39 @@ export default function MapaPage() {
     setPlotted(count)
   }, [leads, mapReady, filterBy])
 
-  const mappedCount   = leads.filter(l => CITY_COORDS[`${l.cidade},${l.estado}`]).length
-  const unmappedCount = leads.length - mappedCount
+  const unmapped = leads.length - leads.filter(l => CITY_COORDS[`${l.cidade},${l.estado}`]).length
 
   return (
     <div className="relative flex h-full overflow-hidden">
-
-      {/* Map container */}
       <div ref={mapEl} className="flex-1" style={{ background: '#0c0a1e' }} />
 
       {loading && (
-        <div className="absolute inset-0 z-20 flex items-center justify-center gap-2 text-sm text-white/50"
+        <div className="absolute inset-0 z-[2000] flex items-center justify-center gap-2 text-sm text-white/50"
           style={{ background: 'rgba(12,10,30,0.8)' }}>
           <Loader2 size={18} className="animate-spin" />Carregando leads…
         </div>
       )}
 
-      {/* Controls panel */}
-      <div className="absolute left-4 top-4 z-10 flex flex-col gap-3">
+      {/* ── Left controls ── z-[1000] stays above Leaflet layers */}
+      <div className="absolute left-4 top-4 z-[1000] flex flex-col gap-3">
+
         {/* Stats */}
-        <div className="rounded-xl px-4 py-3 text-sm"
-          style={{ background: 'rgba(13,11,32,0.92)', border: '0.5px solid rgba(255,255,255,0.14)', backdropFilter: 'blur(12px)' }}>
-          <p className="font-semibold text-white">{plotted} leads no mapa</p>
-          <p className="text-[12px] text-white/40">de {leads.length} total · {unmappedCount} sem coords</p>
+        <div className="rounded-xl px-4 py-3"
+          style={{ background: 'rgba(10,8,28,0.95)', border: '0.5px solid rgba(255,255,255,0.14)', backdropFilter: 'blur(16px)', boxShadow: '0 8px 32px rgba(0,0,0,0.5)' }}>
+          <p className="text-[14px] font-semibold text-white">{plotted} leads no mapa</p>
+          <p className="text-[11px] text-white/40">
+            de {leads.length} total{unmapped > 0 ? ` · ${unmapped} sem localização` : ''}
+          </p>
         </div>
 
         {/* Color by */}
         <div className="rounded-xl p-3"
-          style={{ background: 'rgba(13,11,32,0.92)', border: '0.5px solid rgba(255,255,255,0.14)', backdropFilter: 'blur(12px)' }}>
-          <p className="mb-2 text-[11px] font-semibold uppercase tracking-wider text-white/30 flex items-center gap-1.5">
-            <Filter size={10} />Colorir por
+          style={{ background: 'rgba(10,8,28,0.95)', border: '0.5px solid rgba(255,255,255,0.14)', backdropFilter: 'blur(16px)', boxShadow: '0 8px 32px rgba(0,0,0,0.5)' }}>
+          <p className="mb-2 flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-wider text-white/30">
+            <Filter size={9} />Colorir por
           </p>
           <div className="flex gap-2">
-            {(['segmento', 'status'] as const).map(v => (
+            {(['segmento','status'] as const).map(v => (
               <button key={v} onClick={() => setFilterBy(v)}
                 className="rounded-lg px-3 py-1.5 text-xs font-medium transition-all capitalize"
                 style={filterBy === v
@@ -203,71 +245,76 @@ export default function MapaPage() {
 
         {/* Legend */}
         <div className="rounded-xl p-3"
-          style={{ background: 'rgba(13,11,32,0.92)', border: '0.5px solid rgba(255,255,255,0.14)', backdropFilter: 'blur(12px)' }}>
-          <p className="mb-2 text-[11px] font-semibold uppercase tracking-wider text-white/30">Legenda</p>
+          style={{ background: 'rgba(10,8,28,0.95)', border: '0.5px solid rgba(255,255,255,0.14)', backdropFilter: 'blur(16px)', boxShadow: '0 8px 32px rgba(0,0,0,0.5)' }}>
+          <p className="mb-2 text-[10px] font-semibold uppercase tracking-wider text-white/30">Legenda</p>
           <div className="flex flex-col gap-1.5">
             {filterBy === 'segmento'
               ? Object.entries(SEG_COLORS).map(([k, c]) => (
-                <span key={k} className="flex items-center gap-2 text-[12px] text-white/70">
-                  <span className="h-2.5 w-2.5 rounded-full shrink-0" style={{ background: c }} />
+                <span key={k} className="flex items-center gap-2 text-[11px] text-white/65">
+                  <span className="h-2.5 w-2.5 shrink-0 rounded-full" style={{ background: c }} />
                   {SEGMENT_LABELS[k] ?? k}
                 </span>
               ))
               : Object.entries(STATUS_COLORS).map(([k, c]) => (
-                <span key={k} className="flex items-center gap-2 text-[12px] text-white/70">
-                  <span className="h-2.5 w-2.5 rounded-full shrink-0" style={{ background: c }} />
-                  {{novo:'Novo',contactado:'Contactado',proposta:'Proposta',negociando:'Negociando',fechado:'Fechado',perdido:'Perdido'}[k]}
+                <span key={k} className="flex items-center gap-2 text-[11px] text-white/65">
+                  <span className="h-2.5 w-2.5 shrink-0 rounded-full" style={{ background: c }} />
+                  {STATUS_LABELS[k]}
                 </span>
-              ))
-            }
+              ))}
           </div>
         </div>
       </div>
 
-      {/* Lead detail panel */}
+      {/* ── Right detail panel (on click) ── */}
       {selected && (
-        <div className="absolute right-4 top-4 z-10 w-72 rounded-xl overflow-hidden"
-          style={{ background: 'rgba(13,11,32,0.95)', border: '0.5px solid rgba(255,255,255,0.14)', backdropFilter: 'blur(20px)' }}>
-          <div className="flex items-start justify-between p-4"
+        <div className="absolute right-4 top-4 z-[1000] w-72 overflow-hidden rounded-xl"
+          style={{ background: 'rgba(10,8,28,0.97)', border: '0.5px solid rgba(255,255,255,0.16)', backdropFilter: 'blur(24px)', boxShadow: '0 16px 48px rgba(0,0,0,0.7)' }}>
+
+          {/* Header */}
+          <div className="flex items-start gap-3 p-4"
             style={{ borderBottom: '0.5px solid rgba(255,255,255,0.08)' }}>
-            <div className="flex items-center gap-3">
-              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-[13px] font-bold text-white"
-                style={{ background: `linear-gradient(135deg,${SEG_COLORS[selected.segmento] ?? '#6366f1'},${SEG_COLORS[selected.segmento] ?? '#8b5cf6'})` }}>
-                {selected.empresa?.charAt(0) ?? '?'}
-              </div>
-              <div>
-                <p className="text-[14px] font-semibold text-white">{selected.empresa}</p>
-                <p className="text-[12px] text-white/45">{selected.contato_nome}</p>
-              </div>
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg text-[14px] font-bold text-white"
+              style={{ background: `linear-gradient(135deg,${SEG_COLORS[selected.segmento] ?? '#6366f1'},${SEG_COLORS[selected.segmento] ?? '#8b5cf6'})` }}>
+              {selected.empresa?.charAt(0)}
             </div>
-            <button onClick={() => setSelected(null)}
-              className="text-white/30 hover:text-white/60 transition-all mt-0.5">
-              <X size={14} />
+            <div className="flex-1 min-w-0">
+              <p className="text-[14px] font-bold text-white leading-tight">{selected.empresa}</p>
+              <p className="text-[12px] text-white/45">{selected.contato_nome}</p>
+            </div>
+            <button onClick={() => setSelected(null)} className="shrink-0 text-white/30 hover:text-white/60 transition-all mt-0.5">
+              <X size={15} />
             </button>
           </div>
+
+          {/* Body */}
           <div className="flex flex-col gap-2 p-4">
             {[
-              { label: 'Segmento', value: SEGMENT_LABELS[selected.segmento] ?? selected.segmento },
-              { label: 'Localização', value: `${selected.cidade}, ${selected.estado}` },
-              { label: 'Cargo', value: selected.contato_cargo },
-              { label: 'Telefone', value: selected.telefone },
-              { label: 'E-mail', value: selected.email },
+              { label: 'Cargo',        value: selected.contato_cargo  },
+              { label: 'Segmento',     value: SEGMENT_LABELS[selected.segmento] ?? selected.segmento },
+              { label: 'Localização',  value: `${selected.cidade}, ${selected.estado}` },
+              { label: 'Potencial/mês',value: selected.valor_estimado ? formatCurrencyShort(selected.valor_estimado) : null },
+              { label: 'Telefone',     value: selected.telefone       },
+              { label: 'E-mail',       value: selected.email          },
             ].filter(r => r.value).map(({ label, value }) => (
-              <div key={label} className="flex items-start justify-between gap-2">
-                <span className="shrink-0 text-[12px] text-white/40">{label}</span>
-                <span className="text-right text-[12px] font-medium text-white">{value}</span>
+              <div key={label} className="flex items-start justify-between gap-3">
+                <span className="shrink-0 text-[11px] text-white/35">{label}</span>
+                <span className="text-right text-[12px] font-medium text-white break-all">{value}</span>
               </div>
             ))}
-            {selected.score_ia && (
-              <div className="mt-2 flex items-center gap-2">
-                <div className="flex-1 overflow-hidden rounded-full" style={{ height: 5, background: 'rgba(255,255,255,0.10)' }}>
-                  <div className="h-full rounded-full" style={{ width: `${selected.score_ia}%`, background: getScoreColor(selected.score_ia).color }} />
+
+            {/* Score bar */}
+            {selected.score_ia && (() => {
+              const sc = getScoreColor(selected.score_ia)
+              return (
+                <div className="mt-1 flex items-center gap-2">
+                  <span className="text-[11px] text-white/35">Score IA</span>
+                  <div className="flex-1 overflow-hidden rounded-full" style={{ height: 5, background: 'rgba(255,255,255,0.10)' }}>
+                    <div className="h-full rounded-full" style={{ width: `${selected.score_ia}%`, background: sc.color }} />
+                  </div>
+                  <span className="text-[13px] font-bold" style={{ color: sc.color }}>{selected.score_ia}</span>
                 </div>
-                <span className="text-[13px] font-bold" style={{ color: getScoreColor(selected.score_ia).color }}>
-                  {selected.score_ia}
-                </span>
-              </div>
-            )}
+              )
+            })()}
           </div>
         </div>
       )}
