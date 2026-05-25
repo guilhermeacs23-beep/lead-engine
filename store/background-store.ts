@@ -7,7 +7,7 @@ import { persist } from 'zustand/middleware'
 ═══════════════════════════════════════════════════ */
 
 export type BgType      = 'css-gradient' | 'css-animated' | 'particles' | 'video' | 'image'
-export type BgCategory  = 'dark' | 'light' | 'nature' | 'abstract' | 'cinematic'
+export type BgCategory  = 'dark' | 'light' | 'nature' | 'abstract' | 'cinematic' | 'photo'
 export type OverlayMode = 'auto' | 'none' | 'light' | 'medium' | 'strong'
 export type ContrastMode = 'dark' | 'light'
 
@@ -94,6 +94,85 @@ export const BACKGROUNDS: BackgroundItem[] = [
     id: 'parchment', label: 'Pergaminho', category: 'light', type: 'css-gradient', contrastMode: 'light', defaultOverlay: 0.05,
     preview: 'linear-gradient(135deg,#fffbeb,#fef3c7,#fde68a)',
     cssClass: 'bg-amber',
+  },
+
+
+  /* ── Fotográficos — Unsplash (gratuito) ── */
+  {
+    id: 'photo-alps',
+    label: 'Alpes Suíços',
+    category: 'photo', type: 'image', contrastMode: 'dark', defaultOverlay: 0.28,
+    preview: 'linear-gradient(135deg,#4a6fa5,#6b8cba,#2d4a6e)',
+    src: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?auto=format&fit=crop&w=1920&q=85',
+    isNew: true,
+  },
+  {
+    id: 'photo-milkyway',
+    label: 'Via Láctea',
+    category: 'photo', type: 'image', contrastMode: 'dark', defaultOverlay: 0.20,
+    preview: 'linear-gradient(135deg,#0a0a1a,#1a1040,#2d1b5e)',
+    src: 'https://images.unsplash.com/photo-1519681393784-d120267933ba?auto=format&fit=crop&w=1920&q=85',
+    isNew: true,
+  },
+  {
+    id: 'photo-aurora-real',
+    label: 'Aurora Boreal',
+    category: 'photo', type: 'image', contrastMode: 'dark', defaultOverlay: 0.22,
+    preview: 'linear-gradient(135deg,#042f2e,#065f46,#1e3a5f)',
+    src: 'https://images.unsplash.com/photo-1531366936337-7c912a4589a7?auto=format&fit=crop&w=1920&q=85',
+    isNew: true,
+  },
+  {
+    id: 'photo-ocean',
+    label: 'Oceano Turquesa',
+    category: 'photo', type: 'image', contrastMode: 'dark', defaultOverlay: 0.25,
+    preview: 'linear-gradient(135deg,#0369a1,#0ea5e9,#38bdf8)',
+    src: 'https://images.unsplash.com/photo-1505118380757-91f5f5632de0?auto=format&fit=crop&w=1920&q=85',
+    isNew: true,
+  },
+  {
+    id: 'photo-forest',
+    label: 'Floresta',
+    category: 'photo', type: 'image', contrastMode: 'dark', defaultOverlay: 0.30,
+    preview: 'linear-gradient(135deg,#14532d,#166534,#052e16)',
+    src: 'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?auto=format&fit=crop&w=1920&q=85',
+  },
+  {
+    id: 'photo-desert',
+    label: 'Deserto',
+    category: 'photo', type: 'image', contrastMode: 'dark', defaultOverlay: 0.30,
+    preview: 'linear-gradient(135deg,#92400e,#b45309,#78350f)',
+    src: 'https://images.unsplash.com/photo-1509316785289-025f5b846b35?auto=format&fit=crop&w=1920&q=85',
+  },
+  {
+    id: 'photo-city-night',
+    label: 'Cidade à Noite',
+    category: 'photo', type: 'image', contrastMode: 'dark', defaultOverlay: 0.25,
+    preview: 'linear-gradient(135deg,#1a1a2e,#16213e,#0f3460)',
+    src: 'https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?auto=format&fit=crop&w=1920&q=85',
+  },
+  {
+    id: 'photo-mountains-fog',
+    label: 'Montanhas Nevoeiro',
+    category: 'photo', type: 'image', contrastMode: 'dark', defaultOverlay: 0.22,
+    preview: 'linear-gradient(135deg,#374151,#6b7280,#9ca3af)',
+    src: 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=1920&q=85',
+  },
+  {
+    id: 'photo-cherry-blossom',
+    label: 'Cerejeiras',
+    category: 'photo', type: 'image', contrastMode: 'light', defaultOverlay: 0.10,
+    preview: 'linear-gradient(135deg,#fce7f3,#fbcfe8,#f9a8d4)',
+    src: 'https://images.unsplash.com/photo-1490750967868-88df5691cc77?auto=format&fit=crop&w=1920&q=85',
+    isNew: true,
+  },
+  {
+    id: 'photo-winter',
+    label: 'Inverno',
+    category: 'photo', type: 'image', contrastMode: 'light', defaultOverlay: 0.12,
+    preview: 'linear-gradient(135deg,#e0f2fe,#f0f9ff,#dbeafe)',
+    src: 'https://images.unsplash.com/photo-1483921210049-ed13e3aae56a?auto=format&fit=crop&w=1920&q=85',
+    isNew: true,
   },
 
   /* ── Cinemático (video — infra pronta, arquivo em /public/backgrounds/) ── */
