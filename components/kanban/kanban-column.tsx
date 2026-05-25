@@ -70,7 +70,7 @@ export function KanbanColumn({
   const previewColor = customColor.match(/^#[0-9a-fA-F]{6}$/) ? customColor : editColor
 
   return (
-    <div className="flex w-[240px] flex-shrink-0 flex-col" style={{ position: 'relative' }}>
+    <div className="flex w-[240px] flex-shrink-0 flex-col" style={{ position: 'relative', borderLeft: '2px dashed rgba(255,255,255,0.30)', paddingLeft: '0px' }}>
 
       {/* ── Header colorido estilo Bitrix ── */}
       <div
