@@ -61,17 +61,17 @@ export function Sidebar({ mobileOpen = false, onMobileClose }: Props) {
       >
         <Icon
           size={16} strokeWidth={active ? 2 : 1.6}
-          style={{ flexShrink: 0, opacity: active ? 1 : 0.85 }}
+          style={{ flexShrink: 0, opacity: active ? 1 : 0.72 }}
         />
         {isExpanded && (
-          <span className="truncate text-[13.5px]" style={{ color: active ? '#c4b5fd' : 'var(--text-secondary)' }}>
+          <span className="truncate text-[13.5px]" style={{ color: active ? '#ffffff' : 'rgba(255,255,255,0.75)' }}>
             {label}
           </span>
         )}
         {/* Active pill glow line */}
         {active && isExpanded && (
           <div className="ml-auto h-1.5 w-1.5 rounded-full"
-            style={{ background: '#a78bfa', boxShadow: '0 0 6px #a78bfa' }} />
+            style={{ background: '#ffffff', boxShadow: '0 0 6px rgba(255,255,255,0.7)' }} />
         )}
       </Link>
     )
