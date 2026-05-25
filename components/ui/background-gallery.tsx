@@ -249,29 +249,29 @@ export function BackgroundGallery({ open, onClose }: Props) {
 
   return (
     <>
-      {/* Backdrop */}
+      {/* Full-screen wrapper — flexbox centers the panel reliably */}
       <div
         onClick={onClose}
         style={{
           position: 'fixed',
           inset: 0,
           zIndex: 998,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          padding: '16px',
           background: 'rgba(0,0,0,0.6)',
           backdropFilter: 'blur(6px)',
           WebkitBackdropFilter: 'blur(6px)',
           animation: 'fadeIn 0.2s ease forwards',
         }}
-      />
-
-      {/* Panel */}
+      >
+      {/* Panel — stopPropagation so clicking inside doesn't close */}
       <div
+        onClick={e => e.stopPropagation()}
         style={{
-          position: 'fixed',
-          top: '50%',
-          left: '50%',
-          transform: 'translate(-50%, -50%)',
-          zIndex: 999,
-          width: 'min(820px, 95vw)',
+          position: 'relative',
+          width: 'min(820px, 100%)',
           maxHeight: '88vh',
           display: 'flex',
           flexDirection: 'column',
@@ -541,6 +541,7 @@ export function BackgroundGallery({ open, onClose }: Props) {
             Padrão
           </button>
         </div>
+      </div>
       </div>
     </>
   )
