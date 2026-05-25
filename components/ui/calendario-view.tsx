@@ -76,23 +76,23 @@ export function CalendarioView() {
         <div className="mb-4 flex flex-wrap items-center gap-3">
           <div className="flex items-center gap-2">
             <button onClick={prevMonth}
-              className="flex h-8 w-8 items-center justify-center rounded-lg text-white/50 hover:bg-white/10 hover:text-white transition-all"
-              style={{ border: '0.5px solid rgba(255,255,255,0.10)' }}>
+              className="flex h-8 w-8 items-center justify-center rounded-lg text-gray-500 hover:bg-gray-100 hover:text-gray-800 transition-all"
+              style={{ border: '1px solid #e5e7eb' }}>
               <ChevronLeft size={14} />
             </button>
-            <span className="w-40 text-center text-[15px] font-bold text-white">{MONTHS[month]} {year}</span>
+            <span className="w-40 text-center text-[15px] font-bold text-gray-800">{MONTHS[month]} {year}</span>
             <button onClick={nextMonth}
               className="flex h-8 w-8 items-center justify-center rounded-lg text-white/50 hover:bg-white/10 hover:text-white transition-all"
               style={{ border: '0.5px solid rgba(255,255,255,0.10)' }}>
               <ChevronRight size={14} />
             </button>
           </div>
-          <span className="text-sm text-white/40">
+          <span className="text-sm text-gray-400">
             {loading ? 'Carregando…' : `${acts.length} atividades`}
           </span>
           <div className="ml-auto hidden items-center gap-3 sm:flex">
             {Object.entries(TIPO_CONFIG).slice(0,4).map(([k, v]) => (
-              <span key={k} className="flex items-center gap-1.5 text-[11px] text-white/50">
+              <span key={k} className="flex items-center gap-1.5 text-[11px] text-gray-500">
                 <span className="h-2 w-2 rounded-full" style={{ background: v.color }} />{v.label}
               </span>
             ))}
@@ -100,23 +100,23 @@ export function CalendarioView() {
         </div>
 
         {loading ? (
-          <div className="flex flex-1 items-center justify-center gap-2 text-sm text-white/40">
+          <div className="flex flex-1 items-center justify-center gap-2 text-sm text-gray-400">
             <Loader2 size={18} className="animate-spin" />Carregando atividades…
           </div>
         ) : (
           <div className="flex flex-col overflow-hidden rounded-xl"
-            style={{ border: '0.5px solid rgba(255,255,255,0.10)' }}>
+            style={{ border: '1px solid #e5e7eb' }}>
             {/* Weekday headers */}
             <div className="grid grid-cols-7"
-              style={{ background: 'rgba(255,255,255,0.06)', borderBottom: '0.5px solid rgba(255,255,255,0.08)' }}>
+              style={{ background: '#f9fafb', borderBottom: '1px solid #e5e7eb' }}>
               {WEEKDAYS.map(w => (
-                <div key={w} className="py-2.5 text-center text-[11px] font-semibold text-white/40">{w}</div>
+                <div key={w} className="py-2.5 text-center text-[11px] font-semibold text-gray-500 uppercase">{w}</div>
               ))}
             </div>
             {/* Days */}
             {grid.map((week, wi) => (
               <div key={wi} className="grid grid-cols-7"
-                style={{ borderBottom: wi < grid.length - 1 ? '0.5px solid rgba(255,255,255,0.06)' : 'none' }}>
+                style={{ borderBottom: wi < grid.length - 1 ? '1px solid #e5e7eb' : 'none' }}>
                 {week.map((day, di) => {
                   const key = dayKey(day)
                   const dayActs = day ? (byDay[key] ?? []) : []
@@ -127,26 +127,26 @@ export function CalendarioView() {
                       onClick={() => day && setSelected(isSelected ? null : key)}
                       className="relative min-h-[72px] cursor-pointer p-1.5 transition-all"
                       style={{
-                        borderRight: di < 6 ? '0.5px solid rgba(255,255,255,0.06)' : 'none',
-                        background: isSelected ? 'rgba(99,102,241,0.12)' : day ? 'transparent' : 'rgba(0,0,0,0.15)',
+                        borderRight: di < 6 ? '1px solid #e5e7eb' : 'none',
+                        background: isSelected ? '#eef2ff' : day ? '#fff' : '#f9fafb',
                       }}>
                       {day && (
                         <>
                           <span className={`flex h-6 w-6 items-center justify-center rounded-full text-[12px] font-medium ${
-                            isToday ? 'bg-indigo-500 text-white font-bold' : 'text-white/65'
+                            isToday ? 'bg-indigo-500 text-white font-bold' : 'text-gray-700'
                           }`}>{day}</span>
                           <div className="mt-1 flex flex-col gap-0.5">
                             {dayActs.slice(0, 2).map((a, i) => {
                               const cfg = TIPO_CONFIG[a.tipo]
                               return (
                                 <div key={i} className="truncate rounded px-1 py-0.5 text-[9px] font-medium"
-                                  style={{ background: cfg?.bg ?? 'rgba(255,255,255,0.1)', color: cfg?.color ?? '#fff' }}>
+                                  style={{ background: cfg?.bg ?? 'rgba(255,255,255,0.1)', color: cfg?.color ?? '#6b7280' }}>
                                   {a.empresa}
                                 </div>
                               )
                             })}
                             {dayActs.length > 2 && (
-                              <span className="text-[9px] text-white/35">+{dayActs.length - 2}</span>
+                              <span className="text-[9px] text-gray-400">+{dayActs.length - 2}</span>
                             )}
                           </div>
                         </>
@@ -163,39 +163,39 @@ export function CalendarioView() {
       {/* Day detail panel */}
       {selected && (
         <div className="flex w-64 shrink-0 flex-col overflow-hidden"
-          style={{ borderLeft: '0.5px solid rgba(255,255,255,0.10)', background: 'rgba(255,255,255,0.02)' }}>
+          style={{ borderLeft: '1px solid #e5e7eb', background: '#f9fafb' }}>
           <div className="flex items-center justify-between px-4 py-3"
-            style={{ borderBottom: '0.5px solid rgba(255,255,255,0.08)' }}>
+            style={{ borderBottom: '1px solid #e5e7eb' }}>
             <div>
-              <p className="text-[13px] font-semibold text-white">
+              <p className="text-[13px] font-semibold text-gray-800">
                 {Number(selected.slice(8))} de {MONTHS[Number(selected.slice(5,7)) - 1]}
               </p>
-              <p className="text-[11px] text-white/40">{selectedActs.length} atividade{selectedActs.length !== 1 ? 's' : ''}</p>
+              <p className="text-[11px] text-gray-400">{selectedActs.length} atividade{selectedActs.length !== 1 ? 's' : ''}</p>
             </div>
-            <button onClick={() => setSelected(null)} className="text-white/30 hover:text-white/60 transition-all">
+            <button onClick={() => setSelected(null)} className="text-gray-400 hover:text-gray-600 transition-all">
               <X size={13} />
             </button>
           </div>
           <div className="flex flex-1 flex-col gap-2 overflow-y-auto p-3">
             {selectedActs.length === 0 ? (
-              <p className="py-8 text-center text-sm text-white/30">Nenhuma atividade</p>
+              <p className="py-8 text-center text-sm text-gray-400">Nenhuma atividade</p>
             ) : selectedActs.map(a => {
               const cfg  = TIPO_CONFIG[a.tipo]
               const Icon = cfg?.icon
               return (
                 <div key={a.id} className="rounded-xl p-3"
-                  style={{ background: 'rgba(255,255,255,0.04)', border: '0.5px solid rgba(255,255,255,0.08)' }}>
+                  style={{ background: '#fff', border: '1px solid #e5e7eb' }}>
                   <div className="mb-1.5 flex items-center gap-2">
                     <div className="flex h-5 w-5 items-center justify-center rounded-md"
                       style={{ background: cfg?.bg ?? 'rgba(255,255,255,0.1)' }}>
                       {Icon && <Icon size={10} strokeWidth={1.5} style={{ color: cfg?.color }} />}
                     </div>
                     <span className="text-[11px] font-semibold" style={{ color: cfg?.color }}>{cfg?.label}</span>
-                    <span className="ml-auto text-[10px] text-white/30">{formatTime(a.created_at)}</span>
+                    <span className="ml-auto text-[10px] text-gray-400">{formatTime(a.created_at)}</span>
                   </div>
-                  <p className="text-[12px] font-semibold text-white">{a.empresa}</p>
-                  {a.contato && <p className="text-[10px] text-white/40">{a.contato}</p>}
-                  {a.descricao && <p className="mt-1 text-[11px] text-white/55 leading-relaxed">{a.descricao}</p>}
+                  <p className="text-[12px] font-semibold text-gray-800">{a.empresa}</p>
+                  {a.contato && <p className="text-[10px] text-gray-400">{a.contato}</p>}
+                  {a.descricao && <p className="mt-1 text-[11px] text-gray-500 leading-relaxed">{a.descricao}</p>}
                 </div>
               )
             })}
