@@ -286,9 +286,9 @@ export function KanbanBoard() {
           </button>
           <button className="flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-xs transition-all"
             style={{
-              background: 'linear-gradient(135deg,rgba(99,102,241,0.2),rgba(139,92,246,0.2))',
-              border: '0.5px solid rgba(139,92,246,0.35)',
-              color: '#a78bfa',
+              background: 'rgba(255,255,255,0.10)',
+              border: '0.5px solid rgba(255,255,255,0.22)',
+              color: '#ffffff',
             }}>
             <Sparkles size={11} strokeWidth={1.5} />Gerar Leads IA
           </button>
