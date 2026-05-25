@@ -27,13 +27,14 @@ interface Props {
   onClose: () => void
 }
 
-type Tab = 'all' | BgCategory | 'video'
+type Tab = 'all' | BgCategory | 'video' | 'photo'
 
 const TABS: { id: Tab; label: string; Icon: React.ElementType }[] = [
   { id: 'all',      label: 'Todos',    Icon: Sparkles },
   { id: 'dark',     label: 'Escuro',   Icon: Moon     },
   { id: 'light',    label: 'Claro',    Icon: Sun      },
   { id: 'abstract', label: 'Abstrato', Icon: Sparkles },
+  { id: 'photo',    label: 'Fotos',    Icon: Sun      },
   { id: 'video',    label: 'Vídeo',    Icon: Film     },
 ]
 
@@ -242,6 +243,7 @@ export function BackgroundGallery({ open, onClose }: Props) {
   const filtered = BACKGROUNDS.filter(bg => {
     if (tab === 'all') return true
     if (tab === 'video') return bg.type === 'video'
+    if (tab === 'photo') return bg.type === 'image'
     return bg.category === tab
   })
 
