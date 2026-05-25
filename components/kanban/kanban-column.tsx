@@ -220,16 +220,26 @@ export function KanbanColumn({
 
       {/* ── + Adicionar lead — DENTRO da coluna, abaixo do último card ── */}
       <button onClick={() => onAddLead?.(id)}
-        className="flex items-center justify-center gap-1.5 py-2.5 text-xs text-white/40 transition-all hover:bg-white/[0.07] hover:text-white/70"
+        className="flex items-center justify-center gap-1.5 py-2.5 text-xs font-semibold transition-all"
         style={{
-          border: '1px solid rgba(255,255,255,0.08)',
-          borderTop: '1px solid rgba(255,255,255,0.06)',
+          border: '1px solid rgba(255,255,255,0.22)',
+          borderTop: 'none',
           borderRadius: '0 0 10px 10px',
-          background: 'rgba(255,255,255,0.02)',
+          background: 'rgba(255,255,255,0.10)',
+          color: 'rgba(255,255,255,0.90)',
+          letterSpacing: '0.02em',
+        }}
+        onMouseEnter={e => {
+          e.currentTarget.style.background = 'rgba(255,255,255,0.18)'
+          e.currentTarget.style.color = '#ffffff'
+        }}
+        onMouseLeave={e => {
+          e.currentTarget.style.background = 'rgba(255,255,255,0.10)'
+          e.currentTarget.style.color = 'rgba(255,255,255,0.90)'
         }}
       >
-        <Plus size={12} strokeWidth={2} />
-        Adicionar
+        <Plus size={13} strokeWidth={2.5} />
+        + Adicionar
       </button>
     </div>
   )
