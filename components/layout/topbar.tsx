@@ -2,11 +2,11 @@
 import { useState, useEffect, useRef } from 'react'
 import { usePathname } from 'next/navigation'
 import { Search, Globe, Plus, Bell, X, Clock, Sparkles } from 'lucide-react'
-import { BackgroundGallery } from '@/components/ui/background-gallery'
 import { SearchModal } from '@/components/ui/search-modal'
 import { AddLeadModal } from '@/components/ui/add-lead-modal'
 import { LeadDrawer } from '@/components/ui/lead-drawer'
 import { fetchNotifications, type Notification } from '@/lib/supabase'
+import { useBackgroundStore } from '@/store/background-store'
 
 const TABS = [
   { href: '/leads',      label: 'Leads'      },
@@ -29,10 +29,10 @@ function timeAgo(iso: string) {
 export function Topbar() {
   const pathname = usePathname()
 
-  const [searchOpen,    setSearchOpen]    = useState(false)
-  const [addLeadOpen,   setAddLeadOpen]   = useState(false)
-  const [bgGalleryOpen, setBgGalleryOpen] = useState(false)
-  const [selectedLead,  setSelectedLead]  = useState<any | null>(null)
+  const { setGalleryOpen } = useBackgroundStore()
+  const [searchOpen,   setSearchOpen]   = useState(false)
+  const [addLeadOpen,  setAddLeadOpen]  = useState(false)
+  const [selectedLead, setSelectedLead] = useState<any | null>(null)
   const [bellOpen,      setBellOpen]      = useState(false)
   const [notifs,        setNotifs]        = useState<Notification[]>([])
   const [notifTotal,    setNotifTotal]    = useState(0)
@@ -75,10 +75,7 @@ export function Topbar() {
       <AddLeadModal open={addLeadOpen} onClose={() => setAddLeadOpen(false)} onCreated={() => {}} />
       <LeadDrawer lead={selectedLead} onClose={() => setSelectedLead(null)} />
 
-      {/* Background Gallery Modal */}
-      <BackgroundGallery open={bgGalleryOpen} onClose={() => setBgGalleryOpen(false)} />
-
-      <header className="glass-topbar flex h-[52px] items-center gap-2 px-3 sm:px-5">
+<header className="glass-topbar flex h-[52px] items-center gap-2 px-3 sm:px-5">
 
         {/* Brand — desktop only */}
         <span className="mr-1 hidden text-sm font-medium text-white/90 lg:block">Lead Engine</span>
@@ -194,7 +191,7 @@ export function Topbar() {
 
         {/* Fundo — opens Background Gallery */}
         <button
-          onClick={() => setBgGalleryOpen(true)}
+          onClick={() => setGalleryOpen(true)}
           className="hidden items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-xs text-white/70 transition-all hover:bg-white/10 lg:flex"
           style={{ border: '0.5px solid rgba(255,255,255,0.12)' }}
         >
