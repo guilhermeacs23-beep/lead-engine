@@ -4,7 +4,7 @@ import { usePathname } from 'next/navigation'
 import {
   LayoutDashboard, Users, Kanban, BarChart2,
   Map, Settings, Zap, ChevronRight, LogOut, CalendarDays, X,
-  Rss, CheckSquare, UsersRound, FolderOpen, ChevronDown,
+  Rss, CheckSquare, UsersRound, FolderOpen, ChevronDown, RefreshCw,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useState } from 'react'
@@ -13,6 +13,7 @@ import { supabase } from '@/lib/supabase'
 const NAV_ITEMS = [
   { href: '/dashboard',  icon: LayoutDashboard, label: 'Dashboard'    },
   { href: '/leads',      icon: Users,           label: 'Leads'        },
+  { href: '/recap',      icon: RefreshCw,       label: 'Recap Clientes' },
   { href: '/pipeline',   icon: Kanban,          label: 'Pipeline'     },
   { href: '/relatorios', icon: BarChart2,       label: 'Relatórios'   },
   { href: '/mapa',       icon: Map,             label: 'Mapa'         },
