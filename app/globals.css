@@ -681,3 +681,41 @@ body {
   background-size: 400% 400%;
   animation: bgShiftSlow 24s ease infinite;
 }
+
+/* ════════════════════════════════════════════════════
+   MAIN CONTENT AREA — Fundo branco estilo Bitrix24
+   O fundo decorativo fica visível na sidebar/topbar.
+   O conteúdo principal flutua sobre um painel claro.
+════════════════════════════════════════════════════ */
+.main-content-area {
+  background: #f0f2f7;
+  --panel-bg:          #ffffff;
+  --panel-bg-hover:    #f8f9fc;
+  --panel-border:      rgba(0,0,0,0.08);
+  --panel-border-hover:rgba(0,0,0,0.14);
+  --content-text:      #1a1825;
+  --content-text-2:    rgba(26,24,37,0.70);
+  --content-text-3:    rgba(26,24,37,0.50);
+}
+
+/* Score badges adaptam para fundo claro */
+.main-content-area input,
+.main-content-area select,
+.main-content-area textarea {
+  background: #ffffff !important;
+  border-color: rgba(0,0,0,0.12) !important;
+  color: #1a1825 !important;
+}
+
+.main-content-area input::placeholder {
+  color: rgba(26,24,37,0.40) !important;
+}
+
+/* Scrollbar no content area */
+.main-content-area ::-webkit-scrollbar-track {
+  background: #f0f2f7;
+}
+.main-content-area ::-webkit-scrollbar-thumb {
+  background: rgba(0,0,0,0.15);
+}
+
