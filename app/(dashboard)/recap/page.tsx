@@ -83,9 +83,9 @@ function ScoreBadge({ score, categoria }: { score: number; categoria: keyof type
     <div style={{
       display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
       width: 48, height: 48, borderRadius: 12,
-      background: cfg.bg, border: `1.5px solid ${cfg.border}`,
-      fontWeight: 700, fontSize: 16, color: cfg.color,
-      boxShadow: `0 0 12px ${cfg.bg}`,
+      background: cfg.color, border: 'none',
+      fontWeight: 700, fontSize: 16, color: '#ffffff',
+      boxShadow: `0 2px 8px ${cfg.bg}`,
       flexShrink: 0,
     }}>
       {score}
@@ -148,8 +148,8 @@ function DetailDrawer({
               <ScoreBadge score={cliente.score_reativacao} categoria={cliente.categoria} />
               <div>
                 <span style={{
-                  padding: '2px 10px', borderRadius: 20, fontSize: 11, fontWeight: 700,
-                  background: cfg.bg, border: `1px solid ${cfg.border}`, color: cfg.color,
+                  padding: '3px 12px', borderRadius: 20, fontSize: 11, fontWeight: 700,
+                  background: cfg.color, border: 'none', color: '#ffffff',
                 }}>
                   {cfg.label}
                 </span>
@@ -185,7 +185,7 @@ function DetailDrawer({
               <div style={{ fontSize: 11, color: '#9ca3af', marginTop: 2 }}>Inativo há</div>
             </div>
             <div style={{ flex: 1, textAlign: 'center', padding: '12px 8px', background: '#f3f4f6', borderRadius: 8 }}>
-              <div style={{ fontSize: 13, fontWeight: 600, color: 'white' }}>
+              <div style={{ fontSize: 13, fontWeight: 600, color: '#111827' }}>
                 {cliente.ult_movimento ? new Date(cliente.ult_movimento).toLocaleDateString('pt-BR') : '—'}
               </div>
               <div style={{ fontSize: 11, color: '#9ca3af', marginTop: 2 }}>Último mov.</div>
