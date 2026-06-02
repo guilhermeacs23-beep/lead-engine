@@ -50,26 +50,27 @@ export default function LeadsPage() {
     setSources(prev => prev.includes(id) ? prev.filter(s => s !== id) : [...prev, id])
 
   return (
-    <div className="flex h-full flex-col overflow-auto">
+    <div className="flex h-full flex-col overflow-auto p-3 gap-0">
       <LeadDrawer lead={selectedLead} onClose={() => setSelectedLead(null)} />
       <AddLeadModal open={addOpen} onClose={() => setAddOpen(false)} onCreated={load} />
 
+      <div style={{ background: '#ffffff', borderRadius: 14, boxShadow: '0 2px 16px rgba(0,0,0,0.09), 0 0 0 1px rgba(0,0,0,0.06)', overflow: 'hidden', display: 'flex', flexDirection: 'column', flex: 1 }}>
       {/* Search + filter bar */}
       <div className="sticky top-0 z-10 flex items-center gap-2 px-4 py-3"
-        style={{ background: 'rgba(12,10,30,0.95)', backdropFilter: 'blur(16px)', borderBottom: '0.5px solid rgba(255,255,255,0.08)' }}>
+        style={{ background: '#f8f9fc', borderBottom: '1px solid rgba(0,0,0,0.07)' }}>
         <div className="flex flex-1 items-center gap-2 rounded-xl px-3 py-2.5"
-          style={{ background: 'rgba(255,255,255,0.07)', border: '0.5px solid rgba(255,255,255,0.10)' }}>
+          style={{ background: '#ffffff', border: '1px solid rgba(0,0,0,0.12)' }}>
           <Search size={14} className="text-white/50 shrink-0" />
           <input value={query} onChange={e => setQuery(e.target.value)}
             placeholder="Buscar empresa..."
-            className="flex-1 bg-transparent text-sm text-white outline-none placeholder:text-white/35" />
+            className="flex-1 bg-transparent text-sm text-gray-800 outline-none placeholder:text-gray-400" />
         </div>
         <button onClick={() => setShowFilters(f => !f)}
           className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl transition-all"
           style={{
-            background: showFilters ? 'rgba(99,102,241,0.25)' : 'rgba(255,255,255,0.07)',
-            border: showFilters ? '0.5px solid rgba(99,102,241,0.5)' : '0.5px solid rgba(255,255,255,0.10)',
-            color: showFilters ? '#818cf8' : 'rgba(255,255,255,0.6)',
+            background: showFilters ? 'rgba(99,102,241,0.10)' : 'rgba(0,0,0,0.04)',
+            border: showFilters ? '1px solid rgba(99,102,241,0.4)' : '1px solid rgba(0,0,0,0.10)',
+            color: showFilters ? '#6366f1' : 'rgba(0,0,0,0.45)',
           }}>
           <Filter size={15} strokeWidth={1.5} />
         </button>
@@ -83,34 +84,34 @@ export default function LeadsPage() {
       {/* Collapsible filters */}
       {showFilters && (
         <div className="flex flex-col gap-3 px-4 py-3"
-          style={{ background: 'rgba(255,255,255,0.02)', borderBottom: '0.5px solid rgba(255,255,255,0.08)' }}>
+          style={{ background: '#f4f5f8', borderBottom: '1px solid rgba(0,0,0,0.07)' }}>
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <p className="mb-1 text-[11px] font-medium text-white/40">Segmento</p>
+              <p className="mb-1 text-[11px] font-medium text-gray-500">Segmento</p>
               <select value={segment} onChange={e => setSegment(e.target.value)}
-                className="w-full appearance-none rounded-lg px-3 py-2 text-sm text-white outline-none"
-                style={{ background: 'rgba(255,255,255,0.07)', border: '0.5px solid rgba(255,255,255,0.12)' }}>
+                className="w-full appearance-none rounded-lg px-3 py-2 text-sm text-gray-800 outline-none"
+                style={{ background: '#ffffff', border: '1px solid rgba(0,0,0,0.12)' }}>
                 {SEGMENTS.map(s => <option key={s.value} value={s.value}>{s.label}</option>)}
               </select>
             </div>
             <div>
-              <p className="mb-1 text-[11px] font-medium text-white/40">Estado</p>
+              <p className="mb-1 text-[11px] font-medium text-gray-500">Estado</p>
               <select value={state} onChange={e => setState(e.target.value)}
-                className="w-full appearance-none rounded-lg px-3 py-2 text-sm text-white outline-none"
-                style={{ background: 'rgba(255,255,255,0.07)', border: '0.5px solid rgba(255,255,255,0.12)' }}>
+                className="w-full appearance-none rounded-lg px-3 py-2 text-sm text-gray-800 outline-none"
+                style={{ background: '#ffffff', border: '1px solid rgba(0,0,0,0.12)' }}>
                 {STATES.map(s => <option key={s} value={s}>{s === 'Todos' ? 'Todos os estados' : s}</option>)}
               </select>
             </div>
           </div>
           <div>
-            <p className="mb-1.5 text-[11px] font-medium text-white/40">Fontes</p>
+            <p className="mb-1.5 text-[11px] font-medium text-gray-500">Fontes</p>
             <div className="flex flex-wrap gap-2">
               {SOURCES.map(({ id, label }) => (
                 <button key={id} onClick={() => toggleSource(id)}
                   className="rounded-full px-3 py-1 text-[12px] font-medium transition-all"
                   style={sources.includes(id)
                     ? { background: 'linear-gradient(135deg,#6366f1,#8b5cf6)', color: '#fff' }
-                    : { background: 'rgba(255,255,255,0.06)', color: 'rgba(255,255,255,0.55)', border: '0.5px solid rgba(255,255,255,0.12)' }}>
+                    : { background: '#f0f1f5', color: 'rgba(26,24,37,0.55)', border: '1px solid rgba(0,0,0,0.10)' }}>
                   {label}
                 </button>
               ))}
@@ -121,7 +122,7 @@ export default function LeadsPage() {
 
       {/* Count */}
       <div className="px-4 py-2.5">
-        <p className="text-[12px] text-white/40">
+        <p className="text-[12px] text-gray-400">
           {loading ? 'Buscando…' : `${leads.length} leads · pontuados por potencial`}
         </p>
       </div>
@@ -129,11 +130,11 @@ export default function LeadsPage() {
       {/* ── MOBILE: card list ── */}
       <div className="flex flex-col gap-2 px-4 pb-2 lg:hidden">
         {loading ? (
-          <div className="flex items-center justify-center gap-2 py-16 text-white/40">
+          <div className="flex items-center justify-center gap-2 py-16 text-gray-400">
             <Loader2 size={18} className="animate-spin" />Carregando…
           </div>
         ) : leads.length === 0 ? (
-          <div className="py-12 text-center text-sm text-white/40">Nenhum lead encontrado</div>
+          <div className="py-12 text-center text-sm text-gray-400">Nenhum lead encontrado</div>
         ) : leads.map(lead => {
           const score  = getScoreColor(lead.score_ia)
           const source = SOURCE_LABELS[lead.fonte]
@@ -145,7 +146,7 @@ export default function LeadsPage() {
               {/* Score ring */}
               <div className="relative flex h-11 w-11 shrink-0 items-center justify-center">
                 <svg className="absolute inset-0" viewBox="0 0 44 44">
-                  <circle cx="22" cy="22" r="19" fill="none" stroke="rgba(255,255,255,0.08)" strokeWidth="3" />
+                  <circle cx="22" cy="22" r="19" fill="none" stroke="rgba(0,0,0,0.08)" strokeWidth="3" />
                   <circle cx="22" cy="22" r="19" fill="none" stroke={score.color} strokeWidth="3"
                     strokeDasharray={`${(lead.score_ia / 100) * 119.4} 119.4`}
                     strokeLinecap="round" transform="rotate(-90 22 22)" />
@@ -155,69 +156,70 @@ export default function LeadsPage() {
 
               {/* Info */}
               <div className="flex flex-1 flex-col gap-0.5 min-w-0">
-                <p className="truncate text-[14px] font-semibold text-white">{lead.empresa}</p>
-                <p className="truncate text-[12px] text-white/55">{lead.contato_nome} · {lead.contato_cargo}</p>
+                <p className="truncate text-[14px] font-semibold text-gray-900">{lead.empresa}</p>
+                <p className="truncate text-[12px] text-gray-500">{lead.contato_nome} · {lead.contato_cargo}</p>
                 <div className="mt-1 flex items-center gap-2">
                   {source && (
                     <span className="rounded-md px-1.5 py-0.5 text-[10px] font-medium"
                       style={{ color: source.color, background: source.bg }}>{source.label}</span>
                   )}
-                  <span className="flex items-center gap-1 text-[11px] text-white/40">
+                  <span className="flex items-center gap-1 text-[11px] text-gray-400">
                     <MapPin size={9} strokeWidth={1.5} />{lead.cidade}, {lead.estado}
                   </span>
                 </div>
               </div>
 
-              <ChevronRight size={14} className="shrink-0 text-white/25" />
+              <ChevronRight size={14} className="shrink-0 text-gray-300" />
             </button>
           )
         })}
       </div>
 
       {/* ── DESKTOP: table ── */}
-      <div className="hidden lg:block overflow-hidden rounded-xl mx-5 mb-5"
-        style={{ border: '0.5px solid rgba(255,255,255,0.10)' }}>
-        <div className="grid items-center px-4 py-3 text-[13px] font-semibold text-white"
-          style={{ gridTemplateColumns: '2fr 1.2fr 0.8fr 0.7fr 0.7fr 90px', background: 'rgba(255,255,255,0.07)', borderBottom: '0.5px solid rgba(255,255,255,0.10)' }}>
+      <div className="hidden lg:block overflow-hidden"
+        style={{ border: 'none' }}>
+        <div className="grid items-center px-4 py-3 text-[13px] font-semibold text-gray-600"
+          style={{ gridTemplateColumns: '2fr 1.2fr 0.8fr 0.7fr 0.7fr 90px', background: '#f4f5f8', borderBottom: '1px solid rgba(0,0,0,0.07)' }}>
           <span>Empresa</span><span>Segmento</span><span>Cidade / UF</span><span>Potencial</span><span>Fonte</span><span></span>
         </div>
         {loading ? (
-          <div className="flex items-center justify-center gap-2 py-16 text-white/50">
+          <div className="flex items-center justify-center gap-2 py-16 text-gray-400">
             <Loader2 size={18} className="animate-spin" />Carregando leads…
           </div>
         ) : leads.length === 0 ? (
-          <div className="py-12 text-center text-white/50">Nenhum lead encontrado</div>
+          <div className="py-12 text-center text-gray-400">Nenhum lead encontrado</div>
         ) : leads.map(lead => {
           const score  = getScoreColor(lead.score_ia)
           const source = SOURCE_LABELS[lead.fonte]
           return (
             <div key={lead.id} onClick={() => setSelectedLead(lead)}
-              className="grid cursor-pointer items-center px-4 py-3.5 text-sm transition-all hover:bg-white/[0.06]"
-              style={{ gridTemplateColumns: '2fr 1.2fr 0.8fr 0.7fr 0.7fr 90px', borderBottom: '0.5px solid rgba(255,255,255,0.06)' }}>
+              className="grid cursor-pointer items-center px-4 py-3.5 text-sm transition-all hover:bg-gray-50"
+              style={{ gridTemplateColumns: '2fr 1.2fr 0.8fr 0.7fr 0.7fr 90px', borderBottom: '1px solid rgba(0,0,0,0.05)' }}>
               <div>
-                <p className="font-semibold text-white">{lead.empresa}</p>
-                <p className="mt-0.5 text-[12px] text-white/65">{lead.contato_nome} · {lead.contato_cargo}</p>
+                <p className="font-semibold text-gray-900">{lead.empresa}</p>
+                <p className="mt-0.5 text-[12px] text-gray-500">{lead.contato_nome} · {lead.contato_cargo}</p>
               </div>
-              <span className="font-medium text-white">{SEGMENT_LABELS[lead.segmento] ?? lead.segmento}</span>
-              <span className="font-medium text-white">{lead.cidade}, {lead.estado}</span>
+              <span className="font-medium text-gray-700">{SEGMENT_LABELS[lead.segmento] ?? lead.segmento}</span>
+              <span className="font-medium text-gray-700">{lead.cidade}, {lead.estado}</span>
               <div className="flex items-center gap-2">
-                <div className="flex-1 overflow-hidden rounded-full" style={{ height: 5, background: 'rgba(255,255,255,0.10)' }}>
+                <div className="flex-1 overflow-hidden rounded-full" style={{ height: 5, background: 'rgba(0,0,0,0.08)' }}>
                   <div className="h-full rounded-full" style={{ width: `${lead.score_ia}%`, background: score.color }} />
                 </div>
                 <span className="min-w-[28px] text-right text-[13px] font-bold" style={{ color: score.color }}>{lead.score_ia}</span>
               </div>
               {source
                 ? <span className="w-fit rounded-lg px-2 py-0.5 text-[12px] font-medium" style={{ color: source.color, background: source.bg }}>{source.label}</span>
-                : <span className="text-white/60">{lead.fonte}</span>
+                : <span className="text-gray-500">{lead.fonte}</span>
               }
               <div className="flex justify-end">
-                <button className="flex items-center gap-1 rounded-lg px-2.5 py-1 text-[13px] font-semibold text-indigo-300 hover:bg-indigo-500/15">
+                <button className="flex items-center gap-1 rounded-lg px-2.5 py-1 text-[13px] font-semibold text-indigo-600 hover:bg-indigo-50">
                   <Plus size={12} strokeWidth={2} />Adicionar
                 </button>
               </div>
             </div>
           )
         })}
+      </div>
       </div>
     </div>
   )
