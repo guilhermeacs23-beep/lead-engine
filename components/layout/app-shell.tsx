@@ -45,7 +45,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       {/* ── Main content area ───────────────────── */}
       <div className="relative z-10 flex flex-1 flex-col min-w-0">
         <Topbar />
-        <main className="flex-1 overflow-hidden">
+        <main className="flex-1 overflow-hidden main-content-area">
           <div className="h-full overflow-auto pb-16 lg:pb-0">
             {children}
           </div>
