@@ -96,11 +96,11 @@ function ScoreBadge({ score, categoria }: { score: number; categoria: keyof type
 function ScoreBar({ label, value, max, color }: { label: string; value: number; max: number; color: string }) {
   return (
     <div style={{ marginBottom: 8 }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4, fontSize: 12, color: 'rgba(255,255,255,0.6)' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4, fontSize: 12, color: '#6b7280' }}>
         <span>{label}</span>
-        <span style={{ color: 'white', fontWeight: 600 }}>{value}/{max}</span>
+        <span style={{ color: '#111827', fontWeight: 600 }}>{value}/{max}</span>
       </div>
-      <div style={{ height: 6, background: 'rgba(255,255,255,0.08)', borderRadius: 3, overflow: 'hidden' }}>
+      <div style={{ height: 6, background: '#e5e7eb', borderRadius: 3, overflow: 'hidden' }}>
         <div style={{
           width: `${(value/max)*100}%`, height: '100%',
           background: color, borderRadius: 3,
@@ -155,7 +155,7 @@ function DetailDrawer({
                 </span>
               </div>
             </div>
-            <h2 style={{ fontSize: 16, fontWeight: 700, color: 'white', margin: 0, lineHeight: 1.3 }}>
+            <h2 style={{ fontSize: 16, fontWeight: 700, color: '#111827', margin: 0, lineHeight: 1.3 }}>
               {cliente.nome}
             </h2>
             <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.40)', margin: '4px 0 0' }}>
@@ -168,7 +168,7 @@ function DetailDrawer({
         </div>
 
         {/* Score Breakdown */}
-        <div style={{ background: 'rgba(255,255,255,0.04)', borderRadius: 12, padding: 16, border: '1px solid rgba(255,255,255,0.07)' }}>
+        <div style={{ background: '#ffffff', borderRadius: 12, padding: 16, border: '1px solid rgba(0,0,0,0.08)', boxShadow: '0 1px 4px rgba(0,0,0,0.05)' }}>
           <p style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 1, color: 'rgba(255,255,255,0.45)', marginBottom: 12 }}>Score de Reativação</p>
           <ScoreBar label="Recência"    value={cliente.score_recencia}  max={50} color="#6366f1" />
           <ScoreBar label="Contato"     value={cliente.score_contato}   max={25} color="#10b981" />
@@ -177,14 +177,14 @@ function DetailDrawer({
         </div>
 
         {/* Atividade */}
-        <div style={{ background: 'rgba(255,255,255,0.04)', borderRadius: 12, padding: 16, border: '1px solid rgba(255,255,255,0.07)' }}>
+        <div style={{ background: '#ffffff', borderRadius: 12, padding: 16, border: '1px solid rgba(0,0,0,0.08)', boxShadow: '0 1px 4px rgba(0,0,0,0.05)' }}>
           <p style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 1, color: 'rgba(255,255,255,0.45)', marginBottom: 12 }}>Atividade</p>
           <div style={{ display: 'flex', gap: 16 }}>
-            <div style={{ flex: 1, textAlign: 'center', padding: '12px 8px', background: 'rgba(255,255,255,0.04)', borderRadius: 8 }}>
+            <div style={{ flex: 1, textAlign: 'center', padding: '12px 8px', background: '#f3f4f6', borderRadius: 8 }}>
               <div style={{ fontSize: 22, fontWeight: 700, color: cfg.color }}>{diasLabel(cliente.dias_inativo)}</div>
               <div style={{ fontSize: 11, color: '#9ca3af', marginTop: 2 }}>Inativo há</div>
             </div>
-            <div style={{ flex: 1, textAlign: 'center', padding: '12px 8px', background: 'rgba(255,255,255,0.04)', borderRadius: 8 }}>
+            <div style={{ flex: 1, textAlign: 'center', padding: '12px 8px', background: '#f3f4f6', borderRadius: 8 }}>
               <div style={{ fontSize: 13, fontWeight: 600, color: 'white' }}>
                 {cliente.ult_movimento ? new Date(cliente.ult_movimento).toLocaleDateString('pt-BR') : '—'}
               </div>
@@ -194,7 +194,7 @@ function DetailDrawer({
         </div>
 
         {/* Localização */}
-        <div style={{ background: 'rgba(255,255,255,0.04)', borderRadius: 12, padding: 16, border: '1px solid rgba(255,255,255,0.07)' }}>
+        <div style={{ background: '#ffffff', borderRadius: 12, padding: 16, border: '1px solid rgba(0,0,0,0.08)', boxShadow: '0 1px 4px rgba(0,0,0,0.05)' }}>
           <p style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 1, color: 'rgba(255,255,255,0.45)', marginBottom: 12 }}>Localização</p>
           <InfoRow icon={<MapPin size={14} />} label="Cidade" value={`${cliente.cidade || '—'} / ${cliente.uf || '—'}`} />
           <InfoRow icon={<Building2 size={14} />} label="CFOP" value={cliente.cfop || '—'} />
@@ -204,7 +204,7 @@ function DetailDrawer({
         </div>
 
         {/* Contato */}
-        <div style={{ background: 'rgba(255,255,255,0.04)', borderRadius: 12, padding: 16, border: '1px solid rgba(255,255,255,0.07)' }}>
+        <div style={{ background: '#ffffff', borderRadius: 12, padding: 16, border: '1px solid rgba(0,0,0,0.08)', boxShadow: '0 1px 4px rgba(0,0,0,0.05)' }}>
           <p style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 1, color: 'rgba(255,255,255,0.45)', marginBottom: 12 }}>Contato</p>
           {cliente.email ? (
             <InfoRow icon={<Mail size={14} />} label="E-mail" value={cliente.email} />
@@ -220,7 +220,7 @@ function DetailDrawer({
 
         {/* Status */}
         {cliente.status !== 'pendente' && (
-          <div style={{ padding: '10px 14px', borderRadius: 10, background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)' }}>
+          <div style={{ padding: '10px 14px', borderRadius: 10, background: '#f3f4f6', border: '1px solid rgba(0,0,0,0.08)' }}>
             <span style={{ fontSize: 12, color: STATUS_CONFIG[cliente.status].color, fontWeight: 600 }}>
               {STATUS_CONFIG[cliente.status].label}
               {cliente.aprovado_em && ` em ${new Date(cliente.aprovado_em).toLocaleDateString('pt-BR')}`}
@@ -250,8 +250,8 @@ function DetailDrawer({
               disabled={loading === cliente.id}
               style={{
                 padding: '12px 20px', borderRadius: 12, cursor: 'pointer',
-                background: 'transparent', color: 'rgba(255,255,255,0.4)',
-                border: '1px solid rgba(255,255,255,0.12)', fontWeight: 600, fontSize: 13,
+                background: '#f9fafb', color: '#6b7280',
+                border: '1px solid rgba(0,0,0,0.12)', fontWeight: 600, fontSize: 13,
                 display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
                 transition: 'all 0.2s',
               }}
@@ -269,9 +269,9 @@ function DetailDrawer({
 function InfoRow({ icon, label, value, muted }: { icon: React.ReactNode; label: string; value: string; muted?: boolean }) {
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 8 }}>
-      <span style={{ color: 'rgba(255,255,255,0.3)', flexShrink: 0 }}>{icon}</span>
-      <span style={{ fontSize: 12, color: 'rgba(255,255,255,0.4)', flexShrink: 0, width: 60 }}>{label}</span>
-      <span style={{ fontSize: 12, color: muted ? 'rgba(255,255,255,0.25)' : 'rgba(255,255,255,0.85)', wordBreak: 'break-all' }}>{value}</span>
+      <span style={{ color: '#d1d5db', flexShrink: 0 }}>{icon}</span>
+      <span style={{ fontSize: 12, color: '#9ca3af', flexShrink: 0, width: 60 }}>{label}</span>
+      <span style={{ fontSize: 12, color: muted ? '#d1d5db' : '#1f2937', wordBreak: 'break-all' }}>{value}</span>
     </div>
   )
 }
