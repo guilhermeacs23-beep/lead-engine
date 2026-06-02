@@ -98,9 +98,9 @@ function ScoreBar({ label, value, max, color }: { label: string; value: number; 
     <div style={{ marginBottom: 8 }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4, fontSize: 12, color: 'rgba(255,255,255,0.6)' }}>
         <span>{label}</span>
-        <span style={{ color: '#1a1825', fontWeight: 600 }}>{value}/{max}</span>
+        <span style={{ color: 'white', fontWeight: 600 }}>{value}/{max}</span>
       </div>
-      <div style={{ height: 6, background: 'rgba(0,0,0,0.09)', borderRadius: 3, overflow: 'hidden' }}>
+      <div style={{ height: 6, background: 'rgba(255,255,255,0.08)', borderRadius: 3, overflow: 'hidden' }}>
         <div style={{
           width: `${(value/max)*100}%`, height: '100%',
           background: color, borderRadius: 3,
@@ -136,8 +136,8 @@ function DetailDrawer({
       {/* Drawer */}
       <div style={{
         position: 'fixed', top: 0, right: 0, bottom: 0, width: 420,
-        background: '#ffffff', backdropFilter: 'blur(40px)',
-        borderLeft: '1px solid rgba(0,0,0,0.10)',
+        background: 'rgba(255,255,255,0.04)', backdropFilter: 'blur(40px)',
+        borderLeft: '1px solid rgba(255,255,255,0.10)',
         zIndex: 41, overflowY: 'auto', padding: 28,
         display: 'flex', flexDirection: 'column', gap: 24,
       }}>
@@ -155,21 +155,21 @@ function DetailDrawer({
                 </span>
               </div>
             </div>
-            <h2 style={{ fontSize: 16, fontWeight: 700, color: '#1a1825', margin: 0, lineHeight: 1.3 }}>
+            <h2 style={{ fontSize: 16, fontWeight: 700, color: 'white', margin: 0, lineHeight: 1.3 }}>
               {cliente.nome}
             </h2>
-            <p style={{ fontSize: 12, color: 'rgba(26,24,37,0.42)', margin: '4px 0 0' }}>
+            <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.40)', margin: '4px 0 0' }}>
               {formatCNPJ(cliente.cnpj)}
             </p>
           </div>
-          <button onClick={onClose} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'rgba(26,24,37,0.50)', padding: 4 }}>
+          <button onClick={onClose} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'rgba(255,255,255,0.50)', padding: 4 }}>
             <X size={20} />
           </button>
         </div>
 
         {/* Score Breakdown */}
-        <div style={{ background: '#ffffff', borderRadius: 12, padding: 16, border: '1px solid rgba(0,0,0,0.08)' }}>
-          <p style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 1, color: 'rgba(26,24,37,0.45)', marginBottom: 12 }}>Score de Reativação</p>
+        <div style={{ background: 'rgba(255,255,255,0.04)', borderRadius: 12, padding: 16, border: '1px solid rgba(255,255,255,0.07)' }}>
+          <p style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 1, color: 'rgba(255,255,255,0.45)', marginBottom: 12 }}>Score de Reativação</p>
           <ScoreBar label="Recência"    value={cliente.score_recencia}  max={50} color="#6366f1" />
           <ScoreBar label="Contato"     value={cliente.score_contato}   max={25} color="#10b981" />
           <ScoreBar label="Tipo CFOP"   value={cliente.score_cfop}      max={15} color="#f59e0b" />
@@ -177,15 +177,15 @@ function DetailDrawer({
         </div>
 
         {/* Atividade */}
-        <div style={{ background: '#ffffff', borderRadius: 12, padding: 16, border: '1px solid rgba(0,0,0,0.08)' }}>
-          <p style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 1, color: 'rgba(26,24,37,0.45)', marginBottom: 12 }}>Atividade</p>
+        <div style={{ background: 'rgba(255,255,255,0.04)', borderRadius: 12, padding: 16, border: '1px solid rgba(255,255,255,0.07)' }}>
+          <p style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 1, color: 'rgba(255,255,255,0.45)', marginBottom: 12 }}>Atividade</p>
           <div style={{ display: 'flex', gap: 16 }}>
-            <div style={{ flex: 1, textAlign: 'center', padding: '12px 8px', background: '#ffffff', borderRadius: 8 }}>
+            <div style={{ flex: 1, textAlign: 'center', padding: '12px 8px', background: 'rgba(255,255,255,0.04)', borderRadius: 8 }}>
               <div style={{ fontSize: 22, fontWeight: 700, color: cfg.color }}>{diasLabel(cliente.dias_inativo)}</div>
               <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)', marginTop: 2 }}>Inativo há</div>
             </div>
-            <div style={{ flex: 1, textAlign: 'center', padding: '12px 8px', background: '#ffffff', borderRadius: 8 }}>
-              <div style={{ fontSize: 13, fontWeight: 600, color: '#1a1825' }}>
+            <div style={{ flex: 1, textAlign: 'center', padding: '12px 8px', background: 'rgba(255,255,255,0.04)', borderRadius: 8 }}>
+              <div style={{ fontSize: 13, fontWeight: 600, color: 'white' }}>
                 {cliente.ult_movimento ? new Date(cliente.ult_movimento).toLocaleDateString('pt-BR') : '—'}
               </div>
               <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)', marginTop: 2 }}>Último mov.</div>
@@ -194,8 +194,8 @@ function DetailDrawer({
         </div>
 
         {/* Localização */}
-        <div style={{ background: '#ffffff', borderRadius: 12, padding: 16, border: '1px solid rgba(0,0,0,0.08)' }}>
-          <p style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 1, color: 'rgba(26,24,37,0.45)', marginBottom: 12 }}>Localização</p>
+        <div style={{ background: 'rgba(255,255,255,0.04)', borderRadius: 12, padding: 16, border: '1px solid rgba(255,255,255,0.07)' }}>
+          <p style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 1, color: 'rgba(255,255,255,0.45)', marginBottom: 12 }}>Localização</p>
           <InfoRow icon={<MapPin size={14} />} label="Cidade" value={`${cliente.cidade || '—'} / ${cliente.uf || '—'}`} />
           <InfoRow icon={<Building2 size={14} />} label="CFOP" value={cliente.cfop || '—'} />
           {cliente.vendedor_codigo && (
@@ -204,8 +204,8 @@ function DetailDrawer({
         </div>
 
         {/* Contato */}
-        <div style={{ background: '#ffffff', borderRadius: 12, padding: 16, border: '1px solid rgba(0,0,0,0.08)' }}>
-          <p style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 1, color: 'rgba(26,24,37,0.45)', marginBottom: 12 }}>Contato</p>
+        <div style={{ background: 'rgba(255,255,255,0.04)', borderRadius: 12, padding: 16, border: '1px solid rgba(255,255,255,0.07)' }}>
+          <p style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 1, color: 'rgba(255,255,255,0.45)', marginBottom: 12 }}>Contato</p>
           {cliente.email ? (
             <InfoRow icon={<Mail size={14} />} label="E-mail" value={cliente.email} />
           ) : (
@@ -220,7 +220,7 @@ function DetailDrawer({
 
         {/* Status */}
         {cliente.status !== 'pendente' && (
-          <div style={{ padding: '10px 14px', borderRadius: 10, background: '#ffffff', border: '1px solid rgba(0,0,0,0.08)' }}>
+          <div style={{ padding: '10px 14px', borderRadius: 10, background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)' }}>
             <span style={{ fontSize: 12, color: STATUS_CONFIG[cliente.status].color, fontWeight: 600 }}>
               {STATUS_CONFIG[cliente.status].label}
               {cliente.aprovado_em && ` em ${new Date(cliente.aprovado_em).toLocaleDateString('pt-BR')}`}
@@ -237,7 +237,7 @@ function DetailDrawer({
               style={{
                 padding: '14px 20px', borderRadius: 12, border: 'none', cursor: 'pointer',
                 background: loading === cliente.id ? 'rgba(99,102,241,0.3)' : 'rgba(99,102,241,0.85)',
-                color: '#1a1825', fontWeight: 700, fontSize: 14,
+                color: 'white', fontWeight: 700, fontSize: 14,
                 display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
                 transition: 'all 0.2s',
               }}
@@ -251,7 +251,7 @@ function DetailDrawer({
               style={{
                 padding: '12px 20px', borderRadius: 12, cursor: 'pointer',
                 background: 'transparent', color: 'rgba(255,255,255,0.4)',
-                border: '1px solid rgba(0,0,0,0.12)', fontWeight: 600, fontSize: 13,
+                border: '1px solid rgba(255,255,255,0.12)', fontWeight: 600, fontSize: 13,
                 display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
                 transition: 'all 0.2s',
               }}
@@ -402,15 +402,15 @@ export default function RecapClientesPage() {
 
   /* ── Render ── */
   const glass = {
-    background: '#ffffff',
-    border: '1px solid rgba(0,0,0,0.09)',
+    background: 'rgba(255,255,255,0.04)',
+    border: '1px solid rgba(255,255,255,0.08)',
     borderRadius: 16,
   }
 
   if (loading) return (
     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '60vh', flexDirection: 'column', gap: 16 }}>
       <RefreshCw size={32} style={{ color: '#6366f1', animation: 'spin 1s linear infinite' }} />
-      <p style={{ color: 'rgba(26,24,37,0.50)' }}>Carregando base de clientes...</p>
+      <p style={{ color: 'rgba(255,255,255,0.50)' }}>Carregando base de clientes...</p>
     </div>
   )
 
@@ -420,9 +420,9 @@ export default function RecapClientesPage() {
         <Users size={32} style={{ color: '#6366f1' }} />
       </div>
       <div>
-        <h2 style={{ fontSize: 20, fontWeight: 700, color: '#1a1825', margin: '0 0 8px' }}>Base ainda não importada</h2>
-        <p style={{ color: 'rgba(26,24,37,0.42)', maxWidth: 400 }}>
-          Execute o script <strong style={{ color: '#1a1825' }}>import_clientes_recap.py</strong> com suas credenciais do Supabase para importar a base do SSW.
+        <h2 style={{ fontSize: 20, fontWeight: 700, color: 'white', margin: '0 0 8px' }}>Base ainda não importada</h2>
+        <p style={{ color: 'rgba(255,255,255,0.40)', maxWidth: 400 }}>
+          Execute o script <strong style={{ color: 'white' }}>import_clientes_recap.py</strong> com suas credenciais do Supabase para importar a base do SSW.
         </p>
       </div>
     </div>
@@ -434,14 +434,14 @@ export default function RecapClientesPage() {
       {/* ── Header ── */}
       <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 28 }}>
         <div>
-          <h1 style={{ fontSize: 24, fontWeight: 800, color: '#1a1825', margin: 0 }}>Recap de Clientes</h1>
-          <p style={{ color: 'rgba(26,24,37,0.42)', margin: '4px 0 0', fontSize: 14 }}>
+          <h1 style={{ fontSize: 24, fontWeight: 800, color: 'white', margin: 0 }}>Recap de Clientes</h1>
+          <p style={{ color: 'rgba(255,255,255,0.40)', margin: '4px 0 0', fontSize: 14 }}>
             {kpis.total.toLocaleString('pt-BR')} clientes · {kpis.targets.toLocaleString('pt-BR')} alvos de reativação
           </p>
         </div>
         <button
           onClick={fetchData}
-          style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '10px 16px', borderRadius: 10, background: 'rgba(0,0,0,0.08)', border: '1px solid rgba(0,0,0,0.12)', color: 'rgba(255,255,255,0.8)', cursor: 'pointer', fontSize: 13, fontWeight: 600 }}
+          style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '10px 16px', borderRadius: 10, background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.12)', color: 'rgba(255,255,255,0.8)', cursor: 'pointer', fontSize: 13, fontWeight: 600 }}
         >
           <RefreshCw size={14} /> Atualizar
         </button>
@@ -459,9 +459,9 @@ export default function RecapClientesPage() {
           <div key={k.label} style={{ ...glass, padding: '18px 20px' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10 }}>
               <div style={{ color: k.color }}>{k.icon}</div>
-              <span style={{ fontSize: 11, color: 'rgba(26,24,37,0.42)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: 0.5 }}>{k.label}</span>
+              <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.40)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: 0.5 }}>{k.label}</span>
             </div>
-            <div style={{ fontSize: 26, fontWeight: 800, color: '#1a1825' }}>{k.value}</div>
+            <div style={{ fontSize: 26, fontWeight: 800, color: 'white' }}>{k.value}</div>
           </div>
         ))}
       </div>
@@ -474,7 +474,7 @@ export default function RecapClientesPage() {
             value={search}
             onChange={e => { setSearch(e.target.value); setPage(0) }}
             placeholder="Buscar por nome, CNPJ ou cidade..."
-            style={{ width: '100%', padding: '9px 12px 9px 34px', background: '#f5f6fa', border: '1px solid rgba(0,0,0,0.10)', borderRadius: 8, color: '#1a1825', fontSize: 13, outline: 'none', boxSizing: 'border-box' }}
+            style={{ width: '100%', padding: '9px 12px 9px 34px', background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.10)', borderRadius: 8, color: 'white', fontSize: 13, outline: 'none', boxSizing: 'border-box' }}
           />
         </div>
 
@@ -487,7 +487,7 @@ export default function RecapClientesPage() {
             key={f.label}
             value={f.value}
             onChange={e => { f.set(e.target.value); setPage(0) }}
-            style={{ padding: '9px 12px', background: '#f5f6fa', border: '1px solid rgba(0,0,0,0.10)', borderRadius: 8, color: '#1a1825', fontSize: 13, cursor: 'pointer', minWidth: 150 }}
+            style={{ padding: '9px 12px', background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.10)', borderRadius: 8, color: 'white', fontSize: 13, cursor: 'pointer', minWidth: 150 }}
           >
             {f.opts.map(([val, lbl]) => (
               <option key={val} value={val} style={{ background: '#0f0c1a' }}>{lbl}</option>
@@ -503,7 +503,7 @@ export default function RecapClientesPage() {
       {/* ── Tabela ── */}
       <div style={{ ...glass, overflow: 'hidden' }}>
         {/* Table Header */}
-        <div style={{ display: 'grid', gridTemplateColumns: '56px 1fr 140px 90px 90px 100px 110px', gap: 0, padding: '12px 20px', borderBottom: '1px solid rgba(0,0,0,0.08)', background: '#f8f9fc' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: '56px 1fr 140px 90px 90px 100px 110px', gap: 0, padding: '12px 20px', borderBottom: '1px solid rgba(255,255,255,0.07)', background: 'rgba(255,255,255,0.02)' }}>
           {[
             { key: 'score', label: 'Score' },
             { key: 'nome',  label: 'Cliente' },
@@ -516,7 +516,7 @@ export default function RecapClientesPage() {
             <div
               key={i}
               onClick={col.key ? () => toggleSort(col.key as typeof sortBy) : undefined}
-              style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 0.8, color: 'rgba(26,24,37,0.32)', cursor: col.key ? 'pointer' : 'default', display: 'flex', alignItems: 'center', gap: 4, userSelect: 'none' }}
+              style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 0.8, color: 'rgba(255,255,255,0.30)', cursor: col.key ? 'pointer' : 'default', display: 'flex', alignItems: 'center', gap: 4, userSelect: 'none' }}
             >
               {col.label}
               {col.key && sortBy === col.key && (
@@ -546,7 +546,7 @@ export default function RecapClientesPage() {
                   cursor: 'pointer', transition: 'background 0.15s',
                   background: selected?.id === c.id ? 'rgba(99,102,241,0.06)' : 'transparent',
                 }}
-                onMouseEnter={e => (e.currentTarget.style.background = '#ffffff')}
+                onMouseEnter={e => (e.currentTarget.style.background = 'rgba(255,255,255,0.04)')}
                 onMouseLeave={e => (e.currentTarget.style.background = selected?.id === c.id ? 'rgba(99,102,241,0.06)' : 'transparent')}
               >
                 {/* Score */}
@@ -554,7 +554,7 @@ export default function RecapClientesPage() {
 
                 {/* Nome */}
                 <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', minWidth: 0 }}>
-                  <span style={{ fontSize: 14, fontWeight: 600, color: '#1a1825', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{c.nome}</span>
+                  <span style={{ fontSize: 14, fontWeight: 600, color: 'white', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{c.nome}</span>
                   <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)', marginTop: 2 }}>{c.cidade || '—'}</span>
                 </div>
 
@@ -567,7 +567,7 @@ export default function RecapClientesPage() {
 
                 {/* UF */}
                 <div style={{ display: 'flex', alignItems: 'center' }}>
-                  <span style={{ padding: '3px 10px', borderRadius: 6, background: 'rgba(0,0,0,0.09)', fontSize: 12, fontWeight: 700, color: '#1a1825' }}>
+                  <span style={{ padding: '3px 10px', borderRadius: 6, background: 'rgba(255,255,255,0.08)', fontSize: 12, fontWeight: 700, color: 'white' }}>
                     {c.uf || '—'}
                   </span>
                 </div>
@@ -598,17 +598,17 @@ export default function RecapClientesPage() {
 
         {/* Pagination */}
         {totalPages > 1 && (
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 20px', borderTop: '1px solid rgba(0,0,0,0.08)', background: '#f8f9fc' }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 20px', borderTop: '1px solid rgba(255,255,255,0.07)', background: 'rgba(255,255,255,0.02)' }}>
             <span style={{ fontSize: 12, color: 'rgba(255,255,255,0.4)' }}>
               Página {page + 1} de {totalPages} · {filtered.length.toLocaleString('pt-BR')} registros
             </span>
             <div style={{ display: 'flex', gap: 8 }}>
               <button onClick={() => setPage(p => Math.max(0, p - 1))} disabled={page === 0}
-                style={{ padding: '6px 14px', borderRadius: 8, border: '1px solid rgba(0,0,0,0.12)', background: 'transparent', color: page === 0 ? 'rgba(255,255,255,0.2)' : 'white', cursor: page === 0 ? 'default' : 'pointer', fontSize: 12 }}>
+                style={{ padding: '6px 14px', borderRadius: 8, border: '1px solid rgba(255,255,255,0.12)', background: 'transparent', color: page === 0 ? 'rgba(255,255,255,0.2)' : 'white', cursor: page === 0 ? 'default' : 'pointer', fontSize: 12 }}>
                 ← Anterior
               </button>
               <button onClick={() => setPage(p => Math.min(totalPages - 1, p + 1))} disabled={page === totalPages - 1}
-                style={{ padding: '6px 14px', borderRadius: 8, border: '1px solid rgba(0,0,0,0.12)', background: 'transparent', color: page === totalPages - 1 ? 'rgba(255,255,255,0.2)' : 'white', cursor: page === totalPages - 1 ? 'default' : 'pointer', fontSize: 12 }}>
+                style={{ padding: '6px 14px', borderRadius: 8, border: '1px solid rgba(255,255,255,0.12)', background: 'transparent', color: page === totalPages - 1 ? 'rgba(255,255,255,0.2)' : 'white', cursor: page === totalPages - 1 ? 'default' : 'pointer', fontSize: 12 }}>
                 Próxima →
               </button>
             </div>
