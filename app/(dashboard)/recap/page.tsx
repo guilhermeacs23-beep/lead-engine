@@ -517,7 +517,7 @@ export default function RecapClientesPage() {
             <div
               key={i}
               onClick={col.key ? () => toggleSort(col.key as typeof sortBy) : undefined}
-              style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 0.8, color: 'rgba(255,255,255,0.30)', cursor: col.key ? 'pointer' : 'default', display: 'flex', alignItems: 'center', gap: 4, userSelect: 'none' }}
+              style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 0.8, color: '#6b7280', cursor: col.key ? 'pointer' : 'default', display: 'flex', alignItems: 'center', gap: 4, userSelect: 'none' }}
             >
               {col.label}
               {col.key && sortBy === col.key && (
