@@ -55,7 +55,7 @@ function AreaChart({ data }: { data: { mes: string; pipeline: number; fechado: n
     `${pline(k)} L${px(data.length - 1)},${PAD.t + IH} L${PAD.l},${PAD.t + IH} Z`
 
   if (data.length < 2) return (
-    <div className="flex h-40 items-center justify-center text-sm text-white/30">
+    <div className="flex h-40 items-center justify-center text-sm text-gray-400">
       Dados insuficientes para o gráfico
     </div>
   )
@@ -79,9 +79,9 @@ function AreaChart({ data }: { data: { mes: string; pipeline: number; fechado: n
         return (
           <g key={f}>
             <line x1={PAD.l} y1={y} x2={W - PAD.r} y2={y}
-              stroke="rgba(255,255,255,0.06)" strokeWidth="0.5" />
+              stroke="rgba(0,0,0,0.07)" strokeWidth="0.5" />
             <text x={PAD.l - 6} y={y + 4} textAnchor="end"
-              fill="rgba(255,255,255,0.3)" fontSize="9">
+              fill="rgba(0,0,0,0.40)" fontSize="9">
               {formatCurrencyShort(maxV * f)}
             </text>
           </g>
@@ -102,7 +102,7 @@ function AreaChart({ data }: { data: { mes: string; pipeline: number; fechado: n
           <circle cx={px(i)} cy={py(d.pipeline)} r="3" fill="#6366f1" />
           <circle cx={px(i)} cy={py(d.fechado)}  r="2.5" fill="#34d399" />
           <text x={px(i)} y={H - 6} textAnchor="middle"
-            fill="rgba(255,255,255,0.4)" fontSize="10">{d.mes}</text>
+            fill="rgba(0,0,0,0.45)" fontSize="10">{d.mes}</text>
         </g>
       ))}
     </svg>
@@ -127,7 +127,7 @@ function DonutChart({ segments }: { segments: { label: string; pct: number; colo
         offset += dash
         return el
       })}
-      <circle cx={CX} cy={CY} r={R - 14} fill="rgba(12,10,30,0.95)" />
+      <circle cx={CX} cy={CY} r={R - 14} fill="#ffffff" />
     </svg>
   )
 }
@@ -178,13 +178,13 @@ export default function RelatoriosPage() {
   }
 
   if (loading) return (
-    <div className="flex h-full items-center justify-center gap-2 text-base text-white/50">
+    <div className="flex h-full items-center justify-center gap-2 text-base text-gray-400">
       <Loader2 size={20} className="animate-spin" />Carregando relatórios…
     </div>
   )
 
   if (!report) return (
-    <div className="flex h-full items-center justify-center text-sm text-white/40">
+    <div className="flex h-full items-center justify-center text-sm text-gray-400">
       Nenhum dado disponível ainda.
     </div>
   )
@@ -204,13 +204,13 @@ export default function RelatoriosPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-[18px] font-bold text-white">Relatórios</h1>
-          <p className="text-[13px] text-white/40">{report.total_leads} leads no banco · dados em tempo real</p>
+          <h1 className="text-[18px] font-bold text-gray-900">Relatórios</h1>
+          <p className="text-[13px] text-gray-400">{report.total_leads} leads no banco · dados em tempo real</p>
         </div>
         <div className="flex gap-2">
           <button onClick={exportMonthlyCSV}
-            className="flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-medium text-white/70 transition-all hover:bg-white/[0.08] hover:text-white"
-            style={{ border: '0.5px solid rgba(255,255,255,0.12)' }}>
+            className="flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-medium text-gray-600 transition-all hover:bg-white/[0.08] hover:text-white"
+            style={{ border: '1px solid rgba(0,0,0,0.10)' }}>
             <Download size={13} strokeWidth={1.5} />CSV Mensal
           </button>
           <button onClick={exportLeadsCSV}
@@ -224,9 +224,9 @@ export default function RelatoriosPage() {
       <div className="grid grid-cols-4 gap-3">
         {KPI_CARDS.map(c => (
           <div key={c.label} className="rounded-xl p-5"
-            style={{ background: 'rgba(255,255,255,0.06)', border: '0.5px solid rgba(255,255,255,0.10)' }}>
-            <p className="mb-2 text-[13px] font-medium text-white">{c.label}</p>
-            <p className="text-3xl font-semibold text-white">{c.value}</p>
+            style={{ background: '#f8f9fc', border: '1px solid rgba(0,0,0,0.07)', borderRadius: 14, boxShadow: '0 1px 8px rgba(0,0,0,0.07)' }}>
+            <p className="mb-2 text-[13px] font-medium text-gray-600">{c.label}</p>
+            <p className="text-3xl font-semibold text-gray-900">{c.value}</p>
             <p className="mt-1.5 flex items-center gap-1 text-[13px] font-medium text-emerald-400">
               <TrendingUp size={13} />{c.delta}
             </p>
@@ -239,15 +239,15 @@ export default function RelatoriosPage() {
 
         {/* Area chart */}
         <div className="col-span-3 rounded-xl p-5"
-          style={{ background: 'rgba(255,255,255,0.05)', border: '0.5px solid rgba(255,255,255,0.10)' }}>
+          style={{ background: '#ffffff', border: '1px solid rgba(0,0,0,0.07)', borderRadius: 14, boxShadow: '0 1px 8px rgba(0,0,0,0.07)' }}>
           <div className="mb-4 flex items-center gap-2">
             <BarChart2 size={15} className="text-indigo-400" strokeWidth={1.5} />
-            <p className="text-[15px] font-semibold text-white">Evolução mensal</p>
+            <p className="text-[15px] font-semibold text-gray-900">Evolução mensal</p>
             <div className="ml-auto flex items-center gap-4 text-[12px]">
-              <span className="flex items-center gap-1.5 text-white/55">
+              <span className="flex items-center gap-1.5 text-gray-500">
                 <span className="inline-block h-2 w-4 rounded-full bg-indigo-500" />Pipeline
               </span>
-              <span className="flex items-center gap-1.5 text-white/55">
+              <span className="flex items-center gap-1.5 text-gray-500">
                 <span className="inline-block h-px w-4 border-t border-dashed border-emerald-400" />Fechado
               </span>
             </div>
@@ -257,13 +257,13 @@ export default function RelatoriosPage() {
 
         {/* Funnel */}
         <div className="col-span-2 rounded-xl p-5"
-          style={{ background: 'rgba(255,255,255,0.05)', border: '0.5px solid rgba(255,255,255,0.10)' }}>
+          style={{ background: '#ffffff', border: '1px solid rgba(0,0,0,0.07)', borderRadius: 14, boxShadow: '0 1px 8px rgba(0,0,0,0.07)' }}>
           <div className="mb-4 flex items-center gap-2">
             <Target size={15} className="text-indigo-400" strokeWidth={1.5} />
-            <p className="text-[15px] font-semibold text-white">Funil</p>
+            <p className="text-[15px] font-semibold text-gray-900">Funil</p>
           </div>
           {funnel.length === 0 ? (
-            <p className="py-6 text-center text-sm text-white/40">Nenhum lead no pipeline</p>
+            <p className="py-6 text-center text-sm text-gray-400">Nenhum lead no pipeline</p>
           ) : (
             <div className="flex flex-col gap-2">
               {funnel.map(step => {
@@ -271,15 +271,15 @@ export default function RelatoriosPage() {
                 const barW  = maxFunnel > 0 ? Math.max(4, Math.round((step.count / maxFunnel) * 100)) : 4
                 return (
                   <div key={step.step} className="flex items-center gap-3">
-                    <span className="w-20 text-right text-[12px] font-medium text-white">
+                    <span className="w-20 text-right text-[12px] font-medium text-gray-700">
                       {STATUS_LABELS[step.step]}
                     </span>
                     <div className="flex flex-1 items-center gap-2">
                       <div className="h-5 overflow-hidden rounded-md" style={{ width: `${barW}%`, background: `${color}CC`, minWidth: 8 }}>
                         <div className="h-full opacity-30"
-                          style={{ background: 'linear-gradient(to right, rgba(255,255,255,0.2), transparent)' }} />
+                          style={{ background: 'linear-gradient(to right, rgba(255,255,255,0.5), transparent)' }} />
                       </div>
-                      <span className="text-[12px] font-bold text-white">{step.count}</span>
+                      <span className="text-[12px] font-bold text-gray-800">{step.count}</span>
                     </div>
                   </div>
                 )
@@ -294,13 +294,13 @@ export default function RelatoriosPage() {
 
         {/* Segmentos */}
         <div className="rounded-xl p-5"
-          style={{ background: 'rgba(255,255,255,0.05)', border: '0.5px solid rgba(255,255,255,0.10)' }}>
+          style={{ background: '#ffffff', border: '1px solid rgba(0,0,0,0.07)', borderRadius: 14, boxShadow: '0 1px 8px rgba(0,0,0,0.07)' }}>
           <div className="mb-4 flex items-center gap-2">
             <PieChart size={15} className="text-indigo-400" strokeWidth={1.5} />
-            <p className="text-[15px] font-semibold text-white">Segmentos</p>
+            <p className="text-[15px] font-semibold text-gray-900">Segmentos</p>
           </div>
           {report.segmentos.length === 0 ? (
-            <p className="py-6 text-center text-sm text-white/40">Sem dados</p>
+            <p className="py-6 text-center text-sm text-gray-400">Sem dados</p>
           ) : (
             <div className="flex items-center gap-5">
               <DonutChart segments={report.segmentos} />
@@ -308,8 +308,8 @@ export default function RelatoriosPage() {
                 {report.segmentos.map((s: any) => (
                   <div key={s.label} className="flex items-center gap-2">
                     <div className="h-2 w-2 rounded-full shrink-0" style={{ background: s.color }} />
-                    <span className="flex-1 text-[12px] text-white">{SEG_LABELS[s.label] ?? s.label}</span>
-                    <span className="text-[12px] font-semibold text-white">{s.pct}%</span>
+                    <span className="flex-1 text-[12px] text-gray-700">{SEG_LABELS[s.label] ?? s.label}</span>
+                    <span className="text-[12px] font-semibold text-gray-800">{s.pct}%</span>
                   </div>
                 ))}
               </div>
@@ -319,23 +319,23 @@ export default function RelatoriosPage() {
 
         {/* Fontes */}
         <div className="rounded-xl p-5"
-          style={{ background: 'rgba(255,255,255,0.05)', border: '0.5px solid rgba(255,255,255,0.10)' }}>
+          style={{ background: '#ffffff', border: '1px solid rgba(0,0,0,0.07)', borderRadius: 14, boxShadow: '0 1px 8px rgba(0,0,0,0.07)' }}>
           <div className="mb-4 flex items-center gap-2">
             <Users size={15} className="text-indigo-400" strokeWidth={1.5} />
-            <p className="text-[15px] font-semibold text-white">Fontes de aquisição</p>
+            <p className="text-[15px] font-semibold text-gray-900">Fontes de aquisição</p>
           </div>
           {report.fontes.length === 0 ? (
-            <p className="py-6 text-center text-sm text-white/40">Sem dados</p>
+            <p className="py-6 text-center text-sm text-gray-400">Sem dados</p>
           ) : (
             <div className="flex flex-col gap-3">
               {report.fontes.map((f: any) => (
                 <div key={f.fonte} className="flex flex-col gap-1.5">
                   <div className="flex items-center justify-between">
-                    <span className="text-[13px] font-medium text-white">{SRC_LABELS[f.fonte] ?? f.fonte}</span>
-                    <span className="text-[13px] font-semibold text-white">{f.pct}%</span>
+                    <span className="text-[13px] font-medium text-gray-700">{SRC_LABELS[f.fonte] ?? f.fonte}</span>
+                    <span className="text-[13px] font-semibold text-gray-800">{f.pct}%</span>
                   </div>
                   <div className="h-2 w-full overflow-hidden rounded-full"
-                    style={{ background: 'rgba(255,255,255,0.08)' }}>
+                    style={{ background: 'rgba(0,0,0,0.07)' }}>
                     <div className="h-full rounded-full transition-all duration-700"
                       style={{ width: `${f.pct}%`, background: f.color }} />
                   </div>
