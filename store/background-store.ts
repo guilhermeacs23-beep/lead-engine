@@ -69,6 +69,21 @@ export const BACKGROUNDS: BackgroundItem[] = [
     preview: 'linear-gradient(135deg,#e8f4f8,#dde8f0,#cce0ee)',
     cssClass: 'bg-anim-frost',
   },
+  {
+    id: 'white-clean',
+    label: 'Branco', category: 'light', type: 'css-gradient', contrastMode: 'light', defaultOverlay: 0,
+    preview: 'linear-gradient(135deg,#ffffff,#f8f9fa)',
+  },
+  {
+    id: 'light-gray',
+    label: 'Cinza Claro', category: 'light', type: 'css-gradient', contrastMode: 'light', defaultOverlay: 0,
+    preview: 'linear-gradient(135deg,#f0f2f5,#e8ecf1,#f0f2f5)',
+  },
+  {
+    id: 'light-blue',
+    label: 'Azul Claro', category: 'light', type: 'css-gradient', contrastMode: 'light', defaultOverlay: 0,
+    preview: 'linear-gradient(135deg,#eef2ff,#e0e7ff,#f0f4ff)',
+  },
   /* ── Vivid Gradients ── */
   {
     id: 'neon-pulse',
@@ -292,7 +307,7 @@ interface BackgroundState {
 export const useBackgroundStore = create<BackgroundState>()(
   persist(
     (set) => ({
-      activeId:        'cosmos',
+      activeId:        'white-clean',
       overlayMode:     'auto',
       overlayStrength: 0.25,
       motionEnabled:   true,
@@ -306,7 +321,7 @@ export const useBackgroundStore = create<BackgroundState>()(
       toggleMotion:       () => set((s) => ({ motionEnabled: !s.motionEnabled })),
       toggleParticles:    () => set((s) => ({ particlesOn: !s.particlesOn })),
       setGalleryOpen:     (v) => set({ galleryOpen: v }),
-      reset:              () => set({ activeId: 'cosmos', overlayMode: 'auto', overlayStrength: 0.25 }),
+      reset:              () => set({ activeId: 'white-clean', overlayMode: 'auto', overlayStrength: 0.25 }),
     }),
     {
       name: 'lead-engine-background',
