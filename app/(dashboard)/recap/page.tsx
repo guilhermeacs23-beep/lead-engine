@@ -182,13 +182,13 @@ function DetailDrawer({
           <div style={{ display: 'flex', gap: 16 }}>
             <div style={{ flex: 1, textAlign: 'center', padding: '12px 8px', background: 'rgba(255,255,255,0.04)', borderRadius: 8 }}>
               <div style={{ fontSize: 22, fontWeight: 700, color: cfg.color }}>{diasLabel(cliente.dias_inativo)}</div>
-              <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)', marginTop: 2 }}>Inativo há</div>
+              <div style={{ fontSize: 11, color: 'rgba(0,0,0,0.40)', marginTop: 2 }}>Inativo há</div>
             </div>
             <div style={{ flex: 1, textAlign: 'center', padding: '12px 8px', background: 'rgba(255,255,255,0.04)', borderRadius: 8 }}>
               <div style={{ fontSize: 13, fontWeight: 600, color: 'white' }}>
                 {cliente.ult_movimento ? new Date(cliente.ult_movimento).toLocaleDateString('pt-BR') : '—'}
               </div>
-              <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)', marginTop: 2 }}>Último mov.</div>
+              <div style={{ fontSize: 11, color: 'rgba(0,0,0,0.40)', marginTop: 2 }}>Último mov.</div>
             </div>
           </div>
         </div>
@@ -420,7 +420,7 @@ export default function RecapClientesPage() {
         <Users size={32} style={{ color: '#6366f1' }} />
       </div>
       <div>
-        <h2 style={{ fontSize: 20, fontWeight: 700, color: 'white', margin: '0 0 8px' }}>Base ainda não importada</h2>
+        <h2 style={{ fontSize: 20, fontWeight: 700, color: '#111827', margin: '0 0 8px' }}>Base ainda não importada</h2>
         <p style={{ color: 'rgba(255,255,255,0.40)', maxWidth: 400 }}>
           Execute o script <strong style={{ color: 'white' }}>import_clientes_recap.py</strong> com suas credenciais do Supabase para importar a base do SSW.
         </p>
@@ -429,19 +429,20 @@ export default function RecapClientesPage() {
   )
 
   return (
-    <div style={{ padding: '28px 32px', maxWidth: 1400, margin: '0 auto' }}>
+    <div style={{ padding: '12px', maxWidth: 1440, margin: '0 auto' }}>
 
+      <div style={{ background: '#ffffff', borderRadius: 14, boxShadow: '0 2px 16px rgba(0,0,0,0.09), 0 0 0 1px rgba(0,0,0,0.06)', overflow: 'hidden', padding: '24px 28px', display: 'flex', flexDirection: 'column', gap: 20 }}>
       {/* ── Header ── */}
       <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 28 }}>
         <div>
-          <h1 style={{ fontSize: 24, fontWeight: 800, color: 'white', margin: 0 }}>Recap de Clientes</h1>
+          <h1 style={{ fontSize: 24, fontWeight: 800, color: '#111827', margin: 0 }}>Recap de Clientes</h1>
           <p style={{ color: 'rgba(255,255,255,0.40)', margin: '4px 0 0', fontSize: 14 }}>
             {kpis.total.toLocaleString('pt-BR')} clientes · {kpis.targets.toLocaleString('pt-BR')} alvos de reativação
           </p>
         </div>
         <button
           onClick={fetchData}
-          style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '10px 16px', borderRadius: 10, background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.12)', color: 'rgba(255,255,255,0.8)', cursor: 'pointer', fontSize: 13, fontWeight: 600 }}
+          style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '10px 16px', borderRadius: 10, background: '#f4f5f8', border: '1px solid rgba(0,0,0,0.10)', color: '#374151', cursor: 'pointer', fontSize: 13, fontWeight: 600 }}
         >
           <RefreshCw size={14} /> Atualizar
         </button>
@@ -456,25 +457,25 @@ export default function RecapClientesPage() {
           { label: 'Com Contato',      value: `${Math.round(kpis.comEmail/kpis.total*100)}%`, icon: <Mail size={18} />, color: '#10b981' },
           { label: 'Aprovados',        value: kpis.aprovados.toLocaleString('pt-BR'), icon: <CheckCircle size={18} />, color: '#10b981' },
         ].map(k => (
-          <div key={k.label} style={{ ...glass, padding: '18px 20px' }}>
+          <div key={k.label} style={{ background: '#f8f9fc', border: '1px solid rgba(0,0,0,0.07)', borderRadius: 16, padding: '18px 20px' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10 }}>
               <div style={{ color: k.color }}>{k.icon}</div>
               <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.40)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: 0.5 }}>{k.label}</span>
             </div>
-            <div style={{ fontSize: 26, fontWeight: 800, color: 'white' }}>{k.value}</div>
+            <div style={{ fontSize: 26, fontWeight: 800, color: '#111827' }}>{k.value}</div>
           </div>
         ))}
       </div>
 
       {/* ── Filtros ── */}
-      <div style={{ ...glass, padding: '16px 20px', marginBottom: 20, display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
+      <div style={{ background: '#f4f5f8', border: '1px solid rgba(0,0,0,0.07)', borderRadius: 16, padding: '16px 20px', marginBottom: 20, display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
         <div style={{ position: 'relative', flex: '1 1 220px', minWidth: 180 }}>
-          <Search size={14} style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: 'rgba(255,255,255,0.3)' }} />
+          <Search size={14} style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: 'rgba(0,0,0,0.30)' }} />
           <input
             value={search}
             onChange={e => { setSearch(e.target.value); setPage(0) }}
             placeholder="Buscar por nome, CNPJ ou cidade..."
-            style={{ width: '100%', padding: '9px 12px 9px 34px', background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.10)', borderRadius: 8, color: 'white', fontSize: 13, outline: 'none', boxSizing: 'border-box' }}
+            style={{ width: '100%', padding: '9px 12px 9px 34px', background: '#ffffff', border: '1px solid rgba(0,0,0,0.12)', borderRadius: 8, color: '#111827', fontSize: 13, outline: 'none', boxSizing: 'border-box' }}
           />
         </div>
 
@@ -487,23 +488,23 @@ export default function RecapClientesPage() {
             key={f.label}
             value={f.value}
             onChange={e => { f.set(e.target.value); setPage(0) }}
-            style={{ padding: '9px 12px', background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.10)', borderRadius: 8, color: 'white', fontSize: 13, cursor: 'pointer', minWidth: 150 }}
+            style={{ padding: '9px 12px', background: '#ffffff', border: '1px solid rgba(0,0,0,0.12)', borderRadius: 8, color: '#374151', fontSize: 13, cursor: 'pointer', minWidth: 150 }}
           >
             {f.opts.map(([val, lbl]) => (
-              <option key={val} value={val} style={{ background: '#0f0c1a' }}>{lbl}</option>
+              <option key={val} value={val} style={{ background: '#ffffff', color: '#111827' }}>{lbl}</option>
             ))}
           </select>
         ))}
 
-        <span style={{ marginLeft: 'auto', fontSize: 13, color: 'rgba(255,255,255,0.4)', whiteSpace: 'nowrap' }}>
+        <span style={{ marginLeft: 'auto', fontSize: 13, color: 'rgba(0,0,0,0.40)', whiteSpace: 'nowrap' }}>
           {filtered.length.toLocaleString('pt-BR')} resultado{filtered.length !== 1 ? 's' : ''}
         </span>
       </div>
 
       {/* ── Tabela ── */}
-      <div style={{ ...glass, overflow: 'hidden' }}>
+      <div style={{ background: '#ffffff', border: '1px solid rgba(0,0,0,0.07)', borderRadius: 16, overflow: 'hidden' }}>
         {/* Table Header */}
-        <div style={{ display: 'grid', gridTemplateColumns: '56px 1fr 140px 90px 90px 100px 110px', gap: 0, padding: '12px 20px', borderBottom: '1px solid rgba(255,255,255,0.07)', background: 'rgba(255,255,255,0.02)' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: '56px 1fr 140px 90px 90px 100px 110px', gap: 0, padding: '12px 20px', borderBottom: '1px solid rgba(0,0,0,0.06)', background: '#f8f9fc' }}>
           {[
             { key: 'score', label: 'Score' },
             { key: 'nome',  label: 'Cliente' },
@@ -528,7 +529,7 @@ export default function RecapClientesPage() {
 
         {/* Rows */}
         {paginated.length === 0 ? (
-          <div style={{ padding: '48px 20px', textAlign: 'center', color: 'rgba(255,255,255,0.3)' }}>
+          <div style={{ padding: '48px 20px', textAlign: 'center', color: 'rgba(0,0,0,0.30)' }}>
             Nenhum cliente encontrado com os filtros atuais
           </div>
         ) : (
@@ -542,11 +543,11 @@ export default function RecapClientesPage() {
                 style={{
                   display: 'grid', gridTemplateColumns: '56px 1fr 140px 90px 90px 100px 110px',
                   gap: 0, padding: '14px 20px',
-                  borderBottom: idx < paginated.length - 1 ? '1px solid rgba(255,255,255,0.05)' : 'none',
+                  borderBottom: idx < paginated.length - 1 ? '1px solid rgba(0,0,0,0.05)' : 'none',
                   cursor: 'pointer', transition: 'background 0.15s',
                   background: selected?.id === c.id ? 'rgba(99,102,241,0.06)' : 'transparent',
                 }}
-                onMouseEnter={e => (e.currentTarget.style.background = 'rgba(255,255,255,0.04)')}
+                onMouseEnter={e => (e.currentTarget.style.background = '#f8f9fc')}
                 onMouseLeave={e => (e.currentTarget.style.background = selected?.id === c.id ? 'rgba(99,102,241,0.06)' : 'transparent')}
               >
                 {/* Score */}
@@ -554,20 +555,20 @@ export default function RecapClientesPage() {
 
                 {/* Nome */}
                 <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', minWidth: 0 }}>
-                  <span style={{ fontSize: 14, fontWeight: 600, color: 'white', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{c.nome}</span>
-                  <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)', marginTop: 2 }}>{c.cidade || '—'}</span>
+                  <span style={{ fontSize: 14, fontWeight: 600, color: '#111827', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{c.nome}</span>
+                  <span style={{ fontSize: 11, color: 'rgba(0,0,0,0.40)', marginTop: 2 }}>{c.cidade || '—'}</span>
                 </div>
 
                 {/* CNPJ */}
                 <div style={{ display: 'flex', alignItems: 'center' }}>
-                  <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)', fontFamily: 'monospace' }}>
+                  <span style={{ fontSize: 11, color: 'rgba(0,0,0,0.40)', fontFamily: 'monospace' }}>
                     {c.cnpj ? c.cnpj.replace(/(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/, '$1.$2.$3/$4-$5') : '—'}
                   </span>
                 </div>
 
                 {/* UF */}
                 <div style={{ display: 'flex', alignItems: 'center' }}>
-                  <span style={{ padding: '3px 10px', borderRadius: 6, background: 'rgba(255,255,255,0.08)', fontSize: 12, fontWeight: 700, color: 'white' }}>
+                  <span style={{ padding: '3px 10px', borderRadius: 6, background: 'rgba(99,102,241,0.10)', fontSize: 12, fontWeight: 700, color: '#4f46e5' }}>
                     {c.uf || '—'}
                   </span>
                 </div>
@@ -598,17 +599,17 @@ export default function RecapClientesPage() {
 
         {/* Pagination */}
         {totalPages > 1 && (
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 20px', borderTop: '1px solid rgba(255,255,255,0.07)', background: 'rgba(255,255,255,0.02)' }}>
-            <span style={{ fontSize: 12, color: 'rgba(255,255,255,0.4)' }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 20px', borderTop: '1px solid rgba(0,0,0,0.06)', background: '#f8f9fc' }}>
+            <span style={{ fontSize: 12, color: 'rgba(0,0,0,0.40)' }}>
               Página {page + 1} de {totalPages} · {filtered.length.toLocaleString('pt-BR')} registros
             </span>
             <div style={{ display: 'flex', gap: 8 }}>
               <button onClick={() => setPage(p => Math.max(0, p - 1))} disabled={page === 0}
-                style={{ padding: '6px 14px', borderRadius: 8, border: '1px solid rgba(255,255,255,0.12)', background: 'transparent', color: page === 0 ? 'rgba(255,255,255,0.2)' : 'white', cursor: page === 0 ? 'default' : 'pointer', fontSize: 12 }}>
+                style={{ padding: '6px 14px', borderRadius: 8, border: '1px solid rgba(0,0,0,0.12)', background: '#ffffff', color: page === 0 ? 'rgba(0,0,0,0.25)' : '#374151', cursor: page === 0 ? 'default' : 'pointer', fontSize: 12 }}>
                 ← Anterior
               </button>
               <button onClick={() => setPage(p => Math.min(totalPages - 1, p + 1))} disabled={page === totalPages - 1}
-                style={{ padding: '6px 14px', borderRadius: 8, border: '1px solid rgba(255,255,255,0.12)', background: 'transparent', color: page === totalPages - 1 ? 'rgba(255,255,255,0.2)' : 'white', cursor: page === totalPages - 1 ? 'default' : 'pointer', fontSize: 12 }}>
+                style={{ padding: '6px 14px', borderRadius: 8, border: '1px solid rgba(0,0,0,0.12)', background: '#ffffff', color: page === totalPages - 1 ? 'rgba(0,0,0,0.25)' : '#374151', cursor: page === totalPages - 1 ? 'default' : 'pointer', fontSize: 12 }}>
                 Próxima →
               </button>
             </div>
@@ -625,6 +626,7 @@ export default function RecapClientesPage() {
         loading={actionLoading}
       />
 
+      </div>
       <style>{`@keyframes spin { from { transform: rotate(0deg) } to { transform: rotate(360deg) } }`}</style>
     </div>
   )
