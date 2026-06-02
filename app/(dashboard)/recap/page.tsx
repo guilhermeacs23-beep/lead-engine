@@ -182,13 +182,13 @@ function DetailDrawer({
           <div style={{ display: 'flex', gap: 16 }}>
             <div style={{ flex: 1, textAlign: 'center', padding: '12px 8px', background: 'rgba(255,255,255,0.04)', borderRadius: 8 }}>
               <div style={{ fontSize: 22, fontWeight: 700, color: cfg.color }}>{diasLabel(cliente.dias_inativo)}</div>
-              <div style={{ fontSize: 11, color: 'rgba(0,0,0,0.40)', marginTop: 2 }}>Inativo há</div>
+              <div style={{ fontSize: 11, color: '#9ca3af', marginTop: 2 }}>Inativo há</div>
             </div>
             <div style={{ flex: 1, textAlign: 'center', padding: '12px 8px', background: 'rgba(255,255,255,0.04)', borderRadius: 8 }}>
               <div style={{ fontSize: 13, fontWeight: 600, color: 'white' }}>
                 {cliente.ult_movimento ? new Date(cliente.ult_movimento).toLocaleDateString('pt-BR') : '—'}
               </div>
-              <div style={{ fontSize: 11, color: 'rgba(0,0,0,0.40)', marginTop: 2 }}>Último mov.</div>
+              <div style={{ fontSize: 11, color: '#9ca3af', marginTop: 2 }}>Último mov.</div>
             </div>
           </div>
         </div>
@@ -496,7 +496,7 @@ export default function RecapClientesPage() {
           </select>
         ))}
 
-        <span style={{ marginLeft: 'auto', fontSize: 13, color: 'rgba(0,0,0,0.40)', whiteSpace: 'nowrap' }}>
+        <span style={{ marginLeft: 'auto', fontSize: 13, color: '#9ca3af', whiteSpace: 'nowrap' }}>
           {filtered.length.toLocaleString('pt-BR')} resultado{filtered.length !== 1 ? 's' : ''}
         </span>
       </div>
@@ -504,7 +504,7 @@ export default function RecapClientesPage() {
       {/* ── Tabela ── */}
       <div style={{ background: '#ffffff', border: '1px solid rgba(0,0,0,0.07)', borderRadius: 16, overflow: 'hidden' }}>
         {/* Table Header */}
-        <div style={{ display: 'grid', gridTemplateColumns: '56px 1fr 140px 90px 90px 100px 110px', gap: 0, padding: '12px 20px', borderBottom: '1px solid rgba(0,0,0,0.06)', background: '#f8f9fc' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: '56px 1fr 140px 90px 90px 100px 110px', gap: 0, padding: '12px 20px', borderBottom: '1px solid rgba(0,0,0,0.08)', background: '#f3f4f6' }}>
           {[
             { key: 'score', label: 'Score' },
             { key: 'nome',  label: 'Cliente' },
@@ -556,12 +556,12 @@ export default function RecapClientesPage() {
                 {/* Nome */}
                 <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', minWidth: 0 }}>
                   <span style={{ fontSize: 14, fontWeight: 600, color: '#111827', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{c.nome}</span>
-                  <span style={{ fontSize: 11, color: 'rgba(0,0,0,0.40)', marginTop: 2 }}>{c.cidade || '—'}</span>
+                  <span style={{ fontSize: 11, color: '#9ca3af', marginTop: 2 }}>{c.cidade || '—'}</span>
                 </div>
 
                 {/* CNPJ */}
                 <div style={{ display: 'flex', alignItems: 'center' }}>
-                  <span style={{ fontSize: 11, color: 'rgba(0,0,0,0.40)', fontFamily: 'monospace' }}>
+                  <span style={{ fontSize: 11, color: '#9ca3af', fontFamily: 'monospace' }}>
                     {c.cnpj ? c.cnpj.replace(/(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/, '$1.$2.$3/$4-$5') : '—'}
                   </span>
                 </div>
@@ -600,7 +600,7 @@ export default function RecapClientesPage() {
         {/* Pagination */}
         {totalPages > 1 && (
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 20px', borderTop: '1px solid rgba(0,0,0,0.06)', background: '#f8f9fc' }}>
-            <span style={{ fontSize: 12, color: 'rgba(0,0,0,0.40)' }}>
+            <span style={{ fontSize: 12, color: '#9ca3af' }}>
               Página {page + 1} de {totalPages} · {filtered.length.toLocaleString('pt-BR')} registros
             </span>
             <div style={{ display: 'flex', gap: 8 }}>
