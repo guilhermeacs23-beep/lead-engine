@@ -406,4 +406,8 @@ export const useBackgroundStore = create<BackgroundState>()(
         overlayStrength: s.overlayStrength,
         motionEnabled:   s.motionEnabled,
         particlesOn:     s.particlesOn,
-        // galleryOpen i
+        // galleryOpen is transient — not persisted
+      }),
+    },
+  ),
+)
