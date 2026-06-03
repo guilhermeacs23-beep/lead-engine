@@ -230,7 +230,7 @@ export function BackgroundGallery({ open, onClose }: Props) {
     overlayMode,
     overlayStrength,
     motionEnabled,
-    setBackground,
+    setBackground, setCustomBg,
     setOverlayMode,
     setOverlayStrength,
     setMotionEnabled,
@@ -460,7 +460,7 @@ export function BackgroundGallery({ open, onClose }: Props) {
               key={bg.id}
               bg={bg}
               isActive={bg.id === activeId}
-              onSelect={() => setBackground(bg.id)}
+              onSelect={() => { setBackground(bg.id); if (bg.src && !BACKGROUNDS.find(b => b.id === bg.id)) setCustomBg(bg.src, bg.type === 'video' ? 'video' : 'image'); }}
             />
           ))}
         </div>
@@ -594,3 +594,4 @@ export function BackgroundGallery({ open, onClose }: Props) {
     </>
   )
 }
+
