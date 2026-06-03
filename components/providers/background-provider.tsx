@@ -13,12 +13,17 @@ import { useBackgroundStore, resolveOverlay, BACKGROUNDS, BackgroundItem } from 
 ═══════════════════════════════════════════════════ */
 
 export function BackgroundProvider() {
-  const { activeId, overlayMode, overlayStrength, motionEnabled } = useBackgroundStore()
+  const { activeId, overlayMode, overlayStrength, motionEnabled, customBgSrc, customBgType } = useBackgroundStore()
   const videoRef = useRef<HTMLVideoElement>(null)
   const [videoReady, setVideoReady] = useState(false)
 
+  // Se o id não está nos BACKGROUNDS, usa customBgSrc (vídeos/imagens de "Meus Fundos")
+  const customFallback: BackgroundItem | undefined = (!BACKGROUNDS.find(b => b.id === activeId) && customBgSrc) ? {
+    id: activeId, label: 'Custom', category: 'cinematic', type: customBgType ?? 'video', src: customBgSrc,
+    preview: 'linear-gradient(135deg,#1a1a2e,#0f172a)', contrastMode: 'dark', defaultOverlay: 0.30,
+  } : undefined
   const bg: BackgroundItem | undefined =
-    BACKGROUNDS.find(b => b.id === activeId) ?? BACKGROUNDS[0]
+    BACKGROUNDS.find(b => b.id === activeId) ?? customFallback ?? BACKGROUNDS[0]
 
   const overlay = resolveOverlay(bg, overlayMode, overlayStrength)
 
