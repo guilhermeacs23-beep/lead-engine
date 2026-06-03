@@ -298,4 +298,112 @@ export const BACKGROUNDS: BackgroundItem[] = [
     src: 'https://lpljcfvhwwpgqeyincub.supabase.co/storage/v1/object/public/backgrounds/165229-832460001_medium.mp4',
   },
   {
-    id: 'vid-176072', label: 'Fogo', category: 'cinematic', type: 'video', contrastMode: 'dark', defaultOverlay: 0.35, isNew: tr
+    id: 'vid-176072', label: 'Fogo', category: 'cinematic', type: 'video', contrastMode: 'dark', defaultOverlay: 0.35, isNew: true,
+    preview: 'linear-gradient(135deg,#3d0000,#7a1a00,#b34700)',
+    src: 'https://lpljcfvhwwpgqeyincub.supabase.co/storage/v1/object/public/backgrounds/176072-854875280_medium.mp4',
+  },
+  {
+    id: 'vid-178809', label: 'Natureza', category: 'cinematic', type: 'video', contrastMode: 'dark', defaultOverlay: 0.30, isNew: true,
+    preview: 'linear-gradient(135deg,#1a3a1a,#2d5a2d,#1a4a2a)',
+    src: 'https://lpljcfvhwwpgqeyincub.supabase.co/storage/v1/object/public/backgrounds/178809-860734631_medium.mp4',
+  },
+  {
+    id: 'vid-17925', label: 'Abstrato', category: 'cinematic', type: 'video', contrastMode: 'dark', defaultOverlay: 0.30, isNew: true,
+    preview: 'linear-gradient(135deg,#0f0c29,#302b63,#24243e)',
+    src: 'https://lpljcfvhwwpgqeyincub.supabase.co/storage/v1/object/public/backgrounds/17925-286994396_medium.mp4',
+  },
+  {
+    id: 'vid-180624', label: 'Chuva', category: 'cinematic', type: 'video', contrastMode: 'dark', defaultOverlay: 0.40, isNew: true,
+    preview: 'linear-gradient(135deg,#1a2a3a,#2a3a4a,#0a1a2a)',
+    src: 'https://lpljcfvhwwpgqeyincub.supabase.co/storage/v1/object/public/backgrounds/180624-864656657_medium.mp4',
+  },
+  {
+    id: 'vid-184324', label: 'Tecnologia', category: 'cinematic', type: 'video', contrastMode: 'dark', defaultOverlay: 0.30, isNew: true,
+    preview: 'linear-gradient(135deg,#0a1628,#0d2137,#071520)',
+    src: 'https://lpljcfvhwwpgqeyincub.supabase.co/storage/v1/object/public/backgrounds/184324-873170054_medium.mp4',
+  },
+  {
+    id: 'vid-191684', label: 'Ondas', category: 'cinematic', type: 'video', contrastMode: 'dark', defaultOverlay: 0.30, isNew: true,
+    preview: 'linear-gradient(135deg,#006994,#004499,#001133)',
+    src: 'https://lpljcfvhwwpgqeyincub.supabase.co/storage/v1/object/public/backgrounds/191684-891315375_medium.mp4',
+  },
+  {
+    id: 'vid-28236', label: 'Deserto', category: 'cinematic', type: 'video', contrastMode: 'dark', defaultOverlay: 0.35, isNew: true,
+    preview: 'linear-gradient(135deg,#c5853a,#d4a55a,#b8743a)',
+    src: 'https://lpljcfvhwwpgqeyincub.supabase.co/storage/v1/object/public/backgrounds/28236-368501609_medium.mp4',
+  },
+  {
+    id: 'vid-53640', label: 'Neon', category: 'cinematic', type: 'video', contrastMode: 'dark', defaultOverlay: 0.25, isNew: true,
+    preview: 'linear-gradient(135deg,#ff006e,#8338ec,#3a86ff)',
+    src: 'https://lpljcfvhwwpgqeyincub.supabase.co/storage/v1/object/public/backgrounds/53640-473869916_medium.mp4',
+  },
+  {
+    id: 'vid-blue-gradient', label: 'Gradiente Azul', category: 'cinematic', type: 'video', contrastMode: 'dark', defaultOverlay: 0.20, isNew: true,
+    preview: 'linear-gradient(135deg,#001a2d,#00263d,#000d1a)',
+    src: 'https://lpljcfvhwwpgqeyincub.supabase.co/storage/v1/object/public/backgrounds/Blue%20Dark%20Blue%20Gradient%20Color%20and%20Style%20Video%20Background.mp4',
+  },
+]
+
+/* ─── Utility ──────────────────────────────────── */
+
+export function resolveOverlay(
+  bg: BackgroundItem,
+  mode: OverlayMode,
+  manualStrength: number,
+): number {
+  if (mode === 'none')   return 0
+  if (mode === 'light')  return 0.12
+  if (mode === 'medium') return 0.35
+  if (mode === 'strong') return 0.55
+  if (mode === 'auto')   return bg.defaultOverlay
+  return manualStrength
+}
+
+/* ─── Store ─────────────────────────────────────── */
+
+interface BackgroundState {
+  activeId:        string
+  overlayMode:     OverlayMode
+  overlayStrength: number
+  motionEnabled:   boolean
+  particlesOn:     boolean
+  galleryOpen:     boolean
+
+  setBackground:      (id: string) => void
+  setOverlayMode:     (mode: OverlayMode) => void
+  setOverlayStrength: (v: number) => void
+  setMotionEnabled:   (v: boolean) => void
+  toggleMotion:       () => void
+  toggleParticles:    () => void
+  setGalleryOpen:     (v: boolean) => void
+  reset:              () => void
+}
+
+export const useBackgroundStore = create<BackgroundState>()(
+  persist(
+    (set) => ({
+      activeId:        'white-clean',
+      overlayMode:     'auto',
+      overlayStrength: 0.25,
+      motionEnabled:   true,
+      particlesOn:     false,
+      galleryOpen:     false,
+
+      setBackground:      (id) => set({ activeId: id }),
+      setOverlayMode:     (mode) => set({ overlayMode: mode }),
+      setOverlayStrength: (v) => set({ overlayStrength: v }),
+      setMotionEnabled:   (v) => set({ motionEnabled: v }),
+      toggleMotion:       () => set((s) => ({ motionEnabled: !s.motionEnabled })),
+      toggleParticles:    () => set((s) => ({ particlesOn: !s.particlesOn })),
+      setGalleryOpen:     (v) => set({ galleryOpen: v }),
+      reset:              () => set({ activeId: 'white-clean', overlayMode: 'auto', overlayStrength: 0.25 }),
+    }),
+    {
+      name: 'lead-engine-background',
+      partialize: (s) => ({
+        activeId:        s.activeId,
+        overlayMode:     s.overlayMode,
+        overlayStrength: s.overlayStrength,
+        motionEnabled:   s.motionEnabled,
+        particlesOn:     s.particlesOn,
+        // galleryOpen i
