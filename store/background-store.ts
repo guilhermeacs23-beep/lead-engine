@@ -375,6 +375,9 @@ interface BackgroundState {
   setMotionEnabled:   (v: boolean) => void
   toggleMotion:       () => void
   toggleParticles:    () => void
+  customBgSrc:        string | null
+  customBgType:       'video' | 'image' | null
+  setCustomBg:        (src: string, type: 'video' | 'image') => void
   setGalleryOpen:     (v: boolean) => void
   reset:              () => void
 }
@@ -389,7 +392,10 @@ export const useBackgroundStore = create<BackgroundState>()(
       particlesOn:     false,
       galleryOpen:     false,
 
-      setBackground:      (id) => set({ activeId: id }),
+      customBgSrc:  null,
+      customBgType: null,
+      setCustomBg: (src, type) => set({ customBgSrc: src, customBgType: type }),
+      setBackground:      (id) => set({ activeId: id, customBgSrc: null, customBgType: null }),
       setOverlayMode:     (mode) => set({ overlayMode: mode }),
       setOverlayStrength: (v) => set({ overlayStrength: v }),
       setMotionEnabled:   (v) => set({ motionEnabled: v }),
@@ -406,6 +412,8 @@ export const useBackgroundStore = create<BackgroundState>()(
         overlayStrength: s.overlayStrength,
         motionEnabled:   s.motionEnabled,
         particlesOn:     s.particlesOn,
+        customBgSrc:     s.customBgSrc,
+        customBgType:    s.customBgType,
         // galleryOpen is transient — not persisted
       }),
     },
