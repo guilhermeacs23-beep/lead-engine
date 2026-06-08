@@ -3,7 +3,7 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import {
   LayoutDashboard, Users, Kanban, BarChart2,
-  Map, Settings, Zap, ChevronRight, LogOut, CalendarDays, X,
+  Map, Navigation, Settings, Zap, ChevronRight, LogOut, CalendarDays, X,
   Rss, CheckSquare, UsersRound, FolderOpen, ChevronDown, RefreshCw,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
@@ -17,6 +17,7 @@ const NAV_ITEMS = [
   { href: '/pipeline',   icon: Kanban,          label: 'Pipeline'     },
   { href: '/relatorios', icon: BarChart2,       label: 'Relatórios'   },
   { href: '/mapa',       icon: Map,             label: 'Mapa'         },
+  { href: '/campo',      icon: Navigation,      label: 'App de Campo' },
   { href: '/calendario', icon: CalendarDays,    label: 'Calendário'   },
 ]
 
@@ -190,3 +191,4 @@ export function Sidebar({ mobileOpen = false, onMobileClose }: Props) {
     </aside>
   )
 }
+
