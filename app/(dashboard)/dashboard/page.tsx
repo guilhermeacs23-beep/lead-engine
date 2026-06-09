@@ -26,10 +26,10 @@ const CARD_STYLE = {
 } as const
 
 export default function DashboardPage() {
-  const [metrics, setMetrics] = useState<any>(null)
-  const [recent, setRecent] = useState<any[]>([])
-  const [funnel, setFunnel] = useState<any[]>([])
-  const [activities, setActivities] = useState<any>({ total: 0, por_tipo: [] })
+  const [metrics, setMetrics] = useState(null)
+  const [recent, setRecent] = useState([])
+  const [funnel, setFunnel] = useState([])
+  const [activities, setActivities] = useState({ total: 0, por_tipo: [] })
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
@@ -57,7 +57,7 @@ export default function DashboardPage() {
     )
   }
 
-  const maxFunnelCount = Math.max(...funnel.map((f: any) => f.count), 1)
+  const maxFunnelCount = Math.max(...funnel.map((f) => f.count), 1)
 
   return (
     <div className="flex h-full flex-col overflow-auto">
@@ -142,7 +142,7 @@ export default function DashboardPage() {
               <p className="py-8 text-center text-sm text-white/40">Nenhum lead no pipeline</p>
             ) : (
               <div className="flex items-end gap-0">
-                {funnel.map((step: any, i: number) => {
+                {funnel.map((step, i) => {
                   const color = STATUS_COLORS[step.step] ?? '#6366f1'
                   const barH = Math.max(12, Math.round((step.count / maxFunnelCount) * 96))
                   return (
@@ -186,7 +186,7 @@ export default function DashboardPage() {
             <div className="flex flex-col gap-3">
               {(metrics?.por_fonte ?? []).length === 0 ? (
                 <p className="py-6 text-center text-sm text-white/40">Sem dados de fontes</p>
-              ) : (metrics?.por_fonte ?? []).map(({ fonte, pct }: { fonte: string; pct: number }) => {
+              ) : (metrics?.por_fonte ?? []).map(({ fonte, pct }) => {
                 const src = SOURCE_LABELS[fonte]
                 return (
                   <div key={fonte} className="flex flex-col gap-1.5">
@@ -216,7 +216,7 @@ export default function DashboardPage() {
             </div>
             {recent.length === 0 ? (
               <p className="py-6 text-center text-sm text-white/40">Nenhum lead cadastrado ainda</p>
-            ) : recent.map((lead: any) => (
+            ) : recent.map((lead) => (
               <div key={lead.id}
                 className="flex items-center gap-3 border-b py-3 last:border-0"
                 style={{ borderColor: 'rgba(255,255,255,0.07)' }}>
