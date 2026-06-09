@@ -59,37 +59,6 @@ export default function DashboardPage() {
 
   const maxFunnelCount = Math.max(...funnel.map((f) => f.count), 1)
 
-  const kpiCards = metrics ? [
-    {
-      label: 'Leads este mês',
-      value: String(metrics.leads_mes),
-      delta: `+${metrics.leads_delta}% vs mês anterior`,
-      up: true,
-      icon: Users,
-    },
-    {
-      label: 'Em negociação',
-      value: formatCurrencyShort(metrics.valor_pipeline),
-      delta: `${metrics.oportunidades} oportunidades`,
-      up: true,
-      icon: Target,
-    },
-    {
-      label: 'Fechados (mês)',
-      value: String(metrics.fechados_mes),
-      delta: `${formatCurrencyShort(metrics.valor_fechado)} convertido`,
-      up: true,
-      icon: TrendingUp,
-    },
-    {
-      label: 'Conversão',
-      value: `${metrics.taxa_conversao}%`,
-      delta: `${metrics.taxa_delta}% vs meta`,
-      up: metrics.taxa_delta >= 0,
-      icon: BarChart2,
-    },
-  ] : []
-
   return (
     <div className="flex h-full flex-col overflow-auto">
 
@@ -98,7 +67,7 @@ export default function DashboardPage() {
         <div>
           <h1 className="text-[20px] font-bold text-white">Dashboard</h1>
           <p className="text-[13px] text-white/50 mt-0.5">
-            {metrics?.total_leads ?? 0} leads no banco · dados em tempo real
+            {metrics ? metrics.total_leads : 0} leads no banco · dados em tempo real
           </p>
         </div>
         <button
@@ -113,7 +82,12 @@ export default function DashboardPage() {
 
         {/* KPIs */}
         <div className="grid grid-cols-4 gap-3">
-          {kpiCards.map((k) => {
+          {metrics && [
+            { label: 'Leads este mês', value: String(metrics.leads_mes), delta: '+' + metrics.leads_delta + '% vs mês anterior', up: true, icon: Users },
+            { label: 'Em negociação', value: formatCurrencyShort(metrics.valor_pipeline), delta: metrics.oportunidades + ' oportunidades', up: true, icon: Target },
+            { label: 'Fechados (mês)', value: String(metrics.fechados_mes), delta: formatCurrencyShort(metrics.valor_fechado) + ' convertido', up: true, icon: TrendingUp },
+            { label: 'Conversão', value: metrics.taxa_conversao + '%', delta: metrics.taxa_delta + '% vs meta', up: metrics.taxa_delta >= 0, icon: BarChart2 },
+          ].map((k) => {
             const KIcon = k.icon
             return (
               <div key={k.label} className="rounded-2xl p-5" style={CARD_STYLE}>
@@ -122,7 +96,7 @@ export default function DashboardPage() {
                   <KIcon size={15} strokeWidth={1.5} className="text-white/25" />
                 </div>
                 <p className="text-[28px] font-bold leading-none text-white">{k.value}</p>
-                <p className={`mt-2 flex items-center gap-1 text-[12px] font-medium ${k.up ? 'text-emerald-400' : 'text-red-400'}`}>
+                <p className={'mt-2 flex items-center gap-1 text-[12px] font-medium ' + (k.up ? 'text-emerald-400' : 'text-red-400')}>
                   {k.up ? <TrendingUp size={11} /> : <TrendingDown size={11} />}
                   {k.delta}
                 </p>
@@ -140,7 +114,7 @@ export default function DashboardPage() {
               <Target size={15} className="text-indigo-400" strokeWidth={1.5} />
               <p className="text-[15px] font-semibold text-white">Saúde do funil</p>
               <span className="ml-auto text-[13px] text-white/50">
-                Conversão: <span className="font-semibold text-white">{metrics?.taxa_conversao ?? 0}%</span>
+                Conversão: <span className="font-semibold text-white">{metrics ? metrics.taxa_conversao : 0}%</span>
               </span>
             </div>
             {funnel.length === 0 ? (
@@ -148,21 +122,21 @@ export default function DashboardPage() {
             ) : (
               <div className="flex items-end gap-0">
                 {funnel.map((step, i) => {
-                  const color = STATUS_COLORS[step.step] ?? '#6366f1'
+                  const color = STATUS_COLORS[step.step] || '#6366f1'
                   const barH = Math.max(12, Math.round((step.count / maxFunnelCount) * 96))
                   return (
                     <div key={step.step} className="flex flex-1 flex-col items-center gap-1.5">
                       <div className="flex w-full items-center justify-center h-5">
                         {i > 0 && (
                           <span className="rounded-full px-1.5 py-0.5 text-[11px] font-semibold"
-                            style={{ background: `${color}25`, color }}>
+                            style={{ background: color + '25', color }}>
                             {step.pct_conversao}%
                           </span>
                         )}
                       </div>
                       <span className="text-[14px] font-bold text-white">{step.count}</span>
                       <div className="relative w-full overflow-hidden rounded-t-lg"
-                        style={{ height: barH, background: `${color}CC` }}>
+                        style={{ height: barH, background: color + 'CC' }}>
                         <div className="absolute inset-0"
                           style={{ background: 'linear-gradient(to bottom, rgba(255,255,255,0.15), transparent)' }} />
                       </div>
@@ -189,23 +163,24 @@ export default function DashboardPage() {
               <p className="text-[15px] font-semibold text-white">Fontes de leads</p>
             </div>
             <div className="flex flex-col gap-3">
-              {(metrics?.por_fonte ?? []).length === 0 ? (
-                <p className="py-6 text-center text-sm text-white/40">Sem dados de fontes</p>
-              ) : (metrics?.por_fonte ?? []).map(({ fonte, pct }) => {
+              {(metrics ? metrics.por_fonte : []).map(({ fonte, pct }) => {
                 const src = SOURCE_LABELS[fonte]
                 return (
                   <div key={fonte} className="flex flex-col gap-1.5">
                     <div className="flex items-center justify-between">
-                      <span className="text-[13px] font-medium text-white/80">{src?.label ?? fonte}</span>
+                      <span className="text-[13px] font-medium text-white/80">{src ? src.label : fonte}</span>
                       <span className="text-[13px] font-bold text-white">{pct}%</span>
                     </div>
                     <div className="h-1.5 w-full overflow-hidden rounded-full bg-white/10">
                       <div className="h-full rounded-full transition-all duration-500"
-                        style={{ width: `${pct}%`, background: src?.color ?? '#6366f1' }} />
+                        style={{ width: pct + '%', background: src ? src.color : '#6366f1' }} />
                     </div>
                   </div>
                 )
               })}
+              {(metrics ? metrics.por_fonte : []).length === 0 && (
+                <p className="py-6 text-center text-sm text-white/40">Sem dados de fontes</p>
+              )}
             </div>
           </div>
         </div>
@@ -226,16 +201,16 @@ export default function DashboardPage() {
                 className="flex items-center gap-3 border-b py-3 last:border-0"
                 style={{ borderColor: 'rgba(255,255,255,0.07)' }}>
                 <div className="h-2 w-2 flex-shrink-0 rounded-full"
-                  style={{ background: STATUS_COLORS[lead.status] ?? '#94a3b8' }} />
+                  style={{ background: STATUS_COLORS[lead.status] || '#94a3b8' }} />
                 <div className="flex-1 min-w-0">
                   <p className="truncate text-[13px] font-semibold text-white">{lead.empresa}</p>
                   <p className="truncate text-[12px] text-white/50">
-                    {SEGMENT_LABELS[lead.segmento] ?? lead.segmento} · {lead.cidade}
+                    {SEGMENT_LABELS[lead.segmento] || lead.segmento} · {lead.cidade}
                   </p>
                 </div>
                 <span className="shrink-0 rounded-lg px-2.5 py-1 text-[11px] font-semibold"
-                  style={{ color: STATUS_COLORS[lead.status], background: `${STATUS_COLORS[lead.status]}20` }}>
-                  {STATUS_LABELS[lead.status] ?? lead.status}
+                  style={{ color: STATUS_COLORS[lead.status], background: STATUS_COLORS[lead.status] + '20' }}>
+                  {STATUS_LABELS[lead.status] || lead.status}
                 </span>
               </div>
             ))}
@@ -261,4 +236,5 @@ export default function DashboardPage() {
             ) : (
               <div className="flex flex-col gap-2">
                 {activities.por_tipo.map((a) => {
-      
+                  const label = TIPO_LABELS[a.tipo] || a.tipo
+               
