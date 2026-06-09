@@ -5,15 +5,15 @@ import { SOURCE_LABELS, SEGMENT_LABELS } from '@/lib/mock-data'
 import { formatCurrencyShort } from '@/lib/utils'
 import { TrendingUp, TrendingDown, Loader2, Users, Target, BarChart2, Activity, Download } from 'lucide-react'
 
-const STATUS_LABELS: Record<string, string> = {
+const STATUS_LABELS = {
   novo: 'Novo', contactado: 'Contactado', proposta: 'Proposta',
   negociando: 'Negociando', fechado: 'Fechado', perdido: 'Perdido',
 }
-const STATUS_COLORS: Record<string, string> = {
+const STATUS_COLORS = {
   novo: '#818cf8', contactado: '#60a5fa', proposta: '#fbbf24',
   negociando: '#f472b6', fechado: '#34d399', perdido: '#ef4444',
 }
-const TIPO_LABELS: Record<string, string> = {
+const TIPO_LABELS = {
   ligacao: 'Ligação', email: 'E-mail', reuniao: 'Reunião',
   nota: 'Nota', proposta: 'Proposta', status: 'Status',
 }
@@ -23,7 +23,7 @@ const CARD_STYLE = {
   border: '0.5px solid rgba(255,255,255,0.18)',
   boxShadow: '0 4px 24px rgba(0,0,0,0.18)',
   backdropFilter: 'blur(12px)',
-} as const
+}
 
 export default function DashboardPage() {
   const [metrics, setMetrics] = useState(null)
@@ -59,6 +59,37 @@ export default function DashboardPage() {
 
   const maxFunnelCount = Math.max(...funnel.map((f) => f.count), 1)
 
+  const kpiCards = metrics ? [
+    {
+      label: 'Leads este mês',
+      value: String(metrics.leads_mes),
+      delta: `+${metrics.leads_delta}% vs mês anterior`,
+      up: true,
+      icon: Users,
+    },
+    {
+      label: 'Em negociação',
+      value: formatCurrencyShort(metrics.valor_pipeline),
+      delta: `${metrics.oportunidades} oportunidades`,
+      up: true,
+      icon: Target,
+    },
+    {
+      label: 'Fechados (mês)',
+      value: String(metrics.fechados_mes),
+      delta: `${formatCurrencyShort(metrics.valor_fechado)} convertido`,
+      up: true,
+      icon: TrendingUp,
+    },
+    {
+      label: 'Conversão',
+      value: `${metrics.taxa_conversao}%`,
+      delta: `${metrics.taxa_delta}% vs meta`,
+      up: metrics.taxa_delta >= 0,
+      icon: BarChart2,
+    },
+  ] : []
+
   return (
     <div className="flex h-full flex-col overflow-auto">
 
@@ -82,48 +113,22 @@ export default function DashboardPage() {
 
         {/* KPIs */}
         <div className="grid grid-cols-4 gap-3">
-          {metrics && [
-            {
-              label: 'Leads este mês',
-              value: String(metrics.leads_mes),
-              delta: `+${metrics.leads_delta}% vs mês anterior`,
-              up: true,
-              icon: Users,
-            },
-            {
-              label: 'Em negociação',
-              value: formatCurrencyShort(metrics.valor_pipeline),
-              delta: `${metrics.oportunidades} oportunidades`,
-              up: true,
-              icon: Target,
-            },
-            {
-              label: 'Fechados (mês)',
-              value: String(metrics.fechados_mes),
-              delta: `${formatCurrencyShort(metrics.valor_fechado)} convertido`,
-              up: true,
-              icon: TrendingUp,
-            },
-            {
-              label: 'Conversão',
-              value: `${metrics.taxa_conversao}%`,
-              delta: `${metrics.taxa_delta}% vs meta`,
-              up: metrics.taxa_delta >= 0,
-              icon: BarChart2,
-            },
-          ].map((k) => (
-            <div key={k.label} className="rounded-2xl p-5" style={CARD_STYLE}>
-              <div className="mb-3 flex items-center justify-between">
-                <p className="text-[12px] font-medium text-white/55">{k.label}</p>
-                <k.icon size={15} strokeWidth={1.5} className="text-white/25" />
+          {kpiCards.map((k) => {
+            const KIcon = k.icon
+            return (
+              <div key={k.label} className="rounded-2xl p-5" style={CARD_STYLE}>
+                <div className="mb-3 flex items-center justify-between">
+                  <p className="text-[12px] font-medium text-white/55">{k.label}</p>
+                  <KIcon size={15} strokeWidth={1.5} className="text-white/25" />
+                </div>
+                <p className="text-[28px] font-bold leading-none text-white">{k.value}</p>
+                <p className={`mt-2 flex items-center gap-1 text-[12px] font-medium ${k.up ? 'text-emerald-400' : 'text-red-400'}`}>
+                  {k.up ? <TrendingUp size={11} /> : <TrendingDown size={11} />}
+                  {k.delta}
+                </p>
               </div>
-              <p className="text-[28px] font-bold leading-none text-white">{k.value}</p>
-              <p className={`mt-2 flex items-center gap-1 text-[12px] font-medium ${k.up ? 'text-emerald-400' : 'text-red-400'}`}>
-                {k.up ? <TrendingUp size={11} /> : <TrendingDown size={11} />}
-                {k.delta}
-              </p>
-            </div>
-          ))}
+            )
+          })}
         </div>
 
         {/* Funil + Fontes */}
@@ -250,4 +255,10 @@ export default function DashboardPage() {
               <div className="flex flex-col items-center justify-center gap-2 py-6">
                 <p className="text-sm text-white/50">Nenhuma atividade</p>
                 <p className="text-[12px] text-white/30 text-center">
-                  Ligações, e-mails e reun
+                  Ligações, e-mails e reuniões aparecerão aqui
+                </p>
+              </div>
+            ) : (
+              <div className="flex flex-col gap-2">
+                {activities.por_tipo.map((a) => {
+      
