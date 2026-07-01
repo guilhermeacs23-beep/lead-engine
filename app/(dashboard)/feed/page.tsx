@@ -126,9 +126,9 @@ export default function FeedPage() {
             <button key={f} onClick={() => setActiveFilter(f)}
               className="rounded-full px-3 py-1 text-[12px] font-medium transition-all"
               style={{
-                background: activeFilter === f ? 'rgba(99,102,241,0.2)' : 'rgba(255,255,255,0.06)',
-                color: activeFilter === f ? '#a78bfa' : 'rgba(255,255,255,0.5)',
-                border: activeFilter === f ? '0.5px solid rgba(99,102,241,0.4)' : '0.5px solid transparent',
+                background: activeFilter === f ? '#6366f1' : '#fff',
+                color: activeFilter === f ? '#fff' : '#666',
+                border: activeFilter === f ? '1px solid #6366f1' : '1px solid #e5e5e5',
               }}>
               {f}
             </button>
@@ -247,3 +247,4 @@ export default function FeedPage() {
     </div>
   )
 }
+                                                                        
