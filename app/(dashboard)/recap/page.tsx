@@ -302,7 +302,7 @@ export default function RecapClientesPage() {
   const fetchData = async () => {
     setLoading(true)
     const { data, error } = await supabase
-      .from('clientes_recap')
+      .from('vw_clientes_recap')
       .select('*')
       .order('score_reativacao', { ascending: false })
     if (!error && data) setClientes(data as ClienteRecap[])
@@ -376,7 +376,7 @@ export default function RecapClientesPage() {
     }).select().single()
 
     // 2. Update recap status
-    await supabase.from('clientes_recap').update({
+    await supabase.from('vw_clientes_recap').update({
       status:          'aprovado',
       aprovado_em:     new Date().toISOString(),
       pipeline_lead_id: lead?.id || null,
@@ -389,7 +389,7 @@ export default function RecapClientesPage() {
 
   const handleDiscard = async (id: string) => {
     setActLoad(id)
-    await supabase.from('clientes_recap').update({ status: 'descartado' }).eq('id', id)
+    await supabase.from('vw_clientes_recap').update({ status: 'descartado' }).eq('id', id)
     setClientes(prev => prev.map(c => c.id === id ? { ...c, status: 'descartado' } : c))
     setSelected(null)
     setActLoad(null)
