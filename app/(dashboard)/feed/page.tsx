@@ -111,10 +111,6 @@ export default function FeedPage() {
               <Search size={13} className="text-white/40" />
               <input placeholder="Buscar no feed…" className="w-32 bg-transparent text-[12px] text-white/70 outline-none placeholder:text-white/30" />
             </div>
-            <button className="flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-[12px] font-semibold text-white"
-              style={{ background: 'linear-gradient(135deg,#6366f1,#8b5cf6)' }}>
-              <Plus size={13} strokeWidth={2} /> Nova publicação
-            </button>
           </div>
         </div>
 
@@ -247,4 +243,4 @@ export default function FeedPage() {
     </div>
   )
 }
-                                                                        
+                                                                                                                                                                                                                                                                                                                                                                        
