@@ -2,9 +2,9 @@
 import { useState } from 'react'
 import {
   Plus, Search, Filter, CheckCircle2, Circle, Clock, AlertCircle,
-  ChevronDown, MoreHorizontal, Calendar, Tag, User, Kanban, List,
-  TrendingUp, Zap, Star, Flag, Link2
+  ChevronDown, MoreHorizontal, Calendar, Tag, Star, Flag, Link2
 } from 'lucide-react'
+import { useRouter } from 'next/navigation'
 
 const STATUS_CONFIG: Record<string, { label: string; color: string; bg: string; icon: any }> = {
   pendente:     { label: 'Pendente',      color: '#94a3b8', bg: 'rgba(148,163,184,0.15)', icon: Circle       },
@@ -36,10 +36,10 @@ const STATUS_TABS = ['Todas','Pendente','Em andamento','Concluída','Bloqueada']
 const PROJETOS = ['Todos','Comercial Q2','Operacional','Marketing','Prospecção','Jurídico','Gestão']
 
 export default function TarefasPage() {
+  const router = useRouter()
   const [statusFilter, setStatusFilter] = useState('Todas')
   const [projetoFilter, setProjetoFilter] = useState('Todos')
   const [tasks, setTasks] = useState(MOCK_TASKS)
-  const [viewMode, setViewMode] = useState<'lista'|'kanban'>('lista')
   const [showProjetoDrop, setShowProjetoDrop] = useState(false)
 
   const filtered = tasks.filter(t => {
@@ -74,24 +74,16 @@ export default function TarefasPage() {
           <p className="text-[11px] text-white/40">Minhas Tarefas · Todas as funções</p>
         </div>
         <div className="ml-auto flex items-center gap-2">
-          <div className="flex rounded-lg overflow-hidden" style={{ border: '0.5px solid rgba(255,255,255,0.12)' }}>
-            {(['lista','kanban'] as const).map(v => (
-              <button key={v} onClick={() => setViewMode(v)}
-                className="flex items-center gap-1.5 px-3 py-1.5 text-[12px] font-medium transition-all"
-                style={{ background: viewMode === v ? 'rgba(99,102,241,0.2)' : 'transparent', color: viewMode === v ? '#a78bfa' : 'rgba(255,255,255,0.45)' }}>
-                {v === 'lista' ? <List size={13} /> : <Kanban size={13} />}
-                {v === 'lista' ? 'Lista' : 'Kanban'}
-              </button>
-            ))}
-          </div>
           <div className="flex items-center gap-2 rounded-lg px-3 py-1.5"
             style={{ background: 'rgba(255,255,255,0.07)', border: '0.5px solid rgba(255,255,255,0.10)' }}>
             <Search size={13} className="text-white/40" />
             <input placeholder="Buscar tarefa…" className="w-32 bg-transparent text-[12px] text-white/70 outline-none placeholder:text-white/30" />
           </div>
-          <button className="flex items-center gap-1.5 rounded-lg px-4 py-1.5 text-[13px] font-semibold text-white"
+          <button
+            onClick={() => router.push('/pipeline')}
+            className="flex items-center gap-1.5 rounded-lg px-4 py-1.5 text-[13px] font-semibold text-white"
             style={{ background: 'linear-gradient(135deg,#6366f1,#8b5cf6)', boxShadow: '0 0 16px rgba(99,102,241,0.3)' }}>
-            <Plus size={14} strokeWidth={2} /> Criar
+            <Plus size={14} strokeWidth={2} /> Criar no Pipeline
           </button>
         </div>
       </div>
@@ -117,9 +109,9 @@ export default function TarefasPage() {
             <button key={s} onClick={() => setStatusFilter(s)}
               className="rounded-full px-3 py-1 text-[12px] font-medium transition-all"
               style={{
-                background: statusFilter === s ? 'rgba(99,102,241,0.2)' : 'rgba(255,255,255,0.06)',
-                color: statusFilter === s ? '#a78bfa' : 'rgba(255,255,255,0.45)',
-                border: statusFilter === s ? '0.5px solid rgba(99,102,241,0.4)' : '0.5px solid transparent',
+                background: statusFilter === s ? '#6366f1' : '#fff',
+                color: statusFilter === s ? '#fff' : '#666',
+                border: statusFilter === s ? '1px solid #6366f1' : '1px solid #e5e5e5',
               }}>{s}</button>
           ))}
 
@@ -246,3 +238,4 @@ export default function TarefasPage() {
     </div>
   )
 }
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          
