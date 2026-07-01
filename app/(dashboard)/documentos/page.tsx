@@ -136,8 +136,8 @@ export default function DocumentosPage() {
                 <div key={doc.id}
                   onMouseEnter={() => setHoveredId(doc.id)}
                   onMouseLeave={() => setHoveredId(null)}
-                  className="group relative rounded-2xl p-4 cursor-pointer transition-all hover:ring-1 hover:ring-white/15"
-                  style={{ background: 'rgba(255,255,255,0.05)', border: '0.5px solid rgba(255,255,255,0.09)' }}>
+                  className="group relative rounded-2xl p-4 cursor-pointer transition-all hover:shadow-md"
+                  style={{ background: '#fff', border: '1px solid #e5e5e5', boxShadow: '0 1px 4px rgba(0,0,0,0.05)' }}>
                   {/* Star */}
                   <button
                     onClick={() => setStarred(prev => { const n = new Set(prev); n.has(doc.id) ? n.delete(doc.id) : n.add(doc.id); return n })}
@@ -156,16 +156,16 @@ export default function DocumentosPage() {
                       style={{ background: cfg.color, color: '#fff' }}>{cfg.label}</span>
                   </div>
 
-                  <p className="text-center text-[12px] font-semibold text-white leading-snug mb-1 line-clamp-2">{doc.nome}</p>
-                  <p className="text-center text-[10px] text-white/35">{doc.pasta} · {doc.tamanho}</p>
-                  <p className="text-center text-[10px] text-white/30 mt-0.5">{doc.modificado}</p>
+                  <p className="text-center text-[12px] font-semibold leading-snug mb-1 line-clamp-2" style={{ color: '#111' }}>{doc.nome}</p>
+                  <p className="text-center text-[10px]" style={{ color: '#aaa' }}>{doc.pasta} · {doc.tamanho}</p>
+                  <p className="text-center text-[10px] mt-0.5" style={{ color: '#bbb' }}>{doc.modificado}</p>
 
                   {/* Hover actions */}
                   {hoveredId === doc.id && (
                     <div className="absolute inset-x-3 bottom-3 flex items-center justify-center gap-2 rounded-lg py-1"
-                      style={{ background: 'rgba(12,10,30,0.92)', border: '0.5px solid rgba(255,255,255,0.12)' }}>
+                      style={{ background: 'rgba(255,255,255,0.95)', border: '1px solid #e5e5e5', boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }}>
                       {[Eye, Download, Share2].map((Ic, i) => (
-                        <button key={i} className="p-1 text-white/50 hover:text-white transition-all">
+                        <button key={i} className="p-1 transition-all" style={{ color: '#888' }}>
                           <Ic size={12} />
                         </button>
                       ))}
@@ -177,9 +177,9 @@ export default function DocumentosPage() {
           </div>
         ) : (
           /* Lista view */
-          <div className="overflow-hidden rounded-xl" style={{ border: '0.5px solid rgba(255,255,255,0.10)' }}>
-            <div className="grid px-4 py-2.5 text-[11px] font-semibold uppercase tracking-wider text-white/30"
-              style={{ gridTemplateColumns: '48px 1fr 110px 90px 90px 90px 40px', background: 'rgba(255,255,255,0.06)', borderBottom: '0.5px solid rgba(255,255,255,0.08)' }}>
+          <div className="overflow-hidden rounded-xl" style={{ border: '1px solid #e5e5e5', background: '#fff', boxShadow: '0 1px 4px rgba(0,0,0,0.05)' }}>
+            <div className="grid px-4 py-2.5 text-[11px] font-semibold uppercase tracking-wider"
+              style={{ gridTemplateColumns: '48px 1fr 110px 90px 90px 90px 40px', background: '#f7f7f7', borderBottom: '1px solid #e5e5e5', color: '#aaa' }}>
               <div />
               <div>Nome do arquivo</div>
               <div>Pasta</div>
@@ -194,23 +194,23 @@ export default function DocumentosPage() {
               const isStar = starred.has(doc.id)
               return (
                 <div key={doc.id}
-                  className="group grid cursor-pointer items-center px-4 py-3 transition-all hover:bg-white/[0.04]"
-                  style={{ gridTemplateColumns: '48px 1fr 110px 90px 90px 90px 40px', borderBottom: '0.5px solid rgba(255,255,255,0.06)' }}>
+                  className="group grid cursor-pointer items-center px-4 py-3 transition-all hover:bg-gray-50"
+                  style={{ gridTemplateColumns: '48px 1fr 110px 90px 90px 90px 40px', borderBottom: '1px solid #f0f0f0' }}>
                   <div className="flex h-8 w-8 items-center justify-center rounded-lg"
                     style={{ background: cfg.bg }}>
                     <Icon size={16} style={{ color: cfg.color }} />
                   </div>
                   <div className="flex items-center gap-2 pr-4">
                     {isStar && <Star size={10} fill="#fbbf24" style={{ color: '#fbbf24', flexShrink: 0 }} />}
-                    <p className="text-[13px] font-semibold text-white truncate">{doc.nome}</p>
+                    <p className="text-[13px] font-semibold truncate" style={{ color: '#111' }}>{doc.nome}</p>
                     <span className="rounded px-1.5 py-0.5 text-[9px] font-black flex-shrink-0"
                       style={{ background: cfg.color, color: '#fff' }}>{cfg.label}</span>
                   </div>
-                  <span className="flex items-center gap-1 text-[12px] text-white/50">
-                    <Folder size={11} className="text-white/30" /> {doc.pasta}
+                  <span className="flex items-center gap-1 text-[12px]" style={{ color: '#888' }}>
+                    <Folder size={11} style={{ color: '#bbb' }} /> {doc.pasta}
                   </span>
-                  <span className="text-[12px] text-white/50">{doc.tamanho}</span>
-                  <div className="flex items-center gap-1 text-[12px] text-white/50">
+                  <span className="text-[12px]" style={{ color: '#888' }}>{doc.tamanho}</span>
+                  <div className="flex items-center gap-1 text-[12px]" style={{ color: '#888' }}>
                     <Clock size={10} /> {doc.modificado}
                   </div>
                   <div className="flex items-center gap-1.5">
@@ -218,9 +218,9 @@ export default function DocumentosPage() {
                       style={{ background: doc.cor_autor }}>{doc.autor}</div>
                   </div>
                   <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-all">
-                    <button className="p-1 text-white/30 hover:text-white/70"><Eye size={13} /></button>
-                    <button className="p-1 text-white/30 hover:text-white/70"><Download size={13} /></button>
-                    <button className="p-1 text-white/30 hover:text-red-400"><Trash2 size={13} /></button>
+                    <button className="p-1" style={{ color: '#aaa' }}><Eye size={13} /></button>
+                    <button className="p-1" style={{ color: '#aaa' }}><Download size={13} /></button>
+                    <button className="p-1 hover:text-red-400" style={{ color: '#aaa' }}><Trash2 size={13} /></button>
                   </div>
                 </div>
               )

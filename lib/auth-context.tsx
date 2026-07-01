@@ -44,18 +44,38 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    supabase.auth.getSession().then(async ({ data: { session } }) => {
+      if (session?.user) {
+        // Verifica expiração diária: se o login foi em outro dia, desloga
+        const today = new Date().toISOString().slice(0, 10)
+        const storedDate = typeof window !== 'undefined' ? localStorage.getItem('ld_session_date') : null
+        if (storedDate && storedDate !== today) {
+          await supabase.auth.signOut()
+          if (typeof window !== 'undefined') localStorage.removeItem('ld_session_date')
+          setLoading(false)
+          return
+        }
+      }
       setSession(session)
       setUser(session?.user ?? null)
       if (session?.user) loadProfile(session.user.id)
       setLoading(false)
     })
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       setSession(session)
       setUser(session?.user ?? null)
-      if (session?.user) loadProfile(session.user.id)
-      else setProfile(null)
+      if (session?.user) {
+        loadProfile(session.user.id)
+        // Atualiza a data ao logar (evento SIGNED_IN)
+        if (event === 'SIGNED_IN' && typeof window !== 'undefined') {
+          const today = new Date().toISOString().slice(0, 10)
+          localStorage.setItem('ld_session_date', today)
+        }
+      } else {
+        setProfile(null)
+        if (typeof window !== 'undefined') localStorage.removeItem('ld_session_date')
+      }
     })
 
     return () => subscription.unsubscribe()

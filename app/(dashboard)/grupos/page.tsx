@@ -97,11 +97,11 @@ export default function GruposPage() {
                 const donePct = g.tarefas > 0 ? Math.round((g.tarefas_done / g.tarefas) * 100) : 0
                 return (
                   <div key={g.id} onClick={() => setSelected(g.id === selected ? null : g.id)}
-                    className="rounded-2xl p-5 cursor-pointer transition-all hover:ring-1"
+                    className="rounded-2xl p-5 cursor-pointer transition-all hover:shadow-md"
                     style={{
-                      background: 'rgba(255,255,255,0.04)',
-                      border: selected === g.id ? `1.5px solid ${g.cor}` : '0.5px solid rgba(255,255,255,0.10)',
-                      boxShadow: selected === g.id ? `0 0 20px ${g.cor}25` : 'none',
+                      background: '#fff',
+                      border: selected === g.id ? `1.5px solid ${g.cor}` : '1px solid #e5e5e5',
+                      boxShadow: selected === g.id ? `0 4px 20px ${g.cor}25` : '0 1px 4px rgba(0,0,0,0.05)',
                     }}>
                     {/* Header */}
                     <div className="flex items-start gap-3 mb-3">
@@ -111,7 +111,7 @@ export default function GruposPage() {
                       </div>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2">
-                          <p className="text-[14px] font-bold text-white truncate">{g.nome}</p>
+                          <p className="text-[14px] font-bold truncate" style={{ color: '#111' }}>{g.nome}</p>
                           {g.projeto && <Star size={10} fill="#fbbf24" style={{ color: '#fbbf24', flexShrink: 0 }} />}
                         </div>
                         <div className="flex items-center gap-1 mt-0.5">
@@ -126,7 +126,7 @@ export default function GruposPage() {
                       </button>
                     </div>
 
-                    <p className="text-[12px] text-white/50 leading-relaxed mb-4 line-clamp-2">{g.descricao}</p>
+                    <p className="text-[12px] leading-relaxed mb-4 line-clamp-2" style={{ color: '#888' }}>{g.descricao}</p>
 
                     {/* Tags */}
                     <div className="flex flex-wrap gap-1.5 mb-4">
@@ -141,10 +141,10 @@ export default function GruposPage() {
                     {/* Progress */}
                     <div className="mb-3">
                       <div className="flex justify-between mb-1">
-                        <span className="text-[11px] text-white/40">Progresso das tarefas</span>
+                        <span className="text-[11px]" style={{ color: '#aaa' }}>Progresso das tarefas</span>
                         <span className="text-[11px] font-semibold" style={{ color: g.cor }}>{donePct}%</span>
                       </div>
-                      <div className="h-1.5 rounded-full overflow-hidden" style={{ background: 'rgba(255,255,255,0.1)' }}>
+                      <div className="h-1.5 rounded-full overflow-hidden" style={{ background: '#f0f0f0' }}>
                         <div className="h-full rounded-full transition-all" style={{ width: `${donePct}%`, background: g.cor }} />
                       </div>
                     </div>
@@ -154,13 +154,13 @@ export default function GruposPage() {
                       {/* Avatars */}
                       <div className="flex -space-x-1.5">
                         {g.membros.map((m, i) => (
-                          <div key={i} className="flex h-6 w-6 items-center justify-center rounded-full text-[9px] font-bold text-white ring-2 ring-[rgba(12,10,30,0.98)]"
+                          <div key={i} className="flex h-6 w-6 items-center justify-center rounded-full text-[9px] font-bold text-white ring-2 ring-white"
                             style={{ background: m.c }} title={m.name}>
                             {m.av}
                           </div>
                         ))}
                       </div>
-                      <div className="flex items-center gap-3 text-[11px] text-white/40">
+                      <div className="flex items-center gap-3 text-[11px]" style={{ color: '#aaa' }}>
                         <span className="flex items-center gap-1"><CheckSquare size={10} /> {g.tarefas_done}/{g.tarefas}</span>
                         <span>{g.atualizado}</span>
                       </div>

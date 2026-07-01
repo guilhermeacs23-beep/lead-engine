@@ -98,12 +98,12 @@ export function Sidebar({ mobileOpen = false, onMobileClose }: Props) {
             background: 'rgba(255,255,255,0.96)',
             boxShadow: '0 2px 12px rgba(99,102,241,0.35), inset 0 1px 0 rgba(255,255,255,1)',
           }}>
-          <img src="/logo-engine.png" alt="Lead Engine" className="h-6 w-6 object-contain" />
+          <img src="/logo-leadplus.png" alt="Lead+" className="h-6 w-6 object-contain" />
         </div>
         {isExpanded && (
           <span className="flex-1 truncate text-[13px] font-semibold"
             style={{ color: 'var(--text-primary)', letterSpacing: '-0.01em' }}>
-            Lead Engine
+            Lead+
           </span>
         )}
         {mobileOpen ? (
@@ -191,4 +191,3 @@ export function Sidebar({ mobileOpen = false, onMobileClose }: Props) {
     </aside>
   )
 }
-

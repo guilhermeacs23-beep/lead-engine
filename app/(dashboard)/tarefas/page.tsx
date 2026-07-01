@@ -165,7 +165,7 @@ export default function TarefasPage() {
           <div />
         </div>
 
-        <div className="flex flex-col">
+        <div className="flex flex-col gap-1 p-3">
           {filtered.map((task) => {
             const scfg = STATUS_CONFIG[task.status]
             const pcfg = PRIORITY_CONFIG[task.prioridade]
@@ -173,10 +173,11 @@ export default function TarefasPage() {
             const done = task.status === 'concluida'
             return (
               <div key={task.id}
-                className="group grid items-center px-6 py-3 transition-all hover:bg-white/[0.04] cursor-pointer"
+                className="group grid items-center px-4 py-3 rounded-xl cursor-pointer transition-all hover:shadow-sm"
                 style={{
                   gridTemplateColumns: '32px 1fr 120px 90px 90px 110px 110px 40px',
-                  borderBottom: '0.5px solid rgba(255,255,255,0.05)',
+                  background: '#fff',
+                  border: '1px solid #e5e5e5',
                   opacity: done ? 0.7 : 1,
                 }}>
                 {/* Check */}
@@ -187,12 +188,13 @@ export default function TarefasPage() {
                 {/* Title */}
                 <div className="flex items-center gap-2 pr-4">
                   {task.starred && <Star size={11} strokeWidth={2} fill="#fbbf24" style={{ color: '#fbbf24', flexShrink: 0 }} />}
-                  <p className={`text-[13px] font-medium text-white leading-snug ${done ? 'line-through text-white/40' : ''}`}>
+                  <p className={`text-[13px] font-medium leading-snug ${done ? 'line-through' : ''}`}
+                    style={{ color: done ? '#aaa' : '#111' }}>
                     {task.titulo}
                   </p>
                   {task.lead && (
                     <span className="flex items-center gap-1 rounded px-1.5 py-0.5 text-[10px]"
-                      style={{ background: 'rgba(99,102,241,0.15)', color: '#818cf8', flexShrink: 0 }}>
+                      style={{ background: 'rgba(99,102,241,0.1)', color: '#6366f1', flexShrink: 0 }}>
                       <Link2 size={9} /> {task.lead}
                     </span>
                   )}
@@ -212,22 +214,22 @@ export default function TarefasPage() {
 
                 {/* Prazo */}
                 <div className="flex items-center gap-1">
-                  <Calendar size={11} className="text-white/30" />
-                  <span className="text-[12px] text-white/55">{task.prazo}</span>
+                  <Calendar size={11} style={{ color: '#bbb' }} />
+                  <span className="text-[12px]" style={{ color: '#777' }}>{task.prazo}</span>
                 </div>
 
                 {/* Responsável */}
                 <div className="flex items-center gap-1.5">
                   <div className="flex h-6 w-6 items-center justify-center rounded-full text-[9px] font-bold text-white"
                     style={{ background: task.resp_color }}>{task.responsavel}</div>
-                  <span className="text-[11px] text-white/50">{task.responsavel === 'GC' ? 'Guilherme' : task.responsavel === 'RA' ? 'Rafael' : 'Julio'}</span>
+                  <span className="text-[11px]" style={{ color: '#888' }}>{task.responsavel === 'GC' ? 'Guilherme' : task.responsavel === 'RA' ? 'Rafael' : 'Julio'}</span>
                 </div>
 
                 {/* Projeto */}
-                <span className="truncate text-[11px] text-white/40">{task.projeto}</span>
+                <span className="truncate text-[11px]" style={{ color: '#aaa' }}>{task.projeto}</span>
 
                 {/* More */}
-                <button className="opacity-0 group-hover:opacity-100 text-white/30 hover:text-white/60 transition-all">
+                <button className="opacity-0 group-hover:opacity-100 transition-all" style={{ color: '#bbb' }}>
                   <MoreHorizontal size={15} />
                 </button>
               </div>
