@@ -1,13 +1,16 @@
 import { createClient } from '@supabase/supabase-js'
 import { NextRequest, NextResponse } from 'next/server'
 
-const supabaseAdmin = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!,
-)
+function getAdmin() {
+  return createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!,
+  )
+}
 
 // GET /api/admin/tenants — lista todas as empresas
 export async function GET() {
+  const supabaseAdmin = getAdmin()
   const { data, error } = await supabaseAdmin
     .from('tenants')
     .select('*')
@@ -19,6 +22,7 @@ export async function GET() {
 
 // POST /api/admin/tenants — cria nova empresa
 export async function POST(req: NextRequest) {
+  const supabaseAdmin = getAdmin()
   const body = await req.json()
   const { nome, ssw_folder, email, telefone, contato, plano } = body
 
@@ -36,6 +40,7 @@ export async function POST(req: NextRequest) {
 
 // PATCH /api/admin/tenants — atualiza empresa
 export async function PATCH(req: NextRequest) {
+  const supabaseAdmin = getAdmin()
   const body = await req.json()
   const { id, ...updates } = body
 
@@ -46,6 +51,4 @@ export async function PATCH(req: NextRequest) {
     .update(updates)
     .eq('id', id)
 
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 })
-  return NextResponse.json({ ok: true })
-}
+  
