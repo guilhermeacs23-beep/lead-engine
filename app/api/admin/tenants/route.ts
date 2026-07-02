@@ -8,7 +8,6 @@ function getAdmin() {
   )
 }
 
-// GET /api/admin/tenants — lista todas as empresas
 export async function GET() {
   const supabaseAdmin = getAdmin()
   const { data, error } = await supabaseAdmin
@@ -20,13 +19,12 @@ export async function GET() {
   return NextResponse.json(data)
 }
 
-// POST /api/admin/tenants — cria nova empresa
 export async function POST(req: NextRequest) {
   const supabaseAdmin = getAdmin()
   const body = await req.json()
   const { nome, ssw_folder, email, telefone, contato, plano } = body
 
-  if (!nome) return NextResponse.json({ error: 'nome obrigatório' }, { status: 400 })
+  if (!nome) return NextResponse.json({ error: 'nome obrigatorio' }, { status: 400 })
 
   const { data, error } = await supabaseAdmin
     .from('tenants')
@@ -38,17 +36,18 @@ export async function POST(req: NextRequest) {
   return NextResponse.json(data)
 }
 
-// PATCH /api/admin/tenants — atualiza empresa
 export async function PATCH(req: NextRequest) {
   const supabaseAdmin = getAdmin()
   const body = await req.json()
   const { id, ...updates } = body
 
-  if (!id) return NextResponse.json({ error: 'id obrigatório' }, { status: 400 })
+  if (!id) return NextResponse.json({ error: 'id obrigatorio' }, { status: 400 })
 
   const { error } = await supabaseAdmin
     .from('tenants')
     .update(updates)
     .eq('id', id)
 
-  
+  if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+  return NextResponse.json({ ok: true })
+}
