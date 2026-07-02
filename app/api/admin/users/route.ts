@@ -1,13 +1,16 @@
 import { createClient } from '@supabase/supabase-js'
 import { NextRequest, NextResponse } from 'next/server'
 
-const supabaseAdmin = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!,
-)
+function getAdmin() {
+  return createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!,
+  )
+}
 
 // GET /api/admin/users — lista todos os usuários com tenant
 export async function GET(req: NextRequest) {
+  const supabaseAdmin = getAdmin()
   const { data: users, error } = await supabaseAdmin
     .from('profiles')
     .select(`*, tenants(nome, ssw_folder)`)
@@ -19,6 +22,7 @@ export async function GET(req: NextRequest) {
 
 // PATCH /api/admin/users — ativa, bloqueia ou associa tenant
 export async function PATCH(req: NextRequest) {
+  const supabaseAdmin = getAdmin()
   const body = await req.json()
   const { id, status, tenant_id, role } = body
 
@@ -37,6 +41,4 @@ export async function PATCH(req: NextRequest) {
     .update(updates)
     .eq('id', id)
 
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 })
-  return NextResponse.json({ ok: true })
-}
+  if (error) return NextResponse.json
