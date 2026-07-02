@@ -3,6 +3,7 @@
 import { useEffect, useState, useCallback } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useRouter } from 'next/navigation'
+import { useAuth } from '@/lib/auth-context'
 
 // ─── Tipos ────────────────────────────────────────────────────────────────────
 
@@ -79,16 +80,14 @@ export default function AdminPage() {
   const [selectedTenant, setSelectedTenant] = useState('')
 
   // ─── Auth check ────────────────────────────────────────────────────────────
+  const { user, profile: authProfile, loading: authLoading } = useAuth()
   useEffect(() => {
-    async function check() {
-      const { data: { user } } = await supabase.auth.getUser()
-      if (!user) { router.replace('/login'); return }
-      const { data: profile } = await supabase.from('profiles').select('role').eq('id', user.id).single()
-      if (profile?.role !== 'owner') { router.replace('/'); return }
-      setAuthorized(true)
-    }
-    check()
-  }, [router])
+    if (authLoading) return
+    if (!user) { router.replace('/login'); return }
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    if ((authProfile as any)?.role !== 'owner') { router.replace('/'); return }
+    setAuthorized(true)
+  }, [user, authProfile, authLoading, router])
 
   // ─── Loaders ───────────────────────────────────────────────────────────────
   const loadUsers = useCallback(async () => {
