@@ -8,25 +8,23 @@ function getAdmin() {
   )
 }
 
-// GET /api/admin/users — lista todos os usuários com tenant
-export async function GET(req: NextRequest) {
+export async function GET() {
   const supabaseAdmin = getAdmin()
   const { data: users, error } = await supabaseAdmin
     .from('profiles')
-    .select(`*, tenants(nome, ssw_folder)`)
+    .select('*, tenants(nome, ssw_folder)')
     .order('created_at', { ascending: false })
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
   return NextResponse.json(users)
 }
 
-// PATCH /api/admin/users — ativa, bloqueia ou associa tenant
 export async function PATCH(req: NextRequest) {
   const supabaseAdmin = getAdmin()
   const body = await req.json()
   const { id, status, tenant_id, role } = body
 
-  if (!id) return NextResponse.json({ error: 'id obrigatório' }, { status: 400 })
+  if (!id) return NextResponse.json({ error: 'id obrigatorio' }, { status: 400 })
 
   const updates: Record<string, unknown> = {}
   if (status !== undefined) {
@@ -41,4 +39,6 @@ export async function PATCH(req: NextRequest) {
     .update(updates)
     .eq('id', id)
 
-  if (error) return NextResponse.json
+  if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+  return NextResponse.json({ ok: true })
+}
