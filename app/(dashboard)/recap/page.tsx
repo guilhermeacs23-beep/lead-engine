@@ -30,7 +30,7 @@ interface ClienteRecap {
   score_contato: number
   score_cfop: number
   score_uf: number
-  categoria: 'QUENTE' | 'MORNO' | 'FRIO' | 'PERDIDO'
+  categoria: 'ATIVO' | 'QUENTE' | 'MORNO' | 'FRIO' | 'PERDIDO'
   status: 'pendente' | 'aprovado' | 'descartado' | 'reativado'
   observacao: string | null
   aprovado_em: string | null
@@ -41,6 +41,7 @@ interface ClienteRecap {
    UTILS
 ════════════════════════════════════════════════════════ */
 const CAT_CONFIG = {
+  ATIVO:   { label: '✅ Ativo',   color: '#10b981', bg: 'rgba(16,185,129,0.12)',  border: 'rgba(16,185,129,0.35)' },
   QUENTE:  { label: '🔥 Quente',  color: '#ef4444', bg: 'rgba(239,68,68,0.12)',   border: 'rgba(239,68,68,0.35)' },
   MORNO:   { label: '🟡 Morno',   color: '#f59e0b', bg: 'rgba(245,158,11,0.12)',  border: 'rgba(245,158,11,0.35)' },
   FRIO:    { label: '🔵 Frio',    color: '#3b82f6', bg: 'rgba(59,130,246,0.12)',  border: 'rgba(59,130,246,0.35)' },
@@ -71,7 +72,8 @@ function formatPhone(s: string | null) {
 }
 
 function diasLabel(dias: number | null) {
-  if (!dias) return '—'
+  if (dias === null || dias === undefined) return '—'
+  if (dias === 0)  return 'hoje'
   if (dias < 30)  return `${dias}d`
   if (dias < 365) return `${Math.round(dias/30)}m`
   return `${(dias/365).toFixed(1)}a`
@@ -291,7 +293,7 @@ export default function RecapClientesPage() {
   const [selected, setSelected]       = useState<ClienteRecap | null>(null)
   const [search, setSearch]           = useState('')
   const [filterUF, setFilterUF]       = useState<string>('TODOS')
-  const [filterCat, setFilterCat]     = useState<string>('TODOS')
+  const [filterCat, setFilterCat]     = useState<string>('QUENTE')
   const [filterStatus, setFilterStatus] = useState<string>('pendente')
   const [sortBy, setSortBy]           = useState<'score' | 'dias' | 'nome'>('score')
   const [sortDir, setSortDir]         = useState<'desc' | 'asc'>('desc')
@@ -481,7 +483,7 @@ export default function RecapClientesPage() {
 
         {[
           { label: 'Status', value: filterStatus, set: setFilterStatus, opts: [['TODOS','Todos os status'],['pendente','Pendentes'],['aprovado','Aprovados'],['descartado','Descartados']] },
-          { label: 'Categoria', value: filterCat, set: setFilterCat, opts: [['TODOS','Todas'],['QUENTE','🔥 Quente'],['MORNO','🟡 Morno'],['FRIO','🔵 Frio'],['PERDIDO','❄️ Perdido']] },
+          { label: 'Categoria', value: filterCat, set: setFilterCat, opts: [['TODOS','Todas'],['ATIVO','✅ Ativos'],['QUENTE','🔥 Quente (30-90d)'],['MORNO','🟡 Morno (90-180d)'],['FRIO','🔵 Frio (180-365d)'],['PERDIDO','❄️ Perdido (1+ ano)']] },
           { label: 'UF', value: filterUF, set: setFilterUF, opts: ufs.map(u => [u, u === 'TODOS' ? 'Todos os estados' : u]) },
         ].map(f => (
           <select
@@ -621,14 +623,4 @@ export default function RecapClientesPage() {
       <DetailDrawer
         cliente={selected}
         onClose={() => setSelected(null)}
-        onApprove={handleApprove}
-        onDiscard={handleDiscard}
-        loading={actionLoading}
-      />
-
-      </div>
-      <style>{`@keyframes spin { from { transform: rotate(0deg) } to { transform: rotate(360deg) } }`}</style>
-    </div>
-  )
-}
-         
+      
