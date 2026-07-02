@@ -1,0 +1,42 @@
+import { createClient } from '@supabase/supabase-js'
+import { NextRequest, NextResponse } from 'next/server'
+
+const supabaseAdmin = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.SUPABASE_SERVICE_ROLE_KEY!,
+)
+
+// GET /api/admin/users — lista todos os usuários com tenant
+export async function GET(req: NextRequest) {
+  const { data: users, error } = await supabaseAdmin
+    .from('profiles')
+    .select(`*, tenants(nome, ssw_folder)`)
+    .order('created_at', { ascending: false })
+
+  if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+  return NextResponse.json(users)
+}
+
+// PATCH /api/admin/users — ativa, bloqueia ou associa tenant
+export async function PATCH(req: NextRequest) {
+  const body = await req.json()
+  const { id, status, tenant_id, role } = body
+
+  if (!id) return NextResponse.json({ error: 'id obrigatório' }, { status: 400 })
+
+  const updates: Record<string, unknown> = {}
+  if (status !== undefined) {
+    updates.status = status
+    updates.ativo = status === 'active'
+  }
+  if (tenant_id !== undefined) updates.tenant_id = tenant_id
+  if (role !== undefined) updates.role = role
+
+  const { error } = await supabaseAdmin
+    .from('profiles')
+    .update(updates)
+    .eq('id', id)
+
+  if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+  return NextResponse.json({ ok: true })
+}
