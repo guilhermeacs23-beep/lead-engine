@@ -3,10 +3,9 @@
 import { useEffect, useState, useMemo } from 'react'
 import { createBrowserClient } from '@supabase/ssr'
 import {
-  Users, TrendingUp, Phone, Mail, MapPin, Calendar,
+  Users, TrendingUp, Phone, Mail, MapPin,
   ChevronDown, ChevronUp, Search, X, CheckCircle,
-  XCircle, Clock, Filter, ArrowUpDown, RefreshCw,
-  AlertTriangle, Star, Building2, BarChart3
+  XCircle, RefreshCw, Building2, BarChart3
 } from 'lucide-react'
 
 /* ════════════════════════════════════════════════════════
@@ -403,32 +402,30 @@ export default function RecapClientesPage() {
   }
 
   /* ── Render ── */
-  const glass = {
-    background: 'rgba(255,255,255,0.04)',
-    border: '1px solid rgba(255,255,255,0.08)',
-    borderRadius: 16,
+  if (loading) {
+    return (
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '60vh', flexDirection: 'column', gap: 16 }}>
+        <RefreshCw size={32} style={{ color: '#6366f1', animation: 'spin 1s linear infinite' }} />
+        <p style={{ color: 'rgba(255,255,255,0.50)' }}>Carregando base de clientes...</p>
+      </div>
+    )
   }
 
-  if (loading) return (
-    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '60vh', flexDirection: 'column', gap: 16 }}>
-      <RefreshCw size={32} style={{ color: '#6366f1', animation: 'spin 1s linear infinite' }} />
-      <p style={{ color: 'rgba(255,255,255,0.50)' }}>Carregando base de clientes...</p>
-    </div>
-  )
-
-  if (clientes.length === 0) return (
-    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '60vh', gap: 20, textAlign: 'center' }}>
-      <div style={{ width: 72, height: 72, borderRadius: 20, background: 'rgba(99,102,241,0.12)', border: '1px solid rgba(99,102,241,0.25)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <Users size={32} style={{ color: '#6366f1' }} />
+  if (clientes.length === 0) {
+    return (
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '60vh', gap: 20, textAlign: 'center' }}>
+        <div style={{ width: 72, height: 72, borderRadius: 20, background: 'rgba(99,102,241,0.12)', border: '1px solid rgba(99,102,241,0.25)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <Users size={32} style={{ color: '#6366f1' }} />
+        </div>
+        <div>
+          <h2 style={{ fontSize: 20, fontWeight: 700, color: '#111827', margin: '0 0 8px' }}>Base ainda não importada</h2>
+          <p style={{ color: 'rgba(255,255,255,0.40)', maxWidth: 400 }}>
+            Execute o script <strong style={{ color: 'white' }}>import_clientes_recap.py</strong> com suas credenciais do Supabase para importar a base do SSW.
+          </p>
+        </div>
       </div>
-      <div>
-        <h2 style={{ fontSize: 20, fontWeight: 700, color: '#111827', margin: '0 0 8px' }}>Base ainda não importada</h2>
-        <p style={{ color: 'rgba(255,255,255,0.40)', maxWidth: 400 }}>
-          Execute o script <strong style={{ color: 'white' }}>import_clientes_recap.py</strong> com suas credenciais do Supabase para importar a base do SSW.
-        </p>
-      </div>
-    </div>
-  )
+    )
+  }
 
   return (
     <div style={{ padding: '12px', maxWidth: 1440, margin: '0 auto' }}>
@@ -623,4 +620,13 @@ export default function RecapClientesPage() {
       <DetailDrawer
         cliente={selected}
         onClose={() => setSelected(null)}
-      
+        onApprove={handleApprove}
+        onDiscard={handleDiscard}
+        loading={actionLoading}
+      />
+
+      </div>
+      <style>{`@keyframes spin { from { transform: rotate(0deg) } to { transform: rotate(360deg) } }`}</style>
+    </div>
+  )
+}
