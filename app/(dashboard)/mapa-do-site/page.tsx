@@ -11,7 +11,7 @@ const SITE_MAP = [
   {
     category: 'CRM & Vendas',
     color: '#6366f1',
-    glow: 'rgba(99,102,241,0.25)',
+    glow: 'rgba(99,102,241,0.08)',
     items: [
       { href: '/dashboard',  icon: LayoutDashboard, label: 'Dashboard',    desc: 'Visão geral com KPIs e insights em tempo real' },
       { href: '/leads',      icon: Users,           label: 'Leads',        desc: 'Lista completa de leads com score IA e filtros' },
@@ -22,16 +22,16 @@ const SITE_MAP = [
   {
     category: 'Geolocalização',
     color: '#10b981',
-    glow: 'rgba(16,185,129,0.25)',
+    glow: 'rgba(16,185,129,0.08)',
     items: [
-      { href: '/mapa',      icon: Map,        label: 'Mapa Logístico', desc: 'Leads como bolhas coloridas por etapa do funil no mapa do Brasil' },
-      { href: '/calendario',icon: CalendarDays,label: 'Calendário',    desc: 'Atividades agendadas com visão mensal e detalhes por dia' },
+      { href: '/mapa',       icon: Map,         label: 'Mapa Logístico', desc: 'Leads como bolhas coloridas por etapa do funil no mapa do Brasil' },
+      { href: '/calendario', icon: CalendarDays, label: 'Calendário',    desc: 'Atividades agendadas com visão mensal e detalhes por dia' },
     ]
   },
   {
     category: 'Colaboração',
     color: '#f59e0b',
-    glow: 'rgba(245,158,11,0.25)',
+    glow: 'rgba(245,158,11,0.08)',
     items: [
       { href: '/feed',       icon: Rss,         label: 'Feed',         desc: 'Timeline de atividades do time com curtidas e comentários' },
       { href: '/tarefas',    icon: CheckSquare, label: 'Tarefas',      desc: 'Gestão de tarefas com status, prioridade e projetos' },
@@ -41,128 +41,134 @@ const SITE_MAP = [
   },
   {
     category: 'Sistema',
-    color: '#94a3b8',
-    glow: 'rgba(148,163,184,0.20)',
+    color: '#64748b',
+    glow: 'rgba(100,116,139,0.08)',
     items: [
-      { href: '/configuracoes',  icon: Settings,  label: 'Configurações', desc: 'Perfil, equipe, integrações e preferências do sistema' },
-      { href: '/automacoes',     icon: Zap,       label: 'Automações',    desc: 'Regras automáticas para follow-up e notificações' },
-      { href: '/mapa-do-site',   icon: Globe,     label: 'Mapa do Site',  desc: 'Esta página — navegação visual do sistema' },
+      { href: '/configuracoes', icon: Settings, label: 'Configurações', desc: 'Perfil, equipe, integrações e preferências do sistema' },
+      { href: '/automacoes',    icon: Zap,      label: 'Automações',    desc: 'Regras automáticas para follow-up e notificações' },
+      { href: '/mapa-do-site',  icon: Globe,    label: 'Mapa do Site',  desc: 'Esta página — navegação visual do sistema' },
     ]
   },
 ]
 
 const QUICK_ACTIONS = [
-  { icon: Bell,    label: 'Notificações',    color: '#fbbf24' },
-  { icon: Search,  label: 'Busca Global',    color: '#60a5fa' },
-  { icon: Activity,label: 'Status Sistema',  color: '#34d399' },
-  { icon: Shield,  label: 'Segurança',       color: '#a78bfa' },
-  { icon: Database,label: 'Banco de Dados',  color: '#f472b6' },
-  { icon: Mail,    label: 'E-mail',          color: '#fb923c' },
+  { icon: Bell,     label: 'Notificações',   color: '#fbbf24' },
+  { icon: Search,   label: 'Busca Global',   color: '#60a5fa' },
+  { icon: Activity, label: 'Status Sistema', color: '#34d399' },
+  { icon: Shield,   label: 'Segurança',      color: '#a78bfa' },
+  { icon: Database, label: 'Banco de Dados', color: '#f472b6' },
+  { icon: Mail,     label: 'E-mail',         color: '#fb923c' },
 ]
+
+const CARD_BASE = {
+  background: '#ffffff',
+  border: '1px solid rgba(0,0,0,0.09)',
+  boxShadow: '0 2px 8px rgba(0,0,0,0.07)',
+  borderRadius: 16,
+  padding: 16,
+  transition: 'all 0.18s ease',
+}
 
 export default function MapaDoSitePage() {
   return (
-    <div className="flex h-full flex-col overflow-y-auto">
+    <div style={{ background: '#f4f5f8', minHeight: '100%', display: 'flex', flexDirection: 'column', overflowY: 'auto' }}>
+
       {/* Header */}
-      <div className="flex-shrink-0 px-8 py-6 animate-fade-in"
-        style={{ borderBottom: '1px solid var(--border-glass-sm)' }}>
-        <div className="flex items-end gap-4">
+      <div style={{ background: '#ffffff', borderBottom: '1px solid rgba(0,0,0,0.08)', padding: '24px 32px', flexShrink: 0 }}>
+        <div style={{ display: 'flex', alignItems: 'flex-end', gap: 16 }}>
           <div>
-            <div className="flex items-center gap-2 mb-1">
-              <Globe size={16} style={{ color: '#a78bfa' }} />
-              <span className="section-label">Navegação completa</span>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
+              <Globe size={15} style={{ color: '#a78bfa' }} />
+              <span style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 1, color: '#9ca3af' }}>
+                Navegação completa
+              </span>
             </div>
-            <h1 className="text-[28px] font-bold tracking-tight"
-              style={{ color: 'var(--text-primary)' }}>
+            <h1 style={{ fontSize: 26, fontWeight: 800, color: '#111827', margin: 0, letterSpacing: '-0.02em' }}>
               Mapa do Site
             </h1>
-            <p className="mt-1 text-[14px]" style={{ color: 'var(--text-tertiary)' }}>
+            <p style={{ marginTop: 4, fontSize: 14, color: '#6b7280' }}>
               Visão geral de todos os módulos e funcionalidades do Lead Engine
             </p>
           </div>
+
           {/* Stats */}
-          <div className="ml-auto flex items-center gap-3">
+          <div style={{ marginLeft: 'auto', display: 'flex', gap: 12 }}>
             {[
-              { value: '4', label: 'Categorias' },
-              { value: '15', label: 'Módulos' },
-              { value: '100%', label: 'Disponível' },
+              { value: '4',    label: 'Categorias', color: '#6366f1' },
+              { value: '15',   label: 'Módulos',    color: '#10b981' },
+              { value: '100%', label: 'Disponível', color: '#f59e0b' },
             ].map(s => (
-              <div key={s.label} className="glass-card px-4 py-3 text-center" style={{ minWidth: 80 }}>
-                <p className="text-[20px] font-bold" style={{ color: '#a78bfa' }}>{s.value}</p>
-                <p className="text-[11px]" style={{ color: 'var(--text-muted)' }}>{s.label}</p>
+              <div key={s.label} style={{
+                background: '#f8f9fc', border: '1px solid rgba(0,0,0,0.08)',
+                borderRadius: 12, padding: '12px 20px', textAlign: 'center', minWidth: 80,
+              }}>
+                <p style={{ fontSize: 22, fontWeight: 800, color: s.color, margin: 0 }}>{s.value}</p>
+                <p style={{ fontSize: 11, color: '#9ca3af', margin: 0, marginTop: 2 }}>{s.label}</p>
               </div>
             ))}
           </div>
         </div>
       </div>
 
-      <div className="flex-1 p-8">
+      {/* Body */}
+      <div style={{ flex: 1, padding: 32 }}>
+
         {/* Module grid */}
-        <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
-          {SITE_MAP.map((section, si) => (
-            <div key={section.category} className="animate-fade-in"
-              style={{ animationDelay: `${si * 60}ms` }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 32 }}>
+          {SITE_MAP.map(section => (
+            <div key={section.category}>
               {/* Section header */}
-              <div className="flex items-center gap-2.5 mb-4">
-                <div className="h-2 w-2 rounded-full"
-                  style={{ background: section.color, boxShadow: `0 0 8px ${section.color}` }} />
-                <h2 className="text-[14px] font-bold uppercase tracking-[0.08em]"
-                  style={{ color: section.color }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 14 }}>
+                <div style={{
+                  width: 8, height: 8, borderRadius: '50%',
+                  background: section.color, boxShadow: `0 0 8px ${section.color}`,
+                  flexShrink: 0,
+                }} />
+                <h2 style={{ fontSize: 12, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.08em', color: section.color, margin: 0 }}>
                   {section.category}
                 </h2>
-                <div className="flex-1 h-px" style={{ background: `${section.color}25` }} />
+                <div style={{ flex: 1, height: 1, background: `${section.color}30` }} />
               </div>
 
               {/* Items grid */}
-              <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2">
-                {section.items.map((item, ii) => (
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+                {section.items.map(item => (
                   <Link key={item.href} href={item.href}
-                    className="group relative flex items-start gap-3 rounded-2xl p-4 transition-all duration-200"
-                    style={{
-                      background: 'var(--glass-sm)',
-                      backdropFilter: 'var(--blur-md)',
-                      WebkitBackdropFilter: 'var(--blur-md)',
-                      border: '1px solid var(--border-glass-sm)',
-                      boxShadow: 'var(--shadow-card), var(--inner-glow-sm)',
-                      animationDelay: `${(si * 4 + ii) * 40}ms`,
-                    }}
+                    className="group"
+                    style={{ ...CARD_BASE, display: 'flex', alignItems: 'flex-start', gap: 12, textDecoration: 'none' }}
                     onMouseEnter={e => {
                       const el = e.currentTarget as HTMLElement
                       el.style.background = section.glow
-                      el.style.borderColor = `${section.color}40`
-                      el.style.boxShadow = `0 8px 28px rgba(0,0,0,0.28), 0 0 0 1px ${section.color}30, inset 0 1px 0 rgba(255,255,255,0.18)`
+                      el.style.borderColor = `${section.color}35`
+                      el.style.boxShadow = `0 6px 20px rgba(0,0,0,0.10)`
                       el.style.transform = 'translateY(-2px)'
                     }}
                     onMouseLeave={e => {
                       const el = e.currentTarget as HTMLElement
-                      el.style.background = 'var(--glass-sm)'
-                      el.style.borderColor = 'var(--border-glass-sm)'
-                      el.style.boxShadow = 'var(--shadow-card), var(--inner-glow-sm)'
+                      el.style.background = '#ffffff'
+                      el.style.borderColor = 'rgba(0,0,0,0.09)'
+                      el.style.boxShadow = '0 2px 8px rgba(0,0,0,0.07)'
                       el.style.transform = 'translateY(0)'
                     }}
                   >
                     {/* Icon */}
-                    <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-xl transition-all"
-                      style={{
-                        background: `${section.color}20`,
-                        border: `1px solid ${section.color}35`,
-                      }}>
-                      <item.icon size={17} strokeWidth={1.8} style={{ color: section.color }} />
+                    <div style={{
+                      width: 36, height: 36, borderRadius: 10, flexShrink: 0,
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      background: `${section.color}15`, border: `1px solid ${section.color}30`,
+                    }}>
+                      <item.icon size={16} strokeWidth={1.8} style={{ color: section.color }} />
                     </div>
 
                     {/* Text */}
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-1.5">
-                        <p className="text-[13.5px] font-semibold"
-                          style={{ color: 'var(--text-primary)' }}>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                        <p style={{ fontSize: 13, fontWeight: 700, color: '#111827', margin: 0 }}>
                           {item.label}
                         </p>
-                        <ChevronRight size={11} strokeWidth={2}
-                          className="opacity-0 group-hover:opacity-100 transition-opacity"
-                          style={{ color: section.color }} />
+                        <ChevronRight size={11} strokeWidth={2} style={{ color: section.color, opacity: 0 }} className="group-hover:opacity-100 transition-opacity" />
                       </div>
-                      <p className="mt-0.5 text-[11.5px] leading-relaxed"
-                        style={{ color: 'var(--text-tertiary)' }}>
+                      <p style={{ marginTop: 3, fontSize: 11.5, lineHeight: 1.5, color: '#6b7280' }}>
                         {item.desc}
                       </p>
                     </div>
@@ -174,55 +180,52 @@ export default function MapaDoSitePage() {
         </div>
 
         {/* Quick actions */}
-        <div className="mt-8 animate-fade-in" style={{ animationDelay: '300ms' }}>
-          <div className="flex items-center gap-2 mb-4">
-            <div className="h-2 w-2 rounded-full" style={{ background: '#60a5fa', boxShadow: '0 0 8px #60a5fa' }} />
-            <h2 className="text-[14px] font-bold uppercase tracking-[0.08em]" style={{ color: '#60a5fa' }}>
+        <div style={{ marginTop: 32 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 14 }}>
+            <div style={{ width: 8, height: 8, borderRadius: '50%', background: '#60a5fa', boxShadow: '0 0 8px #60a5fa', flexShrink: 0 }} />
+            <h2 style={{ fontSize: 12, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.08em', color: '#60a5fa', margin: 0 }}>
               Acesso Rápido
             </h2>
-            <div className="flex-1 h-px" style={{ background: 'rgba(96,165,250,0.20)' }} />
+            <div style={{ flex: 1, height: 1, background: 'rgba(96,165,250,0.25)' }} />
           </div>
-          <div className="flex flex-wrap gap-2.5">
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10 }}>
             {QUICK_ACTIONS.map(a => (
               <button key={a.label}
-                className="flex items-center gap-2 rounded-xl px-4 py-2.5 transition-all duration-200 hover:scale-105"
                 style={{
-                  background: 'var(--glass-sm)',
-                  backdropFilter: 'var(--blur-md)',
-                  WebkitBackdropFilter: 'var(--blur-md)',
-                  border: '1px solid var(--border-glass-sm)',
-                  boxShadow: 'var(--shadow-card), var(--inner-glow-sm)',
+                  display: 'flex', alignItems: 'center', gap: 8,
+                  padding: '10px 18px', borderRadius: 12,
+                  background: '#ffffff', border: '1px solid rgba(0,0,0,0.09)',
+                  boxShadow: '0 2px 6px rgba(0,0,0,0.06)',
+                  cursor: 'pointer', transition: 'all 0.18s ease',
                 }}
                 onMouseEnter={e => {
                   const el = e.currentTarget as HTMLElement
-                  el.style.background = `${a.color}18`
+                  el.style.background = `${a.color}12`
                   el.style.borderColor = `${a.color}40`
-                  el.style.boxShadow = `0 0 18px ${a.color}25, var(--inner-glow-sm)`
+                  el.style.boxShadow = `0 4px 14px ${a.color}20`
+                  el.style.transform = 'scale(1.03)'
                 }}
                 onMouseLeave={e => {
                   const el = e.currentTarget as HTMLElement
-                  el.style.background = 'var(--glass-sm)'
-                  el.style.borderColor = 'var(--border-glass-sm)'
-                  el.style.boxShadow = 'var(--shadow-card), var(--inner-glow-sm)'
+                  el.style.background = '#ffffff'
+                  el.style.borderColor = 'rgba(0,0,0,0.09)'
+                  el.style.boxShadow = '0 2px 6px rgba(0,0,0,0.06)'
+                  el.style.transform = 'scale(1)'
                 }}
               >
                 <a.icon size={14} strokeWidth={1.8} style={{ color: a.color }} />
-                <span className="text-[12.5px] font-medium" style={{ color: 'var(--text-secondary)' }}>
-                  {a.label}
-                </span>
+                <span style={{ fontSize: 12.5, fontWeight: 600, color: '#374151' }}>{a.label}</span>
               </button>
             ))}
           </div>
         </div>
 
         {/* Footer */}
-        <div className="mt-8 flex items-center justify-center gap-2 py-4 animate-fade-in"
-          style={{ animationDelay: '400ms', borderTop: '1px solid var(--border-glass-sm)' }}>
-          <div className="flex h-6 w-6 items-center justify-center rounded-lg overflow-hidden"
-            style={{ background: 'rgba(255,255,255,0.92)' }}>
-            <img src="/logo-engine.png" alt="LE" className="h-4 w-4 object-contain" />
+        <div style={{ marginTop: 32, paddingTop: 20, borderTop: '1px solid rgba(0,0,0,0.08)', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
+          <div style={{ width: 24, height: 24, borderRadius: 8, background: '#f3f4f6', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <img src="/logo-lp.png" alt="LE" style={{ width: 16, height: 16, objectFit: 'contain' }} />
           </div>
-          <p className="text-[12px]" style={{ color: 'var(--text-muted)' }}>
+          <p style={{ fontSize: 12, color: '#9ca3af', margin: 0 }}>
             Lead Engine · Transportadora EBT · Todos os módulos disponíveis
           </p>
         </div>
