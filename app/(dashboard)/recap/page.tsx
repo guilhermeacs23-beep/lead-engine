@@ -394,18 +394,21 @@ export default function RecapClientesPage() {
     if (!cliente) return
 
     // 1. Create lead in pipeline
-    const { data: lead } = await supabase.from('leads').insert({
+    const { data: lead, error: leadError } = await supabase.from('leads').insert({
       tenant_id:      '00000000-0000-0000-0000-000000000001',
-      nome_empresa:   cliente.nome,
-      responsavel:    cliente.nome,
+      empresa:        cliente.nome,
+      contato_nome:   cliente.nome,
       email:          cliente.email || '',
       telefone:       cliente.telefone || cliente.celular || '',
-      etapa:          'qualificacao',
-      prioridade:     cliente.categoria === 'QUENTE' ? 'alta' : cliente.categoria === 'MORNO' ? 'media' : 'baixa',
-      valor_estimado: 0,
+      cidade:         cliente.cidade || '',
+      estado:         cliente.uf || '',
+      status:         'novo',
+      valor_estimado: cliente.ticket_medio_mensal ?? 0,
+      score_ia:       cliente.score_reativacao,
       origem:         'recap_clientes',
       observacoes:    `Reativação — Inativo há ${cliente.dias_inativo} dias. Score: ${cliente.score_reativacao}/100`,
     }).select().single()
+    if (leadError) { console.error('handleApprove:', leadError); setActLoad(null); return }
 
     // 2. Update recap status
     await supabase.from('clientes_recap').update({
