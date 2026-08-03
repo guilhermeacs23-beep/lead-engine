@@ -71,22 +71,22 @@ const CARD_BASE = {
 
 export default function MapaDoSitePage() {
   return (
-    <div style={{ background: '#f4f5f8', minHeight: '100%', display: 'flex', flexDirection: 'column', overflowY: 'auto' }}>
+    <div style={{ minHeight: '100%', display: 'flex', flexDirection: 'column', overflowY: 'auto' }}>
 
       {/* Header */}
-      <div style={{ background: '#ffffff', borderBottom: '1px solid rgba(0,0,0,0.08)', padding: '24px 32px', flexShrink: 0 }}>
+      <div style={{ borderBottom: '1px solid rgba(255,255,255,0.10)', padding: '24px 32px', flexShrink: 0 }}>
         <div style={{ display: 'flex', alignItems: 'flex-end', gap: 16 }}>
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
               <Globe size={15} style={{ color: '#a78bfa' }} />
-              <span style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 1, color: '#9ca3af' }}>
+              <span style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 1, color: 'rgba(255,255,255,0.45)' }}>
                 Navegação completa
               </span>
             </div>
-            <h1 style={{ fontSize: 26, fontWeight: 800, color: '#111827', margin: 0, letterSpacing: '-0.02em' }}>
+            <h1 style={{ fontSize: 26, fontWeight: 800, color: '#ffffff', margin: 0, letterSpacing: '-0.02em' }}>
               Mapa do Site
             </h1>
-            <p style={{ marginTop: 4, fontSize: 14, color: '#6b7280' }}>
+            <p style={{ marginTop: 4, fontSize: 14, color: 'rgba(255,255,255,0.55)' }}>
               Visão geral de todos os módulos e funcionalidades do Lead Engine
             </p>
           </div>
@@ -99,11 +99,11 @@ export default function MapaDoSitePage() {
               { value: '100%', label: 'Disponível', color: '#f59e0b' },
             ].map(s => (
               <div key={s.label} style={{
-                background: '#f8f9fc', border: '1px solid rgba(0,0,0,0.08)',
+                background: 'rgba(255,255,255,0.10)', border: '1px solid rgba(255,255,255,0.15)',
                 borderRadius: 12, padding: '12px 20px', textAlign: 'center', minWidth: 80,
               }}>
                 <p style={{ fontSize: 22, fontWeight: 800, color: s.color, margin: 0 }}>{s.value}</p>
-                <p style={{ fontSize: 11, color: '#9ca3af', margin: 0, marginTop: 2 }}>{s.label}</p>
+                <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.45)', margin: 0, marginTop: 2 }}>{s.label}</p>
               </div>
             ))}
           </div>
@@ -221,11 +221,11 @@ export default function MapaDoSitePage() {
         </div>
 
         {/* Footer */}
-        <div style={{ marginTop: 32, paddingTop: 20, borderTop: '1px solid rgba(0,0,0,0.08)', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
-          <div style={{ width: 24, height: 24, borderRadius: 8, background: '#f3f4f6', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <div style={{ marginTop: 32, paddingTop: 20, borderTop: '1px solid rgba(255,255,255,0.10)', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
+          <div style={{ width: 24, height: 24, borderRadius: 8, background: 'rgba(255,255,255,0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
             <img src="/logo-lp.png" alt="LE" style={{ width: 16, height: 16, objectFit: 'contain' }} />
           </div>
-          <p style={{ fontSize: 12, color: '#9ca3af', margin: 0 }}>
+          <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.35)', margin: 0 }}>
             Lead Engine · Transportadora EBT · Todos os módulos disponíveis
           </p>
         </div>
