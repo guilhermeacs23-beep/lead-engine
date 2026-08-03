@@ -40,11 +40,11 @@ interface ClienteRecap {
    UTILS
 ════════════════════════════════════════════════════════ */
 const CAT_CONFIG = {
-  ATIVO:   { label: '✅ Ativo',   color: '#10b981', bg: 'rgba(16,185,129,0.12)',  border: 'rgba(16,185,129,0.35)' },
-  QUENTE:  { label: '🔥 Quente',  color: '#ef4444', bg: 'rgba(239,68,68,0.12)',   border: 'rgba(239,68,68,0.35)' },
-  MORNO:   { label: '🟡 Morno',   color: '#f59e0b', bg: 'rgba(245,158,11,0.12)',  border: 'rgba(245,158,11,0.35)' },
-  FRIO:    { label: '🔵 Frio',    color: '#3b82f6', bg: 'rgba(59,130,246,0.12)',  border: 'rgba(59,130,246,0.35)' },
-  PERDIDO: { label: '❄️ Perdido', color: '#6b7280', bg: 'rgba(107,114,128,0.12)', border: 'rgba(107,114,128,0.35)' },
+  ATIVO:   { label: 'Ativo',          color: '#10b981', bg: 'rgba(16,185,129,0.12)',  border: 'rgba(16,185,129,0.35)' },
+  QUENTE:  { label: '🔥 Quente',      color: '#ef4444', bg: 'rgba(239,68,68,0.12)',   border: 'rgba(239,68,68,0.35)' },
+  MORNO:   { label: '🟡 Morno',       color: '#f59e0b', bg: 'rgba(245,158,11,0.12)',  border: 'rgba(245,158,11,0.35)' },
+  FRIO:    { label: '🔵 Frio',        color: '#3b82f6', bg: 'rgba(59,130,246,0.12)',  border: 'rgba(59,130,246,0.35)' },
+  PERDIDO: { label: '❄️ Perdido',     color: '#6b7280', bg: 'rgba(107,114,128,0.12)', border: 'rgba(107,114,128,0.35)' },
 }
 
 const STATUS_CONFIG = {
@@ -292,7 +292,7 @@ export default function RecapClientesPage() {
   const [selected, setSelected]       = useState<ClienteRecap | null>(null)
   const [search, setSearch]           = useState('')
   const [filterUF, setFilterUF]       = useState<string>('TODOS')
-  const [filterCat, setFilterCat]     = useState<string>('QUENTE')
+  const [filterCat, setFilterCat]     = useState<string>('TODOS')
   const [filterStatus, setFilterStatus] = useState<string>('pendente')
   const [sortBy, setSortBy]           = useState<'score' | 'dias' | 'nome'>('score')
   const [sortDir, setSortDir]         = useState<'desc' | 'asc'>('desc')
@@ -305,6 +305,7 @@ export default function RecapClientesPage() {
     const { data, error } = await supabase
       .from('clientes_recap')
       .select('*')
+      .gte('dias_inativo', 90)
       .order('score_reativacao', { ascending: false })
     if (!error && data) setClientes(data as ClienteRecap[])
     setLoading(false)
@@ -314,16 +315,15 @@ export default function RecapClientesPage() {
 
   /* ── KPIs ── */
   const kpis = useMemo(() => {
-    const all     = clientes
-    const targets = all.filter(c => c.dias_inativo && c.dias_inativo >= 91 && c.dias_inativo <= 365)
+    const all = clientes
     return {
-      total:      all.length,
-      targets:    targets.length,
-      quentes:    all.filter(c => c.categoria === 'QUENTE').length,
-      mornos:     all.filter(c => c.categoria === 'MORNO').length,
-      comEmail:   all.filter(c => c.email).length,
-      aprovados:  all.filter(c => c.status === 'aprovado').length,
-      pendentes:  all.filter(c => c.status === 'pendente').length,
+      total:     all.length,
+      quentes:   all.filter(c => c.categoria === 'QUENTE').length,
+      mornos:    all.filter(c => c.categoria === 'MORNO').length,
+      frios:     all.filter(c => c.categoria === 'FRIO').length,
+      perdidos:  all.filter(c => c.categoria === 'PERDIDO').length,
+      comEmail:  all.filter(c => c.email).length,
+      aprovados: all.filter(c => c.status === 'aprovado').length,
     }
   }, [clientes])
 
@@ -436,7 +436,7 @@ export default function RecapClientesPage() {
         <div>
           <h1 style={{ fontSize: 24, fontWeight: 800, color: '#111827', margin: 0 }}>Recap de Clientes</h1>
           <p style={{ color: 'rgba(255,255,255,0.40)', margin: '4px 0 0', fontSize: 14 }}>
-            {kpis.total.toLocaleString('pt-BR')} clientes · {kpis.targets.toLocaleString('pt-BR')} alvos de reativação
+            {kpis.total.toLocaleString('pt-BR')} clientes inativos · {kpis.aprovados.toLocaleString('pt-BR')} aprovados para reativação
           </p>
         </div>
         <button
@@ -450,11 +450,11 @@ export default function RecapClientesPage() {
       {/* ── KPIs ── */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 14, marginBottom: 24 }}>
         {[
-          { label: 'Total na Base',    value: kpis.total.toLocaleString('pt-BR'),    icon: <Users size={18} />,      color: '#6366f1' },
-          { label: '🔥 Quentes',       value: kpis.quentes.toLocaleString('pt-BR'),  icon: <TrendingUp size={18} />, color: '#ef4444' },
-          { label: '🟡 Mornos',        value: kpis.mornos.toLocaleString('pt-BR'),   icon: <BarChart3 size={18} />,  color: '#f59e0b' },
-          { label: 'Com Contato',      value: `${Math.round(kpis.comEmail/kpis.total*100)}%`, icon: <Mail size={18} />, color: '#10b981' },
-          { label: 'Aprovados',        value: kpis.aprovados.toLocaleString('pt-BR'), icon: <CheckCircle size={18} />, color: '#10b981' },
+          { label: 'Inativos 90d+',  value: kpis.total.toLocaleString('pt-BR'),     icon: <Users size={18} />,       color: '#6366f1' },
+          { label: '🔥 Quente (3-6m)', value: kpis.quentes.toLocaleString('pt-BR'),  icon: <TrendingUp size={18} />,  color: '#ef4444' },
+          { label: '🟡 Morno (6-12m)', value: kpis.mornos.toLocaleString('pt-BR'),   icon: <BarChart3 size={18} />,   color: '#f59e0b' },
+          { label: '🔵 Frio (1-2a)',   value: kpis.frios.toLocaleString('pt-BR'),    icon: <MapPin size={18} />,      color: '#3b82f6' },
+          { label: '❄️ Perdido (2a+)', value: kpis.perdidos.toLocaleString('pt-BR'), icon: <CheckCircle size={18} />, color: '#6b7280' },
         ].map(k => (
           <div key={k.label} style={{ background: '#f8f9fc', border: '1px solid rgba(0,0,0,0.07)', borderRadius: 16, padding: '18px 20px' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10 }}>
@@ -480,7 +480,7 @@ export default function RecapClientesPage() {
 
         {[
           { label: 'Status', value: filterStatus, set: setFilterStatus, opts: [['TODOS','Todos os status'],['pendente','Pendentes'],['aprovado','Aprovados'],['descartado','Descartados']] },
-          { label: 'Categoria', value: filterCat, set: setFilterCat, opts: [['TODOS','Todas'],['ATIVO','✅ Ativos'],['QUENTE','🔥 Quente (30-90d)'],['MORNO','🟡 Morno (90-180d)'],['FRIO','🔵 Frio (180-365d)'],['PERDIDO','❄️ Perdido (1+ ano)']] },
+          { label: 'Categoria', value: filterCat, set: setFilterCat, opts: [['TODOS','Todas'],['QUENTE','🔥 Quente (3-6 meses)'],['MORNO','🟡 Morno (6-12 meses)'],['FRIO','🔵 Frio (1-2 anos)'],['PERDIDO','❄️ Perdido (2+ anos)']] },
           { label: 'UF', value: filterUF, set: setFilterUF, opts: ufs.map(u => [u, u === 'TODOS' ? 'Todos os estados' : u]) },
         ].map(f => (
           <select
