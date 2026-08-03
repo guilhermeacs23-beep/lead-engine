@@ -93,9 +93,9 @@ export function Sidebar({ mobileOpen = false, onMobileClose }: Props) {
         'mb-3 flex items-center gap-2 px-3',
         isExpanded ? 'justify-between' : 'flex-col'
       )}>
-        <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-xl overflow-hidden"
-          style={{ background: 'transparent' }}>
-          <img src="/logo-lp.png" alt="Lead+" className="h-8 w-8 object-contain" />
+        <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center">
+          <img src="/logo-lp.png" alt="Lead+" className="h-9 w-9 object-contain"
+            style={{ mixBlendMode: 'screen' }} />
         </div>
         {isExpanded && (
           <span className="flex-1 truncate text-[13px] font-semibold"
