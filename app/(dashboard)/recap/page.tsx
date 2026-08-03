@@ -34,6 +34,9 @@ interface ClienteRecap {
   observacao: string | null
   aprovado_em: string | null
   aprovado_por: string | null
+  faturamento_12m: number | null
+  ticket_medio_mensal: number | null
+  qtd_notas: number | null
 }
 
 /* ════════════════════════════════════════════════════════
@@ -68,6 +71,13 @@ function formatPhone(s: string | null) {
   if (d.length === 11) return `(${d.slice(0,2)}) ${d.slice(2,7)}-${d.slice(7)}`
   if (d.length === 10) return `(${d.slice(0,2)}) ${d.slice(2,6)}-${d.slice(6)}`
   return s
+}
+
+function fmtBRL(v: number | null | undefined) {
+  if (!v) return '—'
+  if (v >= 1_000_000) return `R$ ${(v / 1_000_000).toFixed(1)}M`
+  if (v >= 1_000)     return `R$ ${(v / 1_000).toFixed(0)}k`
+  return `R$ ${v.toFixed(0)}`
 }
 
 function diasLabel(dias: number | null) {
@@ -194,6 +204,25 @@ function DetailDrawer({
           </div>
         </div>
 
+        {/* Faturamento histórico */}
+        {(cliente.faturamento_12m || cliente.ticket_medio_mensal || cliente.qtd_notas) ? (
+          <div style={{ background: '#ffffff', borderRadius: 12, padding: 16, border: '1px solid rgba(0,0,0,0.08)', boxShadow: '0 1px 4px rgba(0,0,0,0.05)' }}>
+            <p style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 1, color: 'rgba(255,255,255,0.45)', marginBottom: 12 }}>Receita Histórica</p>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 8 }}>
+              {[
+                { label: 'Fat. 12 meses', value: fmtBRL(cliente.faturamento_12m) },
+                { label: 'Ticket/mês',    value: fmtBRL(cliente.ticket_medio_mensal) },
+                { label: 'Qtd. notas',    value: cliente.qtd_notas?.toString() ?? '—' },
+              ].map(item => (
+                <div key={item.label} style={{ textAlign: 'center', padding: '10px 6px', background: '#f3f4f6', borderRadius: 8 }}>
+                  <div style={{ fontSize: 14, fontWeight: 700, color: '#111827' }}>{item.value}</div>
+                  <div style={{ fontSize: 10, color: '#9ca3af', marginTop: 2 }}>{item.label}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+        ) : null}
+
         {/* Localização */}
         <div style={{ background: '#ffffff', borderRadius: 12, padding: 16, border: '1px solid rgba(0,0,0,0.08)', boxShadow: '0 1px 4px rgba(0,0,0,0.05)' }}>
           <p style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 1, color: 'rgba(255,255,255,0.45)', marginBottom: 12 }}>Localização</p>
@@ -316,14 +345,16 @@ export default function RecapClientesPage() {
   /* ── KPIs ── */
   const kpis = useMemo(() => {
     const all = clientes
+    const potencialMensal = all.reduce((sum, c) => sum + (c.ticket_medio_mensal ?? 0), 0)
     return {
-      total:     all.length,
-      quentes:   all.filter(c => c.categoria === 'QUENTE').length,
-      mornos:    all.filter(c => c.categoria === 'MORNO').length,
-      frios:     all.filter(c => c.categoria === 'FRIO').length,
-      perdidos:  all.filter(c => c.categoria === 'PERDIDO').length,
-      comEmail:  all.filter(c => c.email).length,
-      aprovados: all.filter(c => c.status === 'aprovado').length,
+      total:            all.length,
+      quentes:          all.filter(c => c.categoria === 'QUENTE').length,
+      mornos:           all.filter(c => c.categoria === 'MORNO').length,
+      frios:            all.filter(c => c.categoria === 'FRIO').length,
+      perdidos:         all.filter(c => c.categoria === 'PERDIDO').length,
+      comEmail:         all.filter(c => c.email).length,
+      aprovados:        all.filter(c => c.status === 'aprovado').length,
+      potencialMensal,
     }
   }, [clientes])
 
@@ -450,11 +481,11 @@ export default function RecapClientesPage() {
       {/* ── KPIs ── */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 14, marginBottom: 24 }}>
         {[
-          { label: 'Inativos 90d+',  value: kpis.total.toLocaleString('pt-BR'),     icon: <Users size={18} />,       color: '#6366f1' },
-          { label: '🔥 Quente (3-6m)', value: kpis.quentes.toLocaleString('pt-BR'),  icon: <TrendingUp size={18} />,  color: '#ef4444' },
-          { label: '🟡 Morno (6-12m)', value: kpis.mornos.toLocaleString('pt-BR'),   icon: <BarChart3 size={18} />,   color: '#f59e0b' },
-          { label: '🔵 Frio (1-2a)',   value: kpis.frios.toLocaleString('pt-BR'),    icon: <MapPin size={18} />,      color: '#3b82f6' },
-          { label: '❄️ Perdido (2a+)', value: kpis.perdidos.toLocaleString('pt-BR'), icon: <CheckCircle size={18} />, color: '#6b7280' },
+          { label: 'Inativos 90d+',    value: kpis.total.toLocaleString('pt-BR'),                                      icon: <Users size={18} />,      color: '#6366f1' },
+          { label: '🔥 Quente (3-6m)', value: kpis.quentes.toLocaleString('pt-BR'),                                    icon: <TrendingUp size={18} />,  color: '#ef4444' },
+          { label: '🟡 Morno (6-12m)', value: kpis.mornos.toLocaleString('pt-BR'),                                     icon: <BarChart3 size={18} />,   color: '#f59e0b' },
+          { label: '🔵 Frio + Perdido', value: (kpis.frios + kpis.perdidos).toLocaleString('pt-BR'),                   icon: <MapPin size={18} />,      color: '#3b82f6' },
+          { label: '💰 Potencial/mês', value: kpis.potencialMensal > 0 ? fmtBRL(kpis.potencialMensal) : '—',          icon: <CheckCircle size={18} />, color: '#10b981' },
         ].map(k => (
           <div key={k.label} style={{ background: '#f8f9fc', border: '1px solid rgba(0,0,0,0.07)', borderRadius: 16, padding: '18px 20px' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10 }}>
@@ -503,13 +534,14 @@ export default function RecapClientesPage() {
       {/* ── Tabela ── */}
       <div style={{ background: '#ffffff', border: '1px solid rgba(0,0,0,0.07)', borderRadius: 16, overflow: 'hidden' }}>
         {/* Table Header */}
-        <div style={{ display: 'grid', gridTemplateColumns: '56px 1fr 140px 90px 90px 100px 110px', gap: 0, padding: '12px 20px', borderBottom: '1px solid rgba(0,0,0,0.08)', background: '#f3f4f6' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: '56px 1fr 140px 90px 90px 110px 100px 110px', gap: 0, padding: '12px 20px', borderBottom: '1px solid rgba(0,0,0,0.08)', background: '#f3f4f6' }}>
           {[
             { key: 'score', label: 'Score' },
             { key: 'nome',  label: 'Cliente' },
             { key: null,    label: 'CNPJ' },
             { key: null,    label: 'UF' },
             { key: 'dias',  label: 'Inativo' },
+            { key: null,    label: 'Ticket/mês' },
             { key: null,    label: 'Contato' },
             { key: null,    label: 'Status' },
           ].map((col, i) => (
@@ -540,7 +572,7 @@ export default function RecapClientesPage() {
                 key={c.id}
                 onClick={() => setSelected(c)}
                 style={{
-                  display: 'grid', gridTemplateColumns: '56px 1fr 140px 90px 90px 100px 110px',
+                  display: 'grid', gridTemplateColumns: '56px 1fr 140px 90px 90px 110px 100px 110px',
                   gap: 0, padding: '14px 20px',
                   borderBottom: idx < paginated.length - 1 ? '1px solid rgba(0,0,0,0.05)' : 'none',
                   cursor: 'pointer', transition: 'background 0.15s',
@@ -576,6 +608,13 @@ export default function RecapClientesPage() {
                 <div style={{ display: 'flex', alignItems: 'center' }}>
                   <span style={{ fontSize: 13, fontWeight: 600, color: cfg.color }}>
                     {diasLabel(c.dias_inativo)}
+                  </span>
+                </div>
+
+                {/* Ticket médio mensal */}
+                <div style={{ display: 'flex', alignItems: 'center' }}>
+                  <span style={{ fontSize: 12, fontWeight: 600, color: c.ticket_medio_mensal ? '#10b981' : '#d1d5db' }}>
+                    {fmtBRL(c.ticket_medio_mensal)}
                   </span>
                 </div>
 
