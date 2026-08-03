@@ -130,7 +130,7 @@ function DetailDrawer({
 }: {
   cliente: ClienteRecap | null
   onClose: () => void
-  onApprove: (id: string) => void
+  onApprove: (id: string, vendedorCod: string | null) => void
   onDiscard: (id: string) => void
   loading: string | null
 }) {
@@ -262,7 +262,7 @@ function DetailDrawer({
         {cliente.status === 'pendente' && (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginTop: 'auto' }}>
             <button
-              onClick={() => onApprove(cliente.id)}
+              onClick={() => onApprove(cliente.id, cliente.vendedor_codigo)}
               disabled={loading === cliente.id}
               style={{
                 padding: '14px 20px', borderRadius: 12, border: 'none', cursor: 'pointer',
@@ -328,6 +328,11 @@ export default function RecapClientesPage() {
   const [page, setPage]               = useState(0)
   const PER_PAGE = 50
 
+  // Vendor assignment modal
+  const [profiles, setProfiles]           = useState<{id: string; nome: string; role: string}[]>([])
+  const [approveModal, setApproveModal]   = useState<{clienteId: string; vendedorCod: string | null} | null>(null)
+  const [modalResponsavel, setModalResp]  = useState<string>('')
+
   /* ── Fetch ── */
   const fetchData = async () => {
     setLoading(true)
@@ -340,7 +345,15 @@ export default function RecapClientesPage() {
     setLoading(false)
   }
 
-  useEffect(() => { fetchData() }, [])
+  const fetchProfiles = async () => {
+    const { data } = await supabase.from('profiles').select('id, nome, role').order('nome')
+    if (data && data.length > 0) {
+      setProfiles(data)
+      setModalResp(data[0].id)
+    }
+  }
+
+  useEffect(() => { fetchData(); fetchProfiles() }, [])
 
   /* ── KPIs ── */
   const kpis = useMemo(() => {
@@ -388,7 +401,11 @@ export default function RecapClientesPage() {
   const ufs = useMemo(() => ['TODOS', ...Array.from(new Set(clientes.map(c => c.uf).filter(Boolean))).sort()], [clientes])
 
   /* ── Actions ── */
-  const handleApprove = async (id: string) => {
+  const openApproveModal = (id: string, vendedorCod: string | null) => {
+    setApproveModal({ clienteId: id, vendedorCod })
+  }
+
+  const handleApprove = async (id: string, responsavelId: string) => {
     setActLoad(id)
     const cliente = clientes.find(c => c.id === id)
     if (!cliente) return
@@ -406,19 +423,21 @@ export default function RecapClientesPage() {
       valor_estimado: cliente.ticket_medio_mensal ?? 0,
       score_ia:       cliente.score_reativacao,
       origem:         'recap_clientes',
+      responsavel_id: responsavelId || null,
       observacoes:    `Reativação — Inativo há ${cliente.dias_inativo} dias. Score: ${cliente.score_reativacao}/100`,
     }).select().single()
     if (leadError) { console.error('handleApprove:', leadError); setActLoad(null); return }
 
     // 2. Update recap status
     await supabase.from('clientes_recap').update({
-      status:          'aprovado',
-      aprovado_em:     new Date().toISOString(),
+      status:           'aprovado',
+      aprovado_em:      new Date().toISOString(),
       pipeline_lead_id: lead?.id || null,
     }).eq('id', id)
 
     setClientes(prev => prev.map(c => c.id === id ? { ...c, status: 'aprovado', aprovado_em: new Date().toISOString() } : c))
     setSelected(null)
+    setApproveModal(null)
     setActLoad(null)
   }
 
@@ -662,10 +681,78 @@ export default function RecapClientesPage() {
       <DetailDrawer
         cliente={selected}
         onClose={() => setSelected(null)}
-        onApprove={handleApprove}
+        onApprove={openApproveModal}
         onDiscard={handleDiscard}
         loading={actionLoading}
       />
+
+      {/* ── Approve Modal ── */}
+      {approveModal && (
+        <>
+          <div
+            onClick={() => setApproveModal(null)}
+            style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.55)', zIndex: 60, backdropFilter: 'blur(4px)' }}
+          />
+          <div style={{
+            position: 'fixed', top: '50%', left: '50%', transform: 'translate(-50%, -50%)',
+            background: '#ffffff', borderRadius: 20, padding: 32, width: 420, maxWidth: '90vw',
+            zIndex: 61, boxShadow: '0 24px 64px rgba(0,0,0,0.25)',
+          }}>
+            <h3 style={{ fontSize: 18, fontWeight: 700, color: '#111827', margin: '0 0 6px' }}>
+              Aprovar → Pipeline
+            </h3>
+            <p style={{ fontSize: 13, color: '#6b7280', margin: '0 0 22px' }}>
+              Escolha o vendedor responsável por esta reativação.
+            </p>
+
+            {approveModal.vendedorCod && (
+              <div style={{ background: '#f3f4f6', borderRadius: 10, padding: '10px 14px', marginBottom: 18, fontSize: 13, color: '#374151', border: '1px solid rgba(0,0,0,0.08)' }}>
+                <span style={{ fontWeight: 600 }}>Vendedor histórico:</span>{' '}
+                <span style={{ fontFamily: 'monospace', color: '#4f46e5', fontWeight: 700 }}>Cód. {approveModal.vendedorCod}</span>
+              </div>
+            )}
+
+            <div style={{ marginBottom: 24 }}>
+              <label style={{ fontSize: 12, fontWeight: 600, color: '#374151', display: 'block', marginBottom: 6 }}>
+                Atribuir para
+              </label>
+              <select
+                value={modalResponsavel}
+                onChange={e => setModalResp(e.target.value)}
+                style={{ width: '100%', padding: '10px 14px', border: '1.5px solid rgba(0,0,0,0.15)', borderRadius: 10, fontSize: 14, color: '#111827', background: '#ffffff', boxSizing: 'border-box', cursor: 'pointer' }}
+              >
+                {profiles.map(p => (
+                  <option key={p.id} value={p.id}>{p.nome}</option>
+                ))}
+              </select>
+            </div>
+
+            <div style={{ display: 'flex', gap: 10 }}>
+              <button
+                onClick={() => setApproveModal(null)}
+                style={{ flex: 1, padding: '12px', borderRadius: 10, border: '1px solid rgba(0,0,0,0.12)', background: '#f9fafb', color: '#6b7280', fontWeight: 600, cursor: 'pointer', fontSize: 14 }}
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={() => handleApprove(approveModal.clienteId, modalResponsavel)}
+                disabled={actionLoading === approveModal.clienteId}
+                style={{
+                  flex: 2, padding: '12px', borderRadius: 10, border: 'none',
+                  background: actionLoading === approveModal.clienteId ? 'rgba(99,102,241,0.4)' : '#6366f1',
+                  color: '#ffffff', fontWeight: 700,
+                  cursor: actionLoading === approveModal.clienteId ? 'default' : 'pointer', fontSize: 14,
+                  display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+                  transition: 'all 0.2s',
+                }}
+              >
+                <CheckCircle size={15} />
+                {actionLoading === approveModal.clienteId ? 'Aprovando...' : 'Confirmar'}
+              </button>
+            </div>
+          </div>
+        </>
+      )}
 
       </div>
       <style>{`@keyframes spin { from { transform: rotate(0deg) } to { transform: rotate(360deg) } }`}</style>

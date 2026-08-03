@@ -94,8 +94,7 @@ export function Sidebar({ mobileOpen = false, onMobileClose }: Props) {
         isExpanded ? 'justify-between' : 'flex-col'
       )}>
         <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center">
-          <img src="/logo-lp.png" alt="Lead+" className="h-9 w-9 object-contain"
-            style={{ mixBlendMode: 'screen' }} />
+          <img src="/logo-lp.png" alt="Lead+" className="h-9 w-9 object-contain" />
         </div>
         {isExpanded && (
           <span className="flex-1 truncate text-[13px] font-semibold"
