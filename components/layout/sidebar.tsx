@@ -94,11 +94,8 @@ export function Sidebar({ mobileOpen = false, onMobileClose }: Props) {
         isExpanded ? 'justify-between' : 'flex-col'
       )}>
         <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-xl overflow-hidden"
-          style={{
-            background: 'rgba(255,255,255,0.96)',
-            boxShadow: '0 2px 12px rgba(99,102,241,0.35), inset 0 1px 0 rgba(255,255,255,1)',
-          }}>
-          <img src="/logo-leadplus.png" alt="Lead+" className="h-6 w-6 object-contain" />
+          style={{ background: 'transparent' }}>
+          <img src="/logo-lp.png" alt="Lead+" className="h-8 w-8 object-contain" />
         </div>
         {isExpanded && (
           <span className="flex-1 truncate text-[13px] font-semibold"
