@@ -183,13 +183,15 @@ export default function ConfiguracoesPage() {
                     ))}
                   </div>
 
-                  <button style={{
-                    width: 30, height: 30, borderRadius: 8, border: '1px solid rgba(0,0,0,0.09)',
-                    background: '#fff', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    color: '#9ca3af', transition: 'all 0.15s',
-                  }}
-                  onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = '#fef2f2'; (e.currentTarget as HTMLElement).style.color = '#ef4444' }}
-                  onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = '#fff'; (e.currentTarget as HTMLElement).style.color = '#9ca3af' }}
+                  <button
+                    onClick={() => setTeam(t => t.filter(m => m.id !== member.id))}
+                    style={{
+                      width: 30, height: 30, borderRadius: 8, border: '1px solid rgba(0,0,0,0.09)',
+                      background: '#fff', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      color: '#9ca3af', transition: 'all 0.15s',
+                    }}
+                    onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = '#fef2f2'; (e.currentTarget as HTMLElement).style.color = '#ef4444' }}
+                    onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = '#fff'; (e.currentTarget as HTMLElement).style.color = '#9ca3af' }}
                   >
                     <Trash2 size={13} strokeWidth={1.5} />
                   </button>
