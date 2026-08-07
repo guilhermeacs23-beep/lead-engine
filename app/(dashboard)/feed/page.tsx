@@ -126,7 +126,7 @@ export default function FeedPage() {
         {/* Filters */}
         <div style={{ display:'flex', gap:8, padding:'10px 24px', borderBottom:'1px solid rgba(255,255,255,0.06)', flexShrink:0 }}>
           {FILTER_TYPES.map(f => (
-            <button key={f.key} onClick={() => setFilter(f.key)} style={{ padding:'5px 14px', borderRadius:20, fontSize:12, fontWeight:500, border:'none', cursor:'pointer', background: filter===f.key ? 'rgba(99,102,241,0.20)' : 'rgba(255,255,255,0.06)', color: filter===f.key ? '#a78bfa' : 'rgba(255,255,255,0.50)', outline: filter===f.key ? '1px solid rgba(99,102,241,0.40)' : 'none' }}>
+            <button key={f.key} onClick={() => setFilter(f.key)} style={{ padding:'5px 14px', borderRadius:20, fontSize:12, fontWeight:500, border:'1px solid', cursor:'pointer', background: filter===f.key ? '#6366f1' : '#f3f4f6', color: filter===f.key ? '#ffffff' : '#6b7280', borderColor: filter===f.key ? '#6366f1' : '#e5e7eb' }}>
               {f.label}
             </button>
           ))}
