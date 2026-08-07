@@ -146,9 +146,9 @@ export default function FeedPage() {
             const cfg = TYPE_ICONS[item.tipo] || TYPE_ICONS['default']
             const Icon = cfg.icon
             return (
-              <div key={item.id} style={{ background:'rgba(255,255,255,0.04)', border:'1px solid rgba(255,255,255,0.08)', borderRadius:14, padding:'16px 18px', transition:'background 0.15s' }}
-                onMouseEnter={e => (e.currentTarget as HTMLElement).style.background='rgba(255,255,255,0.07)'}
-                onMouseLeave={e => (e.currentTarget as HTMLElement).style.background='rgba(255,255,255,0.04)'}>
+              <div key={item.id} style={{ background:'#ffffff', border:'1px solid rgba(0,0,0,0.09)', borderRadius:14, padding:'16px 18px', boxShadow:'0 2px 8px rgba(0,0,0,0.06)', transition:'box-shadow 0.15s' }}
+                onMouseEnter={e => (e.currentTarget as HTMLElement).style.boxShadow='0 4px 16px rgba(0,0,0,0.10)'}
+                onMouseLeave={e => (e.currentTarget as HTMLElement).style.boxShadow='0 2px 8px rgba(0,0,0,0.06)'}>
                 {/* Top row */}
                 <div style={{ display:'flex', alignItems:'flex-start', gap:12, marginBottom:12 }}>
                   {/* Avatar */}
@@ -157,14 +157,14 @@ export default function FeedPage() {
                   </div>
                   <div style={{ flex:1 }}>
                     <div style={{ display:'flex', alignItems:'center', gap:8 }}>
-                      <span style={{ fontSize:13, fontWeight:700, color:'#fff' }}>{item.user_nome}</span>
+                      <span style={{ fontSize:13, fontWeight:700, color:'#111827' }}>{item.user_nome}</span>
                       <div style={{ display:'flex', alignItems:'center', gap:5, background:cfg.bg, borderRadius:20, padding:'2px 9px' }}>
                         <Icon size={10} style={{ color:cfg.color }} />
                         <span style={{ fontSize:10, fontWeight:600, color:cfg.color, textTransform:'capitalize' }}>{item.tipo}</span>
                       </div>
-                      <span style={{ marginLeft:'auto', fontSize:11, color:'rgba(255,255,255,0.35)' }}>{timeAgo(item.criado_em)}</span>
+                      <span style={{ marginLeft:'auto', fontSize:11, color:'#9ca3af' }}>{timeAgo(item.criado_em)}</span>
                     </div>
-                    <p style={{ margin:'4px 0 0', fontSize:13, color:'rgba(255,255,255,0.75)', lineHeight:1.5 }}>{item.conteudo}</p>
+                    <p style={{ margin:'4px 0 0', fontSize:13, color:'#374151', lineHeight:1.5 }}>{item.conteudo}</p>
                   </div>
                 </div>
 
@@ -178,20 +178,20 @@ export default function FeedPage() {
 
                 {/* Sub */}
                 {item.sub && (
-                  <p style={{ margin:'0 0 10px', fontSize:12, color:'rgba(255,255,255,0.40)', paddingLeft:50 }}>{item.sub}</p>
+                  <p style={{ margin:'0 0 10px', fontSize:12, color:'#9ca3af', paddingLeft:50 }}>{item.sub}</p>
                 )}
 
                 {/* Actions */}
-                <div style={{ display:'flex', alignItems:'center', gap:16, paddingTop:10, borderTop:'1px solid rgba(255,255,255,0.06)' }}>
-                  <button onClick={() => toggleLike(item)} style={{ display:'flex', alignItems:'center', gap:6, border:'none', background:'none', cursor:'pointer', color: item.liked ? '#ec4899' : 'rgba(255,255,255,0.40)', fontSize:12, fontWeight:500, transition:'color 0.15s', padding:0 }}>
+                <div style={{ display:'flex', alignItems:'center', gap:16, paddingTop:10, borderTop:'1px solid rgba(0,0,0,0.06)' }}>
+                  <button onClick={() => toggleLike(item)} style={{ display:'flex', alignItems:'center', gap:6, border:'none', background:'none', cursor:'pointer', color: item.liked ? '#ec4899' : '#9ca3af', fontSize:12, fontWeight:500, transition:'color 0.15s', padding:0 }}>
                     <Heart size={14} fill={item.liked ? '#ec4899' : 'none'} /> {item.likes_count}
                   </button>
-                  <button style={{ display:'flex', alignItems:'center', gap:6, border:'none', background:'none', cursor:'default', color:'rgba(255,255,255,0.30)', fontSize:12, padding:0 }}>
+                  <button style={{ display:'flex', alignItems:'center', gap:6, border:'none', background:'none', cursor:'default', color:'#9ca3af', fontSize:12, padding:0 }}>
                     <MessageCircle size={14} /> {item.comments_count}
                   </button>
-                  <button style={{ display:'flex', alignItems:'center', gap:6, border:'none', background:'none', cursor:'pointer', color:'rgba(255,255,255,0.30)', fontSize:12, padding:0, marginLeft:'auto', transition:'color 0.15s' }}
-                    onMouseEnter={e => (e.currentTarget as HTMLElement).style.color='rgba(255,255,255,0.60)'}
-                    onMouseLeave={e => (e.currentTarget as HTMLElement).style.color='rgba(255,255,255,0.30)'}>
+                  <button style={{ display:'flex', alignItems:'center', gap:6, border:'none', background:'none', cursor:'pointer', color:'#d1d5db', fontSize:12, padding:0, marginLeft:'auto', transition:'color 0.15s' }}
+                    onMouseEnter={e => (e.currentTarget as HTMLElement).style.color='#6b7280'}
+                    onMouseLeave={e => (e.currentTarget as HTMLElement).style.color='#d1d5db'}>
                     <Share2 size={13} />
                   </button>
                 </div>
