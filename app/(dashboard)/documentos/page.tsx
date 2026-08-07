@@ -1,174 +1,202 @@
 'use client'
-import { useState } from 'react'
-import {
-  Plus, Search, Upload, FileText, Table2, Presentation,
-  Folder, Grid3X3, List, Download, Eye, MoreHorizontal,
-  Clock, Star, Trash2, Share2, ChevronRight, File,
-  StickyNote
-} from 'lucide-react'
+import { useState, useEffect, useRef } from 'react'
+import { createBrowserClient } from '@supabase/ssr'
+import { Plus, Search, Upload, FileText, Table2, Presentation, Folder, Grid3X3, List, Download, Eye, Trash2, Star, RefreshCw, X, File, StickyNote } from 'lucide-react'
+
+const supabase = createBrowserClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+)
 
 const FILE_TYPES: Record<string, { color: string; bg: string; label: string; icon: any }> = {
-  doc:  { color: '#2563eb', bg: '#dbeafe', label: 'DOC',  icon: FileText     },
-  xls:  { color: '#16a34a', bg: '#dcfce7', label: 'XLS',  icon: Table2       },
-  ppt:  { color: '#ea580c', bg: '#ffedd5', label: 'PPT',  icon: Presentation },
-  pdf:  { color: '#dc2626', bg: '#fee2e2', label: 'PDF',  icon: File         },
-  txt:  { color: '#6b7280', bg: '#f3f4f6', label: 'TXT',  icon: StickyNote   },
-  folder:{ color: '#d97706', bg: '#fef3c7', label: 'PASTA', icon: Folder     },
+  doc:  { color:'#2563eb', bg:'#dbeafe', label:'DOC',  icon: FileText     },
+  docx: { color:'#2563eb', bg:'#dbeafe', label:'DOCX', icon: FileText     },
+  xls:  { color:'#16a34a', bg:'#dcfce7', label:'XLS',  icon: Table2       },
+  xlsx: { color:'#16a34a', bg:'#dcfce7', label:'XLSX', icon: Table2       },
+  ppt:  { color:'#ea580c', bg:'#ffedd5', label:'PPT',  icon: Presentation },
+  pptx: { color:'#ea580c', bg:'#ffedd5', label:'PPTX', icon: Presentation },
+  pdf:  { color:'#dc2626', bg:'#fee2e2', label:'PDF',  icon: File         },
+  txt:  { color:'#6b7280', bg:'#f3f4f6', label:'TXT',  icon: StickyNote   },
 }
 
-const MOCK_DOCS = [
-  { id: '1', nome: 'Proposta Comercial — Template 2025', tipo: 'doc', pasta: 'Comercial', tamanho: '245 KB', modificado: 'hoje', autor: 'GC', cor_autor: '#6366f1', starred: true  },
-  { id: '2', nome: 'Tabela de Preços EBT 2026',           tipo: 'xls', pasta: 'Financeiro', tamanho: '128 KB', modificado: 'hoje', autor: 'GC', cor_autor: '#6366f1', starred: true  },
-  { id: '3', nome: 'Apresentação Institucional EBT',       tipo: 'ppt', pasta: 'Marketing', tamanho: '3.2 MB', modificado: 'ontem', autor: 'RA', cor_autor: '#ec4899', starred: false },
-  { id: '4', nome: 'Contrato Padrão de Serviços',          tipo: 'doc', pasta: 'Jurídico', tamanho: '89 KB', modificado: '22/05/2026', autor: 'GC', cor_autor: '#6366f1', starred: false },
-  { id: '5', nome: 'Relatório Comercial Q1 2026',           tipo: 'pdf', pasta: 'Relatórios', tamanho: '512 KB', modificado: '15/05/2026', autor: 'GC', cor_autor: '#6366f1', starred: false },
-  { id: '6', nome: 'Planilha de Metas — Time Comercial',   tipo: 'xls', pasta: 'Comercial', tamanho: '210 KB', modificado: '14/05/2026', autor: 'JC', cor_autor: '#10b981', starred: false },
-  { id: '7', nome: 'Script de Vendas — Abordagem Inicial', tipo: 'doc', pasta: 'Comercial', tamanho: '67 KB', modificado: '10/05/2026', autor: 'RA', cor_autor: '#ec4899', starred: false },
-  { id: '8', nome: 'Manual de Onboarding — Novos Clientes',tipo: 'pdf', pasta: 'Operações', tamanho: '890 KB', modificado: '02/05/2026', autor: 'GC', cor_autor: '#6366f1', starred: false },
-]
+const PASTAS = ['Todos','Comercial','Financeiro','Marketing','Jurídico','Relatórios','Operações','Geral']
 
-const PASTAS = ['Todos', 'Comercial', 'Financeiro', 'Marketing', 'Jurídico', 'Relatórios', 'Operações']
+function ext(nome: string) { return nome.split('.').pop()?.toLowerCase() || 'doc' }
+function fmtSize(bytes: number) {
+  if (!bytes) return '—'
+  if (bytes < 1024) return `${bytes} B`
+  if (bytes < 1024*1024) return `${(bytes/1024).toFixed(0)} KB`
+  return `${(bytes/1024/1024).toFixed(1)} MB`
+}
+
+interface Doc {
+  id: string; nome: string; tipo: string; pasta: string
+  storage_path: string | null; url: string | null
+  tamanho: number; starred: boolean
+  criado_em: string; modificado_em: string
+  autor_id: string | null
+}
 
 export default function DocumentosPage() {
-  const [view, setView] = useState<'grade'|'lista'>('grade')
-  const [pastaFilter, setPastaFilter] = useState('Todos')
-  const [search, setSearch] = useState('')
-  const [showNewMenu, setShowNewMenu] = useState(false)
-  const [hoveredId, setHoveredId] = useState<string | null>(null)
-  const [starred, setStarred] = useState<Set<string>>(new Set(MOCK_DOCS.filter(d => d.starred).map(d => d.id)))
+  const [view,         setView]        = useState<'grade'|'lista'>('grade')
+  const [docs,         setDocs]        = useState<Doc[]>([])
+  const [loading,      setLoading]     = useState(true)
+  const [pastaFilter,  setPastaFilter] = useState('Todos')
+  const [search,       setSearch]      = useState('')
+  const [uploading,    setUploading]   = useState(false)
+  const [showPastaModal, setShowPastaModal] = useState<string | null>(null) // docId being moved
+  const [hoveredId,    setHoveredId]   = useState<string | null>(null)
+  const fileInputRef = useRef<HTMLInputElement>(null)
+  const uploadInputRef = useRef<HTMLInputElement>(null)
 
-  const filtered = MOCK_DOCS.filter(d =>
+  async function loadDocs() {
+    setLoading(true)
+    const { data } = await supabase.from('documentos').select('*').order('modificado_em', { ascending: false })
+    setDocs((data as Doc[]) || [])
+    setLoading(false)
+  }
+
+  useEffect(() => { loadDocs() }, [])
+
+  async function handleUpload(files: FileList | null) {
+    if (!files || files.length === 0) return
+    setUploading(true)
+    for (const file of Array.from(files)) {
+      const tipo = ext(file.name)
+      const path = `documentos/${Date.now()}_${file.name}`
+      const { error: upErr } = await supabase.storage.from('documentos').upload(path, file)
+      if (upErr) { console.error('Upload error:', upErr); continue }
+      const { data: urlData } = supabase.storage.from('documentos').getPublicUrl(path)
+      const { data: profile } = await supabase.from('profiles').select('id').limit(1).single()
+      await supabase.from('documentos').insert({
+        nome: file.name, tipo, pasta: 'Geral',
+        storage_path: path, url: urlData.publicUrl,
+        tamanho: file.size, autor_id: profile?.id || null,
+      })
+    }
+    setUploading(false)
+    loadDocs()
+  }
+
+  async function toggleStar(doc: Doc, e: React.MouseEvent) {
+    e.stopPropagation()
+    await supabase.from('documentos').update({ starred: !doc.starred }).eq('id', doc.id)
+    setDocs(prev => prev.map(d => d.id === doc.id ? { ...d, starred: !d.starred } : d))
+  }
+
+  async function deleteDoc(doc: Doc, e: React.MouseEvent) {
+    e.stopPropagation()
+    if (!confirm(`Remover "${doc.nome}"?`)) return
+    if (doc.storage_path) await supabase.storage.from('documentos').remove([doc.storage_path])
+    await supabase.from('documentos').delete().eq('id', doc.id)
+    setDocs(prev => prev.filter(d => d.id !== doc.id))
+  }
+
+  async function downloadDoc(doc: Doc, e: React.MouseEvent) {
+    e.stopPropagation()
+    if (!doc.url) { alert('Arquivo sem URL de download.'); return }
+    const a = document.createElement('a'); a.href = doc.url; a.download = doc.nome; a.target = '_blank'; a.click()
+  }
+
+  async function viewDoc(doc: Doc, e: React.MouseEvent) {
+    e.stopPropagation()
+    if (!doc.url) { alert('Arquivo sem URL.'); return }
+    window.open(doc.url, '_blank')
+  }
+
+  async function changePasta(docId: string, pasta: string) {
+    await supabase.from('documentos').update({ pasta }).eq('id', docId)
+    setDocs(prev => prev.map(d => d.id === docId ? { ...d, pasta } : d))
+    setShowPastaModal(null)
+  }
+
+  const filtered = docs.filter(d =>
     (pastaFilter === 'Todos' || d.pasta === pastaFilter) &&
     d.nome.toLowerCase().includes(search.toLowerCase())
   )
 
   return (
-    <div className="flex h-full flex-col overflow-hidden">
-      {/* Top bar */}
-      <div className="flex flex-shrink-0 items-center gap-3 px-6 py-4"
-        style={{ borderBottom: '0.5px solid rgba(255,255,255,0.08)', background: 'rgba(255,255,255,0.02)' }}>
-        <h1 className="text-[17px] font-bold text-white">Documentos</h1>
-        <div className="ml-auto flex items-center gap-2">
-          <div className="flex items-center gap-2 rounded-lg px-3 py-1.5"
-            style={{ background: 'rgba(255,255,255,0.07)', border: '0.5px solid rgba(255,255,255,0.10)' }}>
-            <Search size={13} className="text-white/40" />
-            <input value={search} onChange={e => setSearch(e.target.value)}
-              placeholder="Buscar documento…" className="w-36 bg-transparent text-[12px] text-white/70 outline-none placeholder:text-white/30" />
+    <div style={{ display:'flex', flexDirection:'column', height:'100%', overflow:'hidden' }}>
+      {/* Hidden file inputs */}
+      <input ref={uploadInputRef} type="file" multiple style={{ display:'none' }} onChange={e => handleUpload(e.target.files)} />
+
+      {/* Header */}
+      <div style={{ display:'flex', alignItems:'center', gap:12, padding:'14px 24px', borderBottom:'1px solid rgba(255,255,255,0.08)', flexShrink:0 }}>
+        <h1 style={{ fontSize:17, fontWeight:700, color:'#fff', margin:0 }}>Documentos</h1>
+        <div style={{ marginLeft:'auto', display:'flex', alignItems:'center', gap:8 }}>
+          <div style={{ display:'flex', alignItems:'center', gap:8, background:'rgba(255,255,255,0.07)', border:'1px solid rgba(255,255,255,0.10)', borderRadius:8, padding:'6px 12px' }}>
+            <Search size={13} style={{ color:'rgba(255,255,255,0.40)' }} />
+            <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Buscar documento…"
+              style={{ background:'transparent', border:'none', outline:'none', fontSize:12, color:'rgba(255,255,255,0.70)', width:140 }} />
           </div>
-          {/* View toggle */}
-          <div className="flex rounded-lg overflow-hidden" style={{ border: '0.5px solid rgba(255,255,255,0.12)' }}>
+          <div style={{ display:'flex', borderRadius:8, overflow:'hidden', border:'1px solid rgba(255,255,255,0.12)' }}>
             {([['grade', Grid3X3],['lista', List]] as const).map(([v, Icon]) => (
-              <button key={v} onClick={() => setView(v as any)}
-                className="flex items-center gap-1.5 px-2.5 py-1.5 transition-all"
-                style={{ background: view === v ? 'rgba(99,102,241,0.2)' : 'transparent', color: view === v ? '#a78bfa' : 'rgba(255,255,255,0.45)' }}>
+              <button key={v} onClick={() => setView(v as any)} style={{ padding:'6px 10px', border:'none', cursor:'pointer', background: view===v ? 'rgba(99,102,241,0.25)' : 'transparent', color: view===v ? '#a78bfa' : 'rgba(255,255,255,0.45)', display:'flex', alignItems:'center' }}>
                 <Icon size={13} />
               </button>
             ))}
           </div>
-          {/* Upload */}
-          <button className="flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-[12px] text-white/60 transition-all hover:bg-white/[0.07]"
-            style={{ border: '0.5px solid rgba(255,255,255,0.14)' }}>
-            <Upload size={13} strokeWidth={2} /> Upload
+          <button onClick={loadDocs} style={{ padding:'6px 10px', borderRadius:8, border:'1px solid rgba(255,255,255,0.12)', background:'transparent', color:'rgba(255,255,255,0.50)', cursor:'pointer', display:'flex', alignItems:'center' }}>
+            <RefreshCw size={13} />
           </button>
-          {/* New doc */}
-          <div className="relative">
-            <button onClick={() => setShowNewMenu(!showNewMenu)}
-              className="flex items-center gap-1.5 rounded-lg px-4 py-1.5 text-[13px] font-semibold text-white"
-              style={{ background: 'linear-gradient(135deg,#6366f1,#8b5cf6)', boxShadow: '0 0 16px rgba(99,102,241,0.3)' }}>
-              <Plus size={14} strokeWidth={2} /> Novo documento
-            </button>
-            {showNewMenu && (
-              <div className="absolute right-0 top-full mt-1 z-50 rounded-xl overflow-hidden"
-                style={{ background: 'rgba(12,10,35,0.98)', border: '0.5px solid rgba(255,255,255,0.14)', boxShadow: '0 12px 40px rgba(0,0,0,0.5)', minWidth: 160 }}>
-                {[
-                  { tipo: 'doc', label: 'Documento', sub: 'Word / Google Docs' },
-                  { tipo: 'xls', label: 'Planilha',  sub: 'Excel / Google Sheets' },
-                  { tipo: 'ppt', label: 'Apresentação', sub: 'PowerPoint / Slides' },
-                ].map(opt => {
-                  const cfg = FILE_TYPES[opt.tipo]
-                  const Icon = cfg.icon
-                  return (
-                    <button key={opt.tipo} onClick={() => setShowNewMenu(false)}
-                      className="flex items-center gap-3 w-full px-4 py-3 hover:bg-white/[0.06] transition-all">
-                      <div className="flex h-8 w-8 items-center justify-center rounded-lg text-[9px] font-black"
-                        style={{ background: cfg.bg, color: cfg.color }}>
-                        <Icon size={16} />
-                      </div>
-                      <div className="text-left">
-                        <p className="text-[13px] font-semibold text-white">{opt.label}</p>
-                        <p className="text-[10px] text-white/40">{opt.sub}</p>
-                      </div>
-                    </button>
-                  )
-                })}
-              </div>
-            )}
-          </div>
+          <button onClick={() => uploadInputRef.current?.click()} disabled={uploading} style={{ display:'flex', alignItems:'center', gap:6, padding:'7px 14px', borderRadius:8, border:'1px solid rgba(255,255,255,0.14)', background:'transparent', color: uploading ? 'rgba(255,255,255,0.30)' : 'rgba(255,255,255,0.70)', cursor: uploading ? 'default' : 'pointer', fontSize:12, fontWeight:500 }}>
+            <Upload size={13} strokeWidth={2} /> {uploading ? 'Enviando...' : 'Upload'}
+          </button>
         </div>
       </div>
 
-      {/* Pasta chips */}
-      <div className="flex flex-shrink-0 items-center gap-2 px-6 py-3 overflow-x-auto"
-        style={{ borderBottom: '0.5px solid rgba(255,255,255,0.06)' }}>
+      {/* Pasta tabs */}
+      <div style={{ display:'flex', alignItems:'center', gap:8, padding:'10px 24px', borderBottom:'1px solid rgba(255,255,255,0.06)', flexShrink:0, overflowX:'auto' }}>
         {PASTAS.map(p => (
-          <button key={p} onClick={() => setPastaFilter(p)}
-            className="flex items-center gap-1.5 rounded-full px-3 py-1 text-[12px] font-medium transition-all flex-shrink-0"
-            style={{
-              background: pastaFilter === p ? 'rgba(99,102,241,0.2)' : 'rgba(255,255,255,0.06)',
-              color: pastaFilter === p ? '#a78bfa' : 'rgba(255,255,255,0.5)',
-              border: pastaFilter === p ? '0.5px solid rgba(99,102,241,0.4)' : '0.5px solid transparent',
-            }}>
-            {p !== 'Todos' && <Folder size={10} />}
-            {p}
+          <button key={p} onClick={() => setPastaFilter(p)} style={{ display:'flex', alignItems:'center', gap:5, padding:'5px 12px', borderRadius:20, fontSize:12, fontWeight:500, border:'none', cursor:'pointer', whiteSpace:'nowrap', background: pastaFilter===p ? 'rgba(99,102,241,0.20)' : 'rgba(255,255,255,0.06)', color: pastaFilter===p ? '#a78bfa' : 'rgba(255,255,255,0.50)', outline: pastaFilter===p ? '1px solid rgba(99,102,241,0.40)' : 'none' }}>
+            {p !== 'Todos' && <Folder size={10} />} {p}
           </button>
         ))}
       </div>
 
-      {/* Main content */}
-      <div className="flex-1 overflow-y-auto p-6">
-        {view === 'grade' ? (
-          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
+      {/* Content */}
+      <div style={{ flex:1, overflowY:'auto', padding:24 }} onClick={() => setShowPastaModal(null)}>
+        {loading ? (
+          <div style={{ display:'flex', alignItems:'center', justifyContent:'center', height:200, gap:12, color:'rgba(255,255,255,0.40)' }}>
+            <RefreshCw size={20} style={{ animation:'spin 1s linear infinite' }} /> Carregando...
+          </div>
+        ) : filtered.length === 0 ? (
+          <div style={{ display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', height:200, gap:16 }}>
+            <div style={{ width:56, height:56, borderRadius:16, background:'rgba(99,102,241,0.10)', border:'1px solid rgba(99,102,241,0.25)', display:'flex', alignItems:'center', justifyContent:'center' }}>
+              <FileText size={24} style={{ color:'#6366f1' }} />
+            </div>
+            <p style={{ color:'rgba(255,255,255,0.40)', fontSize:15 }}>{search ? 'Nenhum documento encontrado.' : 'Nenhum arquivo ainda.'}</p>
+            <button onClick={() => uploadInputRef.current?.click()} style={{ padding:'9px 20px', borderRadius:10, border:'none', background:'#6366f1', color:'#fff', fontWeight:600, cursor:'pointer', fontSize:13, display:'flex', alignItems:'center', gap:8 }}>
+              <Upload size={14} /> Fazer upload
+            </button>
+          </div>
+        ) : view === 'grade' ? (
+          <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fill, minmax(180px, 1fr))', gap:14 }}>
             {filtered.map(doc => {
-              const cfg = FILE_TYPES[doc.tipo]
+              const tipo = ext(doc.nome)
+              const cfg = FILE_TYPES[tipo] || FILE_TYPES['doc']
               const Icon = cfg.icon
-              const isStar = starred.has(doc.id)
+              const isStar = doc.starred
               return (
-                <div key={doc.id}
-                  onMouseEnter={() => setHoveredId(doc.id)}
-                  onMouseLeave={() => setHoveredId(null)}
-                  className="group relative rounded-2xl p-4 cursor-pointer transition-all hover:shadow-md"
-                  style={{ background: '#fff', border: '1px solid #e5e5e5', boxShadow: '0 1px 4px rgba(0,0,0,0.05)' }}>
-                  {/* Star */}
-                  <button
-                    onClick={() => setStarred(prev => { const n = new Set(prev); n.has(doc.id) ? n.delete(doc.id) : n.add(doc.id); return n })}
-                    className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-all"
-                    style={{ color: isStar ? '#fbbf24' : 'rgba(255,255,255,0.3)' }}>
+                <div key={doc.id} onMouseEnter={() => setHoveredId(doc.id)} onMouseLeave={() => setHoveredId(null)}
+                  style={{ background:'#fff', border:'1px solid #e5e5e5', borderRadius:18, padding:'16px 14px', cursor:'default', boxShadow:'0 1px 4px rgba(0,0,0,0.06)', position:'relative', transition:'box-shadow 0.15s' }}>
+                  <button onClick={e => toggleStar(doc, e)} style={{ position:'absolute', top:10, right:10, background:'none', border:'none', cursor:'pointer', opacity: hoveredId===doc.id || isStar ? 1 : 0, transition:'opacity 0.15s', color: isStar ? '#fbbf24' : '#bbb', padding:2 }}>
                     <Star size={13} fill={isStar ? '#fbbf24' : 'none'} />
                   </button>
-
-                  {/* Icon */}
-                  <div className="flex h-14 w-14 mx-auto items-center justify-center rounded-xl mb-3"
-                    style={{ background: cfg.bg }}>
-                    <Icon size={26} style={{ color: cfg.color }} />
+                  <div style={{ display:'flex', width:52, height:52, margin:'0 auto 10px', alignItems:'center', justifyContent:'center', borderRadius:12, background:cfg.bg }}>
+                    <Icon size={24} style={{ color:cfg.color }} />
                   </div>
-                  <div className="flex justify-center mb-1">
-                    <span className="rounded px-1.5 py-0.5 text-[9px] font-black"
-                      style={{ background: cfg.color, color: '#fff' }}>{cfg.label}</span>
+                  <div style={{ display:'flex', justifyContent:'center', marginBottom:6 }}>
+                    <span style={{ borderRadius:4, padding:'1px 6px', fontSize:9, fontWeight:800, background:cfg.color, color:'#fff' }}>{cfg.label}</span>
                   </div>
-
-                  <p className="text-center text-[12px] font-semibold leading-snug mb-1 line-clamp-2" style={{ color: '#111' }}>{doc.nome}</p>
-                  <p className="text-center text-[10px]" style={{ color: '#aaa' }}>{doc.pasta} · {doc.tamanho}</p>
-                  <p className="text-center text-[10px] mt-0.5" style={{ color: '#bbb' }}>{doc.modificado}</p>
-
-                  {/* Hover actions */}
+                  <p style={{ textAlign:'center', fontSize:12, fontWeight:600, color:'#111', lineHeight:1.4, margin:'0 0 4px', display:'-webkit-box', WebkitLineClamp:2, WebkitBoxOrient:'vertical', overflow:'hidden' }}>{doc.nome}</p>
+                  <p style={{ textAlign:'center', fontSize:10, color:'#aaa', margin:0 }}>{doc.pasta} · {fmtSize(doc.tamanho)}</p>
+                  <p style={{ textAlign:'center', fontSize:10, color:'#bbb', margin:'2px 0 0' }}>{new Date(doc.modificado_em).toLocaleDateString('pt-BR')}</p>
                   {hoveredId === doc.id && (
-                    <div className="absolute inset-x-3 bottom-3 flex items-center justify-center gap-2 rounded-lg py-1"
-                      style={{ background: 'rgba(255,255,255,0.95)', border: '1px solid #e5e5e5', boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }}>
-                      {[Eye, Download, Share2].map((Ic, i) => (
-                        <button key={i} className="p-1 transition-all" style={{ color: '#888' }}>
-                          <Ic size={12} />
-                        </button>
-                      ))}
+                    <div style={{ position:'absolute', insetInline:'10px', bottom:10, display:'flex', alignItems:'center', justifyContent:'center', gap:4, background:'rgba(255,255,255,0.96)', border:'1px solid #e5e5e5', borderRadius:10, padding:'6px 8px', boxShadow:'0 2px 8px rgba(0,0,0,0.10)' }}>
+                      <button onClick={e => viewDoc(doc, e)} title="Visualizar" style={{ background:'none', border:'none', cursor:'pointer', color:'#6366f1', padding:4 }}><Eye size={13} /></button>
+                      <button onClick={e => downloadDoc(doc, e)} title="Download" style={{ background:'none', border:'none', cursor:'pointer', color:'#10b981', padding:4 }}><Download size={13} /></button>
+                      <button onClick={e => deleteDoc(doc, e)} title="Excluir" style={{ background:'none', border:'none', cursor:'pointer', color:'#ef4444', padding:4 }}><Trash2 size={13} /></button>
                     </div>
                   )}
                 </div>
@@ -176,69 +204,44 @@ export default function DocumentosPage() {
             })}
           </div>
         ) : (
-          /* Lista view */
-          <div className="overflow-hidden rounded-xl" style={{ border: '1px solid #e5e5e5', background: '#fff', boxShadow: '0 1px 4px rgba(0,0,0,0.05)' }}>
-            <div className="grid px-4 py-2.5 text-[11px] font-semibold uppercase tracking-wider"
-              style={{ gridTemplateColumns: '48px 1fr 110px 90px 90px 90px 40px', background: '#f7f7f7', borderBottom: '1px solid #e5e5e5', color: '#aaa' }}>
-              <div />
-              <div>Nome do arquivo</div>
-              <div>Pasta</div>
-              <div>Tamanho</div>
-              <div>Modificado</div>
-              <div>Autor</div>
-              <div />
+          <div style={{ background:'#fff', border:'1px solid #e5e5e5', borderRadius:14, overflow:'hidden', boxShadow:'0 1px 4px rgba(0,0,0,0.05)' }}>
+            <div style={{ display:'grid', gridTemplateColumns:'44px 1fr 110px 90px 90px 80px', padding:'10px 16px', background:'#f7f7f7', borderBottom:'1px solid #e5e5e5', fontSize:11, fontWeight:700, textTransform:'uppercase', color:'#aaa', letterSpacing:'0.06em' }}>
+              <div /><div>Nome</div><div>Pasta</div><div>Tamanho</div><div>Modificado</div><div>Ações</div>
             </div>
             {filtered.map(doc => {
-              const cfg = FILE_TYPES[doc.tipo]
+              const tipo = ext(doc.nome)
+              const cfg = FILE_TYPES[tipo] || FILE_TYPES['doc']
               const Icon = cfg.icon
-              const isStar = starred.has(doc.id)
+              const isStar = doc.starred
               return (
-                <div key={doc.id}
-                  className="group grid cursor-pointer items-center px-4 py-3 transition-all hover:bg-gray-50"
-                  style={{ gridTemplateColumns: '48px 1fr 110px 90px 90px 90px 40px', borderBottom: '1px solid #f0f0f0' }}>
-                  <div className="flex h-8 w-8 items-center justify-center rounded-lg"
-                    style={{ background: cfg.bg }}>
-                    <Icon size={16} style={{ color: cfg.color }} />
+                <div key={doc.id} style={{ display:'grid', gridTemplateColumns:'44px 1fr 110px 90px 90px 80px', padding:'11px 16px', borderBottom:'1px solid #f0f0f0', alignItems:'center' }}>
+                  <div style={{ width:32, height:32, borderRadius:8, display:'flex', alignItems:'center', justifyContent:'center', background:cfg.bg }}><Icon size={16} style={{ color:cfg.color }} /></div>
+                  <div style={{ display:'flex', alignItems:'center', gap:8, paddingRight:12 }}>
+                    {isStar && <Star size={10} fill="#fbbf24" style={{ color:'#fbbf24', flexShrink:0 }} />}
+                    <p style={{ fontSize:13, fontWeight:600, color:'#111', margin:0, overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>{doc.nome}</p>
+                    <span style={{ borderRadius:4, padding:'1px 5px', fontSize:9, fontWeight:800, background:cfg.color, color:'#fff', flexShrink:0 }}>{cfg.label}</span>
                   </div>
-                  <div className="flex items-center gap-2 pr-4">
-                    {isStar && <Star size={10} fill="#fbbf24" style={{ color: '#fbbf24', flexShrink: 0 }} />}
-                    <p className="text-[13px] font-semibold truncate" style={{ color: '#111' }}>{doc.nome}</p>
-                    <span className="rounded px-1.5 py-0.5 text-[9px] font-black flex-shrink-0"
-                      style={{ background: cfg.color, color: '#fff' }}>{cfg.label}</span>
-                  </div>
-                  <span className="flex items-center gap-1 text-[12px]" style={{ color: '#888' }}>
-                    <Folder size={11} style={{ color: '#bbb' }} /> {doc.pasta}
-                  </span>
-                  <span className="text-[12px]" style={{ color: '#888' }}>{doc.tamanho}</span>
-                  <div className="flex items-center gap-1 text-[12px]" style={{ color: '#888' }}>
-                    <Clock size={10} /> {doc.modificado}
-                  </div>
-                  <div className="flex items-center gap-1.5">
-                    <div className="flex h-6 w-6 items-center justify-center rounded-full text-[9px] font-bold text-white"
-                      style={{ background: doc.cor_autor }}>{doc.autor}</div>
-                  </div>
-                  <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-all">
-                    <button className="p-1" style={{ color: '#aaa' }}><Eye size={13} /></button>
-                    <button className="p-1" style={{ color: '#aaa' }}><Download size={13} /></button>
-                    <button className="p-1 hover:text-red-400" style={{ color: '#aaa' }}><Trash2 size={13} /></button>
+                  <span style={{ display:'flex', alignItems:'center', gap:4, fontSize:12, color:'#888' }}><Folder size={11} style={{ color:'#bbb' }} /> {doc.pasta}</span>
+                  <span style={{ fontSize:12, color:'#888' }}>{fmtSize(doc.tamanho)}</span>
+                  <span style={{ fontSize:12, color:'#888' }}>{new Date(doc.modificado_em).toLocaleDateString('pt-BR')}</span>
+                  <div style={{ display:'flex', gap:2 }}>
+                    <button onClick={e => viewDoc(doc, e)} title="Visualizar" style={{ background:'none', border:'none', cursor:'pointer', color:'#9ca3af', padding:4, borderRadius:6 }}
+                      onMouseEnter={e => (e.currentTarget as HTMLElement).style.color='#6366f1'}
+                      onMouseLeave={e => (e.currentTarget as HTMLElement).style.color='#9ca3af'}><Eye size={13} /></button>
+                    <button onClick={e => downloadDoc(doc, e)} title="Download" style={{ background:'none', border:'none', cursor:'pointer', color:'#9ca3af', padding:4, borderRadius:6 }}
+                      onMouseEnter={e => (e.currentTarget as HTMLElement).style.color='#10b981'}
+                      onMouseLeave={e => (e.currentTarget as HTMLElement).style.color='#9ca3af'}><Download size={13} /></button>
+                    <button onClick={e => deleteDoc(doc, e)} title="Excluir" style={{ background:'none', border:'none', cursor:'pointer', color:'#9ca3af', padding:4, borderRadius:6 }}
+                      onMouseEnter={e => (e.currentTarget as HTMLElement).style.color='#ef4444'}
+                      onMouseLeave={e => (e.currentTarget as HTMLElement).style.color='#9ca3af'}><Trash2 size={13} /></button>
                   </div>
                 </div>
               )
             })}
           </div>
         )}
-
-        {filtered.length === 0 && (
-          <div className="flex flex-col items-center justify-center py-24 gap-4">
-            <div className="flex h-16 w-16 items-center justify-center rounded-2xl"
-              style={{ background: 'rgba(99,102,241,0.1)', border: '1px solid rgba(99,102,241,0.2)' }}>
-              <FileText size={28} strokeWidth={1.2} className="text-indigo-400" />
-            </div>
-            <p className="text-[16px] font-semibold text-white/60">Nenhum documento encontrado</p>
-            <p className="text-[13px] text-white/35">Crie novos documentos ou faça upload de arquivos</p>
-          </div>
-        )}
       </div>
+      <style>{`@keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}`}</style>
     </div>
   )
 }

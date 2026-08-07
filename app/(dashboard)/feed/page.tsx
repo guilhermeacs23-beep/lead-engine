@@ -1,196 +1,199 @@
 'use client'
-import { useState } from 'react'
-import {
-  Users, Plus, TrendingUp, CheckCircle2, MessageSquare,
-  FileText, UserPlus, Bell, Filter, Search, Heart, Share2, MoreHorizontal
-} from 'lucide-react'
+import { useState, useEffect } from 'react'
+import { createBrowserClient } from '@supabase/ssr'
+import { Heart, MessageCircle, Share2, Zap, TrendingUp, CheckCircle2, UserPlus, AlertCircle, RefreshCw, Plus, Users, Bell } from 'lucide-react'
 
-const FEED_ITEMS = [
-  {
-    id: '1', type: 'lead_novo', user: 'Guilherme Campos', avatar: 'GC', avatarColor: '#6366f1',
-    time: 'há 5 min', content: 'Adicionou um novo lead',
-    highlight: 'Transportadora Neves Ltda',
-    sub: 'Score IA: 87 · Segmento: Carga Pesada · São Paulo, SP',
-    actions: { likes: 2, comments: 0 },
-  },
-  {
-    id: '2', type: 'pipeline_move', user: 'Rafael Arrecife', avatar: 'RA', avatarColor: '#ec4899',
-    time: 'há 23 min', content: 'Moveu negócio para etapa',
-    highlight: 'Proposta → Negociando',
-    sub: 'Cliente: Logística Total S.A · Valor: R$ 12.500/mês',
-    actions: { likes: 3, comments: 1 },
-  },
-  {
-    id: '3', type: 'task_done', user: 'Julio Campos', avatar: 'JC', avatarColor: '#10b981',
-    time: 'há 1 hora', content: 'Concluiu a tarefa',
-    highlight: 'Enviar proposta comercial para Vidro Santana',
-    sub: 'Projeto: Comercial Q2 · Prioridade: Alta',
-    actions: { likes: 5, comments: 2 },
-  },
-  {
-    id: '4', type: 'doc', user: 'Guilherme Campos', avatar: 'GC', avatarColor: '#6366f1',
-    time: 'há 2 horas', content: 'Criou documento',
-    highlight: 'Proposta Comercial — Template 2025.docx',
-    sub: 'Pasta: Documentos · Tamanho: 245 KB',
-    actions: { likes: 1, comments: 0 },
-  },
-  {
-    id: '5', type: 'member', user: 'Sistema', avatar: 'LE', avatarColor: '#f59e0b',
-    time: 'há 3 horas', content: 'Novo membro adicionado ao grupo',
-    highlight: 'Ana Paula Silva — Grupo: Comercial SP',
-    sub: 'Função: Vendedora · Nível de acesso: Membro',
-    actions: { likes: 0, comments: 0 },
-  },
-  {
-    id: '6', type: 'lead_novo', user: 'Rafael Arrecife', avatar: 'RA', avatarColor: '#ec4899',
-    time: 'ontem', content: 'Adicionou um novo lead',
-    highlight: 'Distribuidora Paulista de Vidros',
-    sub: 'Score IA: 74 · Segmento: Vidraçaria · Campinas, SP',
-    actions: { likes: 1, comments: 3 },
-  },
-  {
-    id: '7', type: 'pipeline_move', user: 'Julio Campos', avatar: 'JC', avatarColor: '#10b981',
-    time: 'ontem', content: 'Fechou negócio',
-    highlight: 'Grupo Alfa Transportes — R$ 8.200/mês',
-    sub: 'Parabéns! Negócio fechado após 14 dias no funil.',
-    actions: { likes: 12, comments: 4 },
-    highlight_color: '#10b981',
-  },
-  {
-    id: '8', type: 'task_done', user: 'Guilherme Campos', avatar: 'GC', avatarColor: '#6366f1',
-    time: 'há 2 dias', content: 'Criou projeto',
-    highlight: 'Expansão Região Sul — Q3 2026',
-    sub: '5 tarefas criadas · Prazo: 30/08/2026',
-    actions: { likes: 3, comments: 1 },
-  },
-]
+const supabase = createBrowserClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+)
 
-const TYPE_CONFIG: Record<string, { icon: any; color: string; bg: string; label: string }> = {
-  lead_novo:     { icon: UserPlus,     color: '#6366f1', bg: 'rgba(99,102,241,0.1)',  label: 'LEAD NOVO'     },
-  pipeline_move: { icon: TrendingUp,   color: '#f59e0b', bg: 'rgba(245,158,11,0.1)', label: 'PIPELINE MOVE' },
-  task_done:     { icon: CheckCircle2, color: '#10b981', bg: 'rgba(16,185,129,0.1)', label: 'TASK DONE'     },
-  doc:           { icon: FileText,     color: '#3b82f6', bg: 'rgba(59,130,246,0.1)', label: 'DOC'           },
-  member:        { icon: Users,        color: '#ec4899', bg: 'rgba(236,72,153,0.1)', label: 'MEMBER'        },
+const TYPE_ICONS: Record<string, { icon: any; color: string; bg: string }> = {
+  venda:     { icon: Zap,          color: '#10b981', bg: 'rgba(16,185,129,0.12)'  },
+  meta:      { icon: TrendingUp,   color: '#6366f1', bg: 'rgba(99,102,241,0.12)'  },
+  tarefa:    { icon: CheckCircle2, color: '#f59e0b', bg: 'rgba(245,158,11,0.12)'  },
+  membro:    { icon: UserPlus,     color: '#3b82f6', bg: 'rgba(59,130,246,0.12)'  },
+  alerta:    { icon: AlertCircle,  color: '#ef4444', bg: 'rgba(239,68,68,0.12)'   },
+  default:   { icon: Bell,         color: '#a78bfa', bg: 'rgba(167,139,250,0.12)' },
 }
 
-const FILTERS = ['Todos','Leads','Pipeline','Tarefas','Documentos','Membros']
+function timeAgo(dateStr: string) {
+  const diff = Date.now() - new Date(dateStr).getTime()
+  const mins = Math.floor(diff / 60000)
+  if (mins < 1) return 'agora'
+  if (mins < 60) return `${mins}min atrás`
+  const hrs = Math.floor(mins / 60)
+  if (hrs < 24) return `${hrs}h atrás`
+  return `${Math.floor(hrs / 24)}d atrás`
+}
+
+interface FeedItem {
+  id: string
+  tipo: string
+  user_nome: string
+  user_avatar: string
+  user_cor: string
+  conteudo: string
+  highlight: string | null
+  highlight_cor: string | null
+  sub: string | null
+  likes_count: number
+  comments_count: number
+  criado_em: string
+  liked?: boolean
+}
+
+interface Profile {
+  id: string; nome: string; cargo: string; cor: string
+}
 
 export default function FeedPage() {
-  const [activeFilter, setActiveFilter] = useState('Todos')
-  const [likedItems, setLikedItems] = useState<Set<string>>(new Set())
+  const [items,     setItems]     = useState<FeedItem[]>([])
+  const [profiles,  setProfiles]  = useState<Profile[]>([])
+  const [myId,      setMyId]      = useState<string | null>(null)
+  const [loading,   setLoading]   = useState(true)
+  const [filter,    setFilter]    = useState<string>('todos')
 
-  const filtered = FEED_ITEMS.filter(item => {
-    if (activeFilter === 'Todos') return true
-    if (activeFilter === 'Leads') return item.type === 'lead_novo'
-    if (activeFilter === 'Pipeline') return item.type === 'pipeline_move'
-    if (activeFilter === 'Tarefas') return item.type === 'task_done'
-    if (activeFilter === 'Documentos') return item.type === 'doc'
-    if (activeFilter === 'Membros') return item.type === 'member'
-    return true
-  })
+  async function loadAll() {
+    setLoading(true)
+    const { data: prof } = await supabase.from('profiles').select('id,nome,cargo,cor').eq('ativo', true)
+    const allProfiles = (prof || []) as Profile[]
+    setProfiles(allProfiles)
+    // determine current user — first profile (simplified, no auth.getUser needed)
+    const myProfile = allProfiles[0] || null
+    setMyId(myProfile?.id || null)
 
-  function toggleLike(id: string) {
-    setLikedItems(prev => {
-      const next = new Set(prev)
-      next.has(id) ? next.delete(id) : next.add(id)
-      return next
-    })
+    const { data: feedData } = await supabase.from('feed_items').select('*').order('criado_em', { ascending: false })
+    const feedItems = (feedData || []) as FeedItem[]
+
+    if (myProfile) {
+      // fetch liked items
+      const { data: likes } = await supabase.from('feed_likes').select('item_id').eq('profile_id', myProfile.id)
+      const likedSet = new Set((likes || []).map((l: any) => l.item_id))
+      setItems(feedItems.map(i => ({ ...i, liked: likedSet.has(i.id) })))
+    } else {
+      setItems(feedItems)
+    }
+    setLoading(false)
+  }
+
+  useEffect(() => { loadAll() }, [])
+
+  async function toggleLike(item: FeedItem) {
+    if (!myId) return
+    const wasLiked = item.liked
+    // optimistic
+    setItems(prev => prev.map(i => i.id === item.id ? { ...i, liked: !wasLiked, likes_count: i.likes_count + (wasLiked ? -1 : 1) } : i))
+    if (wasLiked) {
+      await supabase.from('feed_likes').delete().eq('item_id', item.id).eq('profile_id', myId)
+      await supabase.from('feed_items').update({ likes_count: item.likes_count - 1 }).eq('id', item.id)
+    } else {
+      await supabase.from('feed_likes').insert({ item_id: item.id, profile_id: myId })
+      await supabase.from('feed_items').update({ likes_count: item.likes_count + 1 }).eq('id', item.id)
+    }
+  }
+
+  const FILTER_TYPES = [
+    { key:'todos',  label:'Todos' },
+    { key:'venda',  label:'Vendas' },
+    { key:'meta',   label:'Metas' },
+    { key:'tarefa', label:'Tarefas' },
+    { key:'membro', label:'Equipe' },
+  ]
+
+  const filtered = filter === 'todos' ? items : items.filter(i => i.tipo === filter)
+
+  const stats = {
+    vendas:  items.filter(i => i.tipo === 'venda').length,
+    metas:   items.filter(i => i.tipo === 'meta').length,
+    membros: profiles.length,
   }
 
   return (
-    <div className="flex h-full overflow-hidden">
-      {/* Main feed */}
-      <div className="flex flex-1 flex-col overflow-hidden">
+    <div style={{ display:'flex', height:'100%', overflow:'hidden' }}>
+      {/* Feed */}
+      <div style={{ flex:1, overflowY:'auto', display:'flex', flexDirection:'column' }}>
         {/* Header */}
-        <div className="flex flex-shrink-0 items-center gap-3 px-6 py-4"
-          style={{ borderBottom: '0.5px solid rgba(255,255,255,0.08)', background: 'rgba(255,255,255,0.02)' }}>
-          <h1 className="text-[17px] font-bold text-white">Feed</h1>
-          <div className="ml-auto flex items-center gap-2">
-            <div className="flex items-center gap-2 rounded-lg px-3 py-1.5"
-              style={{ background: 'rgba(255,255,255,0.07)', border: '0.5px solid rgba(255,255,255,0.10)' }}>
-              <Search size={13} className="text-white/40" />
-              <input placeholder="Buscar no feed…" className="w-32 bg-transparent text-[12px] text-white/70 outline-none placeholder:text-white/30" />
-            </div>
+        <div style={{ display:'flex', alignItems:'center', gap:12, padding:'14px 24px', borderBottom:'1px solid rgba(255,255,255,0.08)', flexShrink:0 }}>
+          <h1 style={{ fontSize:17, fontWeight:700, color:'#fff', margin:0 }}>Feed da Equipe</h1>
+          <div style={{ marginLeft:'auto', display:'flex', alignItems:'center', gap:8 }}>
+            <button onClick={loadAll} style={{ padding:'6px 10px', borderRadius:8, border:'1px solid rgba(255,255,255,0.12)', background:'transparent', color:'rgba(255,255,255,0.50)', cursor:'pointer', display:'flex', alignItems:'center' }}>
+              <RefreshCw size={13} />
+            </button>
           </div>
         </div>
 
-        {/* Filter chips */}
-        <div className="flex flex-shrink-0 items-center gap-2 px-6 py-3"
-          style={{ borderBottom: '0.5px solid rgba(255,255,255,0.06)' }}>
-          <Filter size={13} className="text-white/35" />
-          {FILTERS.map(f => (
-            <button key={f} onClick={() => setActiveFilter(f)}
-              className="rounded-full px-3 py-1 text-[12px] font-medium transition-all"
-              style={{
-                background: activeFilter === f ? '#6366f1' : '#fff',
-                color: activeFilter === f ? '#fff' : '#666',
-                border: activeFilter === f ? '1px solid #6366f1' : '1px solid #e5e5e5',
-              }}>
-              {f}
+        {/* Filters */}
+        <div style={{ display:'flex', gap:8, padding:'10px 24px', borderBottom:'1px solid rgba(255,255,255,0.06)', flexShrink:0 }}>
+          {FILTER_TYPES.map(f => (
+            <button key={f.key} onClick={() => setFilter(f.key)} style={{ padding:'5px 14px', borderRadius:20, fontSize:12, fontWeight:500, border:'none', cursor:'pointer', background: filter===f.key ? 'rgba(99,102,241,0.20)' : 'rgba(255,255,255,0.06)', color: filter===f.key ? '#a78bfa' : 'rgba(255,255,255,0.50)', outline: filter===f.key ? '1px solid rgba(99,102,241,0.40)' : 'none' }}>
+              {f.label}
             </button>
           ))}
         </div>
 
-        {/* Feed items */}
-        <div className="flex-1 overflow-y-auto px-6 py-4 flex flex-col gap-3">
-          {filtered.map((item) => {
-            const cfg = TYPE_CONFIG[item.type]
-            const Icon = cfg?.icon
-            const liked = likedItems.has(item.id)
+        {/* Items */}
+        <div style={{ flex:1, padding:'16px 24px', display:'flex', flexDirection:'column', gap:12 }}>
+          {loading ? (
+            <div style={{ display:'flex', alignItems:'center', justifyContent:'center', height:200, gap:10, color:'rgba(255,255,255,0.40)' }}>
+              <RefreshCw size={18} style={{ animation:'spin 1s linear infinite' }} /> Carregando...
+            </div>
+          ) : filtered.length === 0 ? (
+            <div style={{ display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', height:200, gap:12 }}>
+              <p style={{ color:'rgba(255,255,255,0.30)', fontSize:15 }}>Nenhuma atividade.</p>
+            </div>
+          ) : filtered.map(item => {
+            const cfg = TYPE_ICONS[item.tipo] || TYPE_ICONS['default']
+            const Icon = cfg.icon
             return (
-              <div key={item.id} className="rounded-2xl p-4 transition-all"
-                style={{
-                  background: '#fff',
-                  border: '1px solid #e5e5e5',
-                  boxShadow: '0 1px 4px rgba(0,0,0,0.06)',
-                }}>
-                <div className="flex gap-3">
+              <div key={item.id} style={{ background:'rgba(255,255,255,0.04)', border:'1px solid rgba(255,255,255,0.08)', borderRadius:14, padding:'16px 18px', transition:'background 0.15s' }}
+                onMouseEnter={e => (e.currentTarget as HTMLElement).style.background='rgba(255,255,255,0.07)'}
+                onMouseLeave={e => (e.currentTarget as HTMLElement).style.background='rgba(255,255,255,0.04)'}>
+                {/* Top row */}
+                <div style={{ display:'flex', alignItems:'flex-start', gap:12, marginBottom:12 }}>
                   {/* Avatar */}
-                  <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full text-[11px] font-bold text-white"
-                    style={{ background: item.avatarColor }}>
-                    {item.avatar}
+                  <div style={{ width:38, height:38, borderRadius:12, flexShrink:0, background: item.user_cor || '#6366f1', display:'flex', alignItems:'center', justifyContent:'center', fontSize:14, fontWeight:700, color:'#fff' }}>
+                    {item.user_nome.charAt(0).toUpperCase()}
                   </div>
-
-                  <div className="flex-1 min-w-0">
-                    {/* Top row */}
-                    <div className="flex items-center gap-2 flex-wrap">
-                      <span className="text-[13px] font-semibold" style={{ color: '#111' }}>{item.user}</span>
-                      <span className="text-[12px]" style={{ color: '#888' }}>{item.content}</span>
-                      <div className="flex items-center gap-1 rounded-md px-1.5 py-0.5"
-                        style={{ background: cfg?.bg, color: cfg?.color }}>
-                        {Icon && <Icon size={9} strokeWidth={2} />}
-                        <span className="text-[10px] font-semibold uppercase tracking-wide">{cfg?.label}</span>
+                  <div style={{ flex:1 }}>
+                    <div style={{ display:'flex', alignItems:'center', gap:8 }}>
+                      <span style={{ fontSize:13, fontWeight:700, color:'#fff' }}>{item.user_nome}</span>
+                      <div style={{ display:'flex', alignItems:'center', gap:5, background:cfg.bg, borderRadius:20, padding:'2px 9px' }}>
+                        <Icon size={10} style={{ color:cfg.color }} />
+                        <span style={{ fontSize:10, fontWeight:600, color:cfg.color, textTransform:'capitalize' }}>{item.tipo}</span>
                       </div>
-                      <span className="ml-auto text-[11px] flex-shrink-0" style={{ color: '#bbb' }}>{item.time}</span>
+                      <span style={{ marginLeft:'auto', fontSize:11, color:'rgba(255,255,255,0.35)' }}>{timeAgo(item.criado_em)}</span>
                     </div>
-
-                    <p className="mt-1.5 text-[14px] font-semibold"
-                      style={{ color: item.highlight_color ?? '#111' }}>
-                      {item.highlight}
-                    </p>
-                    <p className="mt-0.5 text-[12px]" style={{ color: '#888' }}>{item.sub}</p>
-
-                    {/* Actions */}
-                    <div className="mt-3 flex items-center gap-4 pt-2"
-                      style={{ borderTop: '1px solid #f0f0f0' }}>
-                      <button onClick={() => toggleLike(item.id)}
-                        className="flex items-center gap-1.5 text-[12px] transition-all"
-                        style={{ color: liked ? '#f472b6' : '#bbb' }}>
-                        <Heart size={13} strokeWidth={2} fill={liked ? '#f472b6' : 'none'} />
-                        {item.actions.likes + (liked ? 1 : 0)}
-                      </button>
-                      <button className="flex items-center gap-1.5 text-[12px] transition-all" style={{ color: '#bbb' }}>
-                        <MessageSquare size={13} strokeWidth={2} />
-                        {item.actions.comments}
-                      </button>
-                      <button className="flex items-center gap-1.5 text-[12px] transition-all" style={{ color: '#bbb' }}>
-                        <Share2 size={13} strokeWidth={2} /> Compartilhar
-                      </button>
-                      <button className="ml-auto transition-all" style={{ color: '#ddd' }}>
-                        <MoreHorizontal size={15} />
-                      </button>
-                    </div>
+                    <p style={{ margin:'4px 0 0', fontSize:13, color:'rgba(255,255,255,0.75)', lineHeight:1.5 }}>{item.conteudo}</p>
                   </div>
+                </div>
+
+                {/* Highlight */}
+                {item.highlight && (
+                  <div style={{ marginBottom:12, padding:'10px 14px', borderRadius:10, background: item.highlight_cor ? `${item.highlight_cor}10` : 'rgba(99,102,241,0.08)', border: `1px solid ${item.highlight_cor || '#6366f1'}25`, display:'flex', alignItems:'center', gap:10 }}>
+                    <div style={{ width:3, height:24, borderRadius:4, background: item.highlight_cor || '#6366f1', flexShrink:0 }} />
+                    <p style={{ margin:0, fontSize:13, fontWeight:700, color: item.highlight_cor || '#a78bfa' }}>{item.highlight}</p>
+                  </div>
+                )}
+
+                {/* Sub */}
+                {item.sub && (
+                  <p style={{ margin:'0 0 10px', fontSize:12, color:'rgba(255,255,255,0.40)', paddingLeft:50 }}>{item.sub}</p>
+                )}
+
+                {/* Actions */}
+                <div style={{ display:'flex', alignItems:'center', gap:16, paddingTop:10, borderTop:'1px solid rgba(255,255,255,0.06)' }}>
+                  <button onClick={() => toggleLike(item)} style={{ display:'flex', alignItems:'center', gap:6, border:'none', background:'none', cursor:'pointer', color: item.liked ? '#ec4899' : 'rgba(255,255,255,0.40)', fontSize:12, fontWeight:500, transition:'color 0.15s', padding:0 }}>
+                    <Heart size={14} fill={item.liked ? '#ec4899' : 'none'} /> {item.likes_count}
+                  </button>
+                  <button style={{ display:'flex', alignItems:'center', gap:6, border:'none', background:'none', cursor:'default', color:'rgba(255,255,255,0.30)', fontSize:12, padding:0 }}>
+                    <MessageCircle size={14} /> {item.comments_count}
+                  </button>
+                  <button style={{ display:'flex', alignItems:'center', gap:6, border:'none', background:'none', cursor:'pointer', color:'rgba(255,255,255,0.30)', fontSize:12, padding:0, marginLeft:'auto', transition:'color 0.15s' }}
+                    onMouseEnter={e => (e.currentTarget as HTMLElement).style.color='rgba(255,255,255,0.60)'}
+                    onMouseLeave={e => (e.currentTarget as HTMLElement).style.color='rgba(255,255,255,0.30)'}>
+                    <Share2 size={13} />
+                  </button>
                 </div>
               </div>
             )
@@ -198,49 +201,47 @@ export default function FeedPage() {
         </div>
       </div>
 
-      {/* Right sidebar */}
-      <div className="hidden xl:flex w-64 flex-shrink-0 flex-col gap-4 overflow-y-auto p-4"
-        style={{ borderLeft: '0.5px solid rgba(255,255,255,0.08)' }}>
-        {/* Online team */}
-        <div>
-          <p className="mb-3 text-[11px] font-semibold uppercase tracking-wider text-white/40">Time online</p>
+      {/* Sidebar */}
+      <div style={{ width:240, flexShrink:0, borderLeft:'1px solid rgba(255,255,255,0.08)', overflowY:'auto', display:'flex', flexDirection:'column', gap:0 }}>
+        {/* Stats */}
+        <div style={{ padding:'16px 16px 0' }}>
+          <p style={{ fontSize:10, fontWeight:700, textTransform:'uppercase', letterSpacing:'0.08em', color:'rgba(255,255,255,0.30)', margin:'0 0 10px' }}>Resumo</p>
           {[
-            { name: 'Guilherme Campos', role: 'Admin',     av: 'GC', c: '#6366f1', online: true  },
-            { name: 'Rafael Arrecife',  role: 'Vendas',    av: 'RA', c: '#ec4899', online: true  },
-            { name: 'Julio Campos',     role: 'Vendas',    av: 'JC', c: '#10b981', online: false },
-            { name: 'Ana Paula Silva',  role: 'Comercial', av: 'AP', c: '#f59e0b', online: false },
-          ].map(m => (
-            <div key={m.name} className="flex items-center gap-2.5 rounded-lg px-2 py-2 hover:bg-white/[0.04] transition-all">
-              <div className="relative">
-                <div className="flex h-7 w-7 items-center justify-center rounded-full text-[10px] font-bold text-white"
-                  style={{ background: m.c }}>{m.av}</div>
-                <div className="absolute -bottom-0.5 -right-0.5 h-2.5 w-2.5 rounded-full border-2 border-[rgba(12,10,30,0.98)]"
-                  style={{ background: m.online ? '#34d399' : '#475569' }} />
-              </div>
-              <div className="min-w-0">
-                <p className="truncate text-[12px] font-medium text-white/80">{m.name}</p>
-                <p className="text-[10px] text-white/40">{m.role}</p>
-              </div>
+            { label:'Vendas registradas', value: stats.vendas,  color:'#10b981' },
+            { label:'Metas conquistadas', value: stats.metas,   color:'#6366f1' },
+            { label:'Membros ativos',     value: stats.membros, color:'#f59e0b' },
+          ].map(s => (
+            <div key={s.label} style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:'8px 0', borderBottom:'1px solid rgba(255,255,255,0.05)' }}>
+              <span style={{ fontSize:12, color:'rgba(255,255,255,0.55)' }}>{s.label}</span>
+              <span style={{ fontSize:15, fontWeight:800, color:s.color }}>{s.value}</span>
             </div>
           ))}
         </div>
 
-        <div style={{ borderTop: '0.5px solid rgba(255,255,255,0.08)' }} className="pt-4">
-          <p className="mb-3 text-[11px] font-semibold uppercase tracking-wider text-white/40">Notificações</p>
-          {[
-            { text: '2 leads aguardando follow-up', color: '#fbbf24' },
-            { text: '1 proposta vencem hoje',        color: '#f472b6' },
-            { text: 'Reunião com Vidro Santana amanhã 09h', color: '#60a5fa' },
-          ].map((n, i) => (
-            <div key={i} className="mb-2 flex items-start gap-2 rounded-lg p-2.5"
-              style={{ background: `${n.color}12`, border: `0.5px solid ${n.color}30` }}>
-              <Bell size={11} style={{ color: n.color, flexShrink: 0, marginTop: 1 }} />
-              <p className="text-[11px] leading-snug text-white/70">{n.text}</p>
-            </div>
-          ))}
+        {/* Team */}
+        <div style={{ padding:'16px' }}>
+          <p style={{ fontSize:10, fontWeight:700, textTransform:'uppercase', letterSpacing:'0.08em', color:'rgba(255,255,255,0.30)', margin:'0 0 10px', display:'flex', alignItems:'center', gap:5 }}>
+            <Users size={10} /> Equipe
+          </p>
+          <div style={{ display:'flex', flexDirection:'column', gap:8 }}>
+            {profiles.map(p => (
+              <div key={p.id} style={{ display:'flex', alignItems:'center', gap:9 }}>
+                <div style={{ width:30, height:30, borderRadius:9, background: p.cor || '#6366f1', display:'flex', alignItems:'center', justifyContent:'center', fontSize:12, fontWeight:700, color:'#fff', flexShrink:0 }}>
+                  {p.nome.charAt(0).toUpperCase()}
+                </div>
+                <div style={{ flex:1, overflow:'hidden' }}>
+                  <p style={{ fontSize:12, fontWeight:600, color:'rgba(255,255,255,0.80)', margin:0, overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>{p.nome}</p>
+                  <p style={{ fontSize:10, color:'rgba(255,255,255,0.35)', margin:0 }}>{p.cargo || 'Vendedor'}</p>
+                </div>
+                <div style={{ width:7, height:7, borderRadius:'50%', background:'#10b981', flexShrink:0 }} />
+              </div>
+            ))}
+            {profiles.length === 0 && <p style={{ fontSize:12, color:'rgba(255,255,255,0.25)' }}>Nenhum membro.</p>}
+          </div>
         </div>
       </div>
+
+      <style>{`@keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}`}</style>
     </div>
   )
 }
-                                                                                                                                                                                                                                                                                                                                                                        
