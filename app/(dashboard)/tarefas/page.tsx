@@ -68,16 +68,16 @@ export default function TarefasPage() {
     <div className="flex h-full flex-col overflow-hidden">
       {/* Top bar */}
       <div className="flex flex-shrink-0 items-center gap-3 px-6 py-4"
-        style={{ borderBottom: '0.5px solid rgba(255,255,255,0.08)', background: 'rgba(255,255,255,0.02)' }}>
+        style={{ borderBottom: '1px solid rgba(0,0,0,0.07)', background: 'rgba(255,255,255,0.82)', backdropFilter: 'blur(12px)' }}>
         <div>
-          <h1 className="text-[17px] font-bold text-white">Tarefas & Projetos</h1>
-          <p className="text-[11px] text-white/40">Minhas Tarefas · Todas as funções</p>
+          <h1 className="text-[17px] font-bold" style={{ color: '#111827' }}>Tarefas & Projetos</h1>
+          <p className="text-[11px]" style={{ color: '#6b7280' }}>Minhas Tarefas · Todas as funções</p>
         </div>
         <div className="ml-auto flex items-center gap-2">
           <div className="flex items-center gap-2 rounded-lg px-3 py-1.5"
-            style={{ background: 'rgba(255,255,255,0.07)', border: '0.5px solid rgba(255,255,255,0.10)' }}>
-            <Search size={13} className="text-white/40" />
-            <input placeholder="Buscar tarefa…" className="w-32 bg-transparent text-[12px] text-white/70 outline-none placeholder:text-white/30" />
+            style={{ background: '#f3f4f6', border: '1px solid #e5e7eb' }}>
+            <Search size={13} style={{ color: '#9ca3af' }} />
+            <input placeholder="Buscar tarefa…" className="w-32 bg-transparent text-[12px] outline-none" style={{ color: '#111827' }} />
           </div>
           <button
             onClick={() => router.push('/pipeline')}
@@ -90,16 +90,16 @@ export default function TarefasPage() {
 
       {/* KPI strip */}
       <div className="flex flex-shrink-0 items-center gap-6 px-6 py-3"
-        style={{ borderBottom: '0.5px solid rgba(255,255,255,0.06)' }}>
+        style={{ borderBottom: '1px solid rgba(0,0,0,0.07)', background: 'rgba(255,255,255,0.82)', backdropFilter: 'blur(12px)' }}>
         {[
-          { label: 'Total', value: stats.total, color: '#94a3b8' },
-          { label: 'Concluídas', value: stats.done, color: '#34d399' },
-          { label: 'Para hoje', value: stats.today, color: '#fbbf24' },
+          { label: 'Total', value: stats.total, color: '#6366f1' },
+          { label: 'Concluídas', value: stats.done, color: '#10b981' },
+          { label: 'Para hoje', value: stats.today, color: '#f59e0b' },
           { label: 'Bloqueadas', value: stats.blocked, color: '#ef4444' },
         ].map(s => (
           <div key={s.label} className="flex items-center gap-2">
             <span className="text-[20px] font-bold" style={{ color: s.color }}>{s.value}</span>
-            <span className="text-[12px] text-white/45">{s.label}</span>
+            <span className="text-[12px]" style={{ color: '#6b7280' }}>{s.label}</span>
           </div>
         ))}
 
@@ -109,17 +109,17 @@ export default function TarefasPage() {
             <button key={s} onClick={() => setStatusFilter(s)}
               className="rounded-full px-3 py-1 text-[12px] font-medium transition-all"
               style={{
-                background: statusFilter === s ? '#6366f1' : '#fff',
-                color: statusFilter === s ? '#fff' : '#666',
-                border: statusFilter === s ? '1px solid #6366f1' : '1px solid #e5e5e5',
+                background: statusFilter === s ? '#6366f1' : '#f3f4f6',
+                color: statusFilter === s ? '#fff' : '#374151',
+                border: statusFilter === s ? '1px solid #6366f1' : '1px solid #e5e7eb',
               }}>{s}</button>
           ))}
 
           {/* Projeto filter */}
           <div className="relative">
             <button onClick={() => setShowProjetoDrop(!showProjetoDrop)}
-              className="flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-[12px] text-white/50 transition-all hover:bg-white/[0.07]"
-              style={{ border: '0.5px solid rgba(255,255,255,0.12)' }}>
+              className="flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-[12px] transition-all"
+              style={{ border: '1px solid #e5e7eb', background: '#f3f4f6', color: '#374151' }}>
               <Tag size={11} /> {projetoFilter} <ChevronDown size={11} />
             </button>
             {showProjetoDrop && (
@@ -141,11 +141,13 @@ export default function TarefasPage() {
       {/* Task list */}
       <div className="flex-1 overflow-y-auto">
         {/* Header */}
-        <div className="grid items-center px-6 py-2 text-[11px] font-semibold uppercase tracking-wider text-white/30 sticky top-0 z-10"
+        <div className="grid items-center px-6 py-2 text-[11px] font-semibold uppercase tracking-wider sticky top-0 z-10"
           style={{
             gridTemplateColumns: '32px 1fr 120px 90px 90px 110px 110px 40px',
-            background: 'rgba(12,10,30,0.97)',
-            borderBottom: '0.5px solid rgba(255,255,255,0.06)',
+            background: 'rgba(255,255,255,0.92)',
+            backdropFilter: 'blur(8px)',
+            borderBottom: '1px solid rgba(0,0,0,0.07)',
+            color: '#9ca3af',
           }}>
           <div />
           <div>Tarefa</div>
@@ -230,12 +232,11 @@ export default function TarefasPage() {
         </div>
 
         {/* Add task row */}
-        <button className="flex w-full items-center gap-2 px-6 py-3 text-[13px] text-white/30 hover:text-white/60 hover:bg-white/[0.03] transition-all"
-          style={{ borderTop: '0.5px solid rgba(255,255,255,0.06)' }}>
+        <button className="flex w-full items-center gap-2 px-6 py-3 text-[13px] transition-all"
+          style={{ borderTop: '1px solid rgba(0,0,0,0.06)', color: '#9ca3af' }}>
           <Plus size={14} strokeWidth={2} /> Adicionar tarefa
         </button>
       </div>
     </div>
   )
 }
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          
