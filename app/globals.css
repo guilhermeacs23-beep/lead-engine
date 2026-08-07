@@ -142,11 +142,11 @@ body {
 
   /* ── Sidebar glass ── */
   .glass-sidebar {
-    background: rgba(4, 2, 12, 0.32);
-    backdrop-filter: var(--blur-xl);
-    -webkit-backdrop-filter: var(--blur-xl);
-    border-right: 1px solid rgba(255,255,255,0.10);
-    box-shadow: 4px 0 40px rgba(0,0,0,0.25);
+    background: rgba(8, 5, 24, 0.18);
+    backdrop-filter: blur(32px) saturate(160%);
+    -webkit-backdrop-filter: blur(32px) saturate(160%);
+    border-right: 1px solid rgba(255,255,255,0.08);
+    box-shadow: 4px 0 24px rgba(0,0,0,0.12);
     will-change: backdrop-filter;
   }
 
@@ -681,4 +681,3 @@ body {
   background-size: 400% 400%;
   animation: bgShiftSlow 24s ease infinite;
 }
-
