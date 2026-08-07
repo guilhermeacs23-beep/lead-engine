@@ -7,8 +7,10 @@ import {
   Rss, CheckSquare, UsersRound, FolderOpen, ChevronDown, RefreshCw,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { supabase } from '@/lib/supabase'
+
+interface UserProfile { nome: string; cargo: string; cor: string }
 
 const NAV_ITEMS = [
   { href: '/dashboard',  icon: LayoutDashboard, label: 'Dashboard'    },
@@ -42,8 +44,24 @@ export function Sidebar({ mobileOpen = false, onMobileClose }: Props) {
   const pathname   = usePathname()
   const [expanded,  setExpanded]  = useState(false)
   const [colabOpen, setColabOpen] = useState(true)
+  const [profile,   setProfile]   = useState<UserProfile | null>(null)
 
   const isExpanded = expanded || mobileOpen
+
+  useEffect(() => {
+    async function loadProfile() {
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) return
+      const { data } = await supabase.from('profiles').select('nome,cargo,cor').eq('id', user.id).single()
+      if (data) setProfile(data as UserProfile)
+    }
+    loadProfile()
+  }, [])
+
+  const initials = profile?.nome
+    ? profile.nome.split(' ').map((w: string) => w[0]).slice(0, 2).join('').toUpperCase()
+    : '?'
+  const firstName = profile?.nome?.split(' ')[0] ?? '...'
 
   async function handleLogout() {
     await supabase.auth.signOut()
@@ -162,17 +180,17 @@ export function Sidebar({ mobileOpen = false, onMobileClose }: Props) {
         <div
           className="flex h-8 w-8 flex-shrink-0 cursor-pointer items-center justify-center rounded-full text-[11px] font-bold text-white"
           style={{
-            background: 'linear-gradient(135deg,#6366f1,#8b5cf6)',
+            background: profile?.cor ? profile.cor : 'linear-gradient(135deg,#6366f1,#8b5cf6)',
             boxShadow: '0 0 14px rgba(99,102,241,0.45), inset 0 1px 0 rgba(255,255,255,0.25)',
           }}
-          title="Guilherme Campos"
-        >GC</div>
+          title={profile?.nome ?? ''}
+        >{initials}</div>
         {isExpanded && (
           <div className="min-w-0 flex-1">
             <p className="truncate text-[12.5px] font-semibold" style={{ color: 'var(--text-primary)' }}>
-              Guilherme
+              {firstName}
             </p>
-            <p className="truncate text-[10px]" style={{ color: 'var(--text-muted)' }}>Admin</p>
+            <p className="truncate text-[10px]" style={{ color: 'var(--text-muted)' }}>{profile?.cargo ?? ''}</p>
           </div>
         )}
         <button onClick={handleLogout} title="Sair"
