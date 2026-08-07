@@ -111,6 +111,17 @@ export default function ConfiguracoesPage() {
     setMembers(prev => prev.map(m => m.id === member.id ? { ...m, cor } : m))
   }
 
+  /* ── Update cargo ── */
+  async function updateCargo(member: Member, cargo: string) {
+    if (member.isPending) {
+      await supabase.from('team_invites').update({ cargo }).eq('id', member.id)
+    } else {
+      await supabase.from('profiles').update({ cargo }).eq('id', member.id)
+    }
+    setMembers(prev => prev.map(m => m.id === member.id ? { ...m, cargo } : m))
+    showSaved('Cargo atualizado.')
+  }
+
   /* ── Invite ── */
   async function handleInvite() {
     if (!inviteEmail.trim()) return
@@ -282,10 +293,16 @@ export default function ConfiguracoesPage() {
                         )}
                       </div>
 
-                      {/* Cargo */}
-                      <span style={{ padding: '5px 12px', borderRadius: 8, fontSize: 12, fontWeight: 600, background: '#f3f4f6', color: '#374151', border: '1px solid rgba(0,0,0,0.08)', whiteSpace: 'nowrap', flexShrink: 0 }}>
-                        {cargo}
-                      </span>
+                      {/* Cargo — editável */}
+                      <select
+                        value={cargo}
+                        onChange={e => updateCargo(member, e.target.value)}
+                        style={{ padding: '5px 10px', borderRadius: 8, fontSize: 12, fontWeight: 600, background: '#f3f4f6', color: '#374151', border: '1px solid rgba(0,0,0,0.08)', cursor: 'pointer', flexShrink: 0 }}
+                      >
+                        {['Vendedor','Supervisor','Analista','Gerente Comercial','Administrador'].map(c => (
+                          <option key={c} value={c}>{c}</option>
+                        ))}
+                      </select>
 
                       {/* Color picker */}
                       <div style={{ display: 'flex', alignItems: 'center', gap: 5, flexShrink: 0 }}>
