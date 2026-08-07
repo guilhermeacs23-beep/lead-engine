@@ -17,7 +17,6 @@ const NAV_ITEMS = [
   { href: '/leads',      icon: Users,           label: 'Leads'        },
   { href: '/recap',      icon: RefreshCw,       label: 'Recap Clientes' },
   { href: '/pipeline',   icon: Kanban,          label: 'Pipeline'     },
-  { href: '/relatorios', icon: BarChart2,       label: 'Relatórios'   },
   { href: '/mapa',       icon: Map,             label: 'Mapa'         },
   { href: '/campo',      icon: Navigation,      label: 'App de Campo' },
   { href: '/calendario', icon: CalendarDays,    label: 'Calendário'   },
