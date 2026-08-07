@@ -127,34 +127,34 @@ export default function DocumentosPage() {
       <input ref={uploadInputRef} type="file" multiple style={{ display:'none' }} onChange={e => handleUpload(e.target.files)} />
 
       {/* Header */}
-      <div style={{ display:'flex', alignItems:'center', gap:12, padding:'14px 24px', borderBottom:'1px solid rgba(255,255,255,0.08)', flexShrink:0 }}>
-        <h1 style={{ fontSize:17, fontWeight:700, color:'#fff', margin:0 }}>Documentos</h1>
+      <div style={{ display:'flex', alignItems:'center', gap:12, padding:'14px 24px', borderBottom:'1px solid rgba(0,0,0,0.07)', flexShrink:0, background:'rgba(255,255,255,0.82)', backdropFilter:'blur(12px)', WebkitBackdropFilter:'blur(12px)' }}>
+        <h1 style={{ fontSize:17, fontWeight:700, color:'#111827', margin:0 }}>Documentos</h1>
         <div style={{ marginLeft:'auto', display:'flex', alignItems:'center', gap:8 }}>
-          <div style={{ display:'flex', alignItems:'center', gap:8, background:'rgba(255,255,255,0.07)', border:'1px solid rgba(255,255,255,0.10)', borderRadius:8, padding:'6px 12px' }}>
-            <Search size={13} style={{ color:'rgba(255,255,255,0.40)' }} />
+          <div style={{ display:'flex', alignItems:'center', gap:8, background:'#f3f4f6', border:'1px solid #e5e7eb', borderRadius:8, padding:'6px 12px' }}>
+            <Search size={13} style={{ color:'#9ca3af' }} />
             <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Buscar documento…"
-              style={{ background:'transparent', border:'none', outline:'none', fontSize:12, color:'rgba(255,255,255,0.70)', width:140 }} />
+              style={{ background:'transparent', border:'none', outline:'none', fontSize:12, color:'#111827', width:140 }} />
           </div>
-          <div style={{ display:'flex', borderRadius:8, overflow:'hidden', border:'1px solid rgba(255,255,255,0.12)' }}>
+          <div style={{ display:'flex', borderRadius:8, overflow:'hidden', border:'1px solid #e5e7eb' }}>
             {([['grade', Grid3X3],['lista', List]] as const).map(([v, Icon]) => (
-              <button key={v} onClick={() => setView(v as any)} style={{ padding:'6px 10px', border:'none', cursor:'pointer', background: view===v ? 'rgba(99,102,241,0.25)' : 'transparent', color: view===v ? '#a78bfa' : 'rgba(255,255,255,0.45)', display:'flex', alignItems:'center' }}>
+              <button key={v} onClick={() => setView(v as any)} style={{ padding:'6px 10px', border:'none', cursor:'pointer', background: view===v ? '#6366f1' : '#f3f4f6', color: view===v ? '#fff' : '#6b7280', display:'flex', alignItems:'center' }}>
                 <Icon size={13} />
               </button>
             ))}
           </div>
-          <button onClick={loadDocs} style={{ padding:'6px 10px', borderRadius:8, border:'1px solid rgba(255,255,255,0.12)', background:'transparent', color:'rgba(255,255,255,0.50)', cursor:'pointer', display:'flex', alignItems:'center' }}>
+          <button onClick={loadDocs} style={{ padding:'6px 10px', borderRadius:8, border:'1px solid #e5e7eb', background:'#f3f4f6', color:'#6b7280', cursor:'pointer', display:'flex', alignItems:'center' }}>
             <RefreshCw size={13} />
           </button>
-          <button onClick={() => uploadInputRef.current?.click()} disabled={uploading} style={{ display:'flex', alignItems:'center', gap:6, padding:'7px 14px', borderRadius:8, border:'1px solid rgba(255,255,255,0.14)', background:'transparent', color: uploading ? 'rgba(255,255,255,0.30)' : 'rgba(255,255,255,0.70)', cursor: uploading ? 'default' : 'pointer', fontSize:12, fontWeight:500 }}>
+          <button onClick={() => uploadInputRef.current?.click()} disabled={uploading} style={{ display:'flex', alignItems:'center', gap:6, padding:'7px 14px', borderRadius:8, border:'none', background: uploading ? '#a5b4fc' : '#6366f1', color:'#fff', cursor: uploading ? 'default' : 'pointer', fontSize:12, fontWeight:600 }}>
             <Upload size={13} strokeWidth={2} /> {uploading ? 'Enviando...' : 'Upload'}
           </button>
         </div>
       </div>
 
       {/* Pasta tabs */}
-      <div style={{ display:'flex', alignItems:'center', gap:8, padding:'10px 24px', borderBottom:'1px solid rgba(255,255,255,0.06)', flexShrink:0, overflowX:'auto' }}>
+      <div style={{ display:'flex', alignItems:'center', gap:8, padding:'10px 24px', borderBottom:'1px solid rgba(0,0,0,0.06)', flexShrink:0, overflowX:'auto', background:'rgba(255,255,255,0.75)', backdropFilter:'blur(10px)', WebkitBackdropFilter:'blur(10px)' }}>
         {PASTAS.map(p => (
-          <button key={p} onClick={() => setPastaFilter(p)} style={{ display:'flex', alignItems:'center', gap:5, padding:'5px 12px', borderRadius:20, fontSize:12, fontWeight:500, border:'none', cursor:'pointer', whiteSpace:'nowrap', background: pastaFilter===p ? 'rgba(99,102,241,0.20)' : 'rgba(255,255,255,0.06)', color: pastaFilter===p ? '#a78bfa' : 'rgba(255,255,255,0.50)', outline: pastaFilter===p ? '1px solid rgba(99,102,241,0.40)' : 'none' }}>
+          <button key={p} onClick={() => setPastaFilter(p)} style={{ display:'flex', alignItems:'center', gap:5, padding:'5px 12px', borderRadius:20, fontSize:12, fontWeight:500, border:'1px solid', cursor:'pointer', whiteSpace:'nowrap', background: pastaFilter===p ? '#6366f1' : '#f3f4f6', color: pastaFilter===p ? '#fff' : '#374151', borderColor: pastaFilter===p ? '#6366f1' : '#e5e7eb' }}>
             {p !== 'Todos' && <Folder size={10} />} {p}
           </button>
         ))}
