@@ -82,14 +82,28 @@ export function LeadCard({ lead, onClick }: LeadCardProps) {
 
       {/* Footer */}
       <div className="mt-3 flex items-center gap-3 border-t pt-2.5" style={{ borderColor: '#edf2f7' }}>
-        <span className="flex items-center gap-1 text-[11px] font-medium text-slate-400">
-          <Mail size={12} strokeWidth={1.5} />
-          {Math.floor(Math.random() * 8) + 1}
-        </span>
-        <span className="flex items-center gap-1 text-[11px] font-medium text-slate-400">
-          <Clock size={12} strokeWidth={1.5} />
-          {Math.floor(Math.random() * 5) + 1}d
-        </span>
+        {(lead as any).etapa_em ? (
+          <>
+            <span className="flex items-center gap-1 text-[11px] font-medium text-slate-400">
+              <Clock size={12} strokeWidth={1.5} />
+              {(() => {
+                const diff = Date.now() - new Date((lead as any).etapa_em).getTime()
+                const days = Math.floor(diff / 86400000)
+                if (days === 0) return 'hoje'
+                if (days === 1) return '1d nesta etapa'
+                return `${days}d nesta etapa`
+              })()}
+            </span>
+            <span className="ml-auto text-[10px] text-slate-400">
+              {new Date((lead as any).etapa_em).toLocaleDateString('pt-BR', { day:'2-digit', month:'2-digit', year:'2-digit' })}
+            </span>
+          </>
+        ) : (
+          <span className="flex items-center gap-1 text-[11px] font-medium text-slate-400">
+            <Clock size={12} strokeWidth={1.5} />
+            {new Date(lead.created_at || '').toLocaleDateString('pt-BR', { day:'2-digit', month:'2-digit', year:'2-digit' })}
+          </span>
+        )}
       </div>
     </div>
   )

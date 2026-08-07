@@ -95,7 +95,7 @@ export function LeadDrawer({ lead, onClose, onStageChange }: LeadDrawerProps) {
   async function handleMoveStage(status: PipelineStatus) {
     if (status === lead.status || movingTo) return
     setMovingTo(status)
-    const ok = await updateLeadStatus(lead.id, status)
+    const ok = await updateLeadStatus(lead.id, status, lead.status)
     if (ok) {
       onStageChange?.(lead.id, status)
       await addActivity(lead.id, 'status', `Etapa alterada para "${STATUS_LABELS[status]}"`)
