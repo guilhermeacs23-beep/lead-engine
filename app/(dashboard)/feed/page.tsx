@@ -202,17 +202,17 @@ export default function FeedPage() {
       </div>
 
       {/* Sidebar */}
-      <div style={{ width:240, flexShrink:0, borderLeft:'1px solid rgba(255,255,255,0.08)', overflowY:'auto', display:'flex', flexDirection:'column', gap:0 }}>
+      <div style={{ width:240, flexShrink:0, borderLeft:'1px solid rgba(0,0,0,0.07)', overflowY:'auto', display:'flex', flexDirection:'column', gap:0, background:'rgba(255,255,255,0.70)', backdropFilter:'blur(16px)', WebkitBackdropFilter:'blur(16px)' }}>
         {/* Stats */}
         <div style={{ padding:'16px 16px 0' }}>
-          <p style={{ fontSize:10, fontWeight:700, textTransform:'uppercase', letterSpacing:'0.08em', color:'rgba(255,255,255,0.30)', margin:'0 0 10px' }}>Resumo</p>
+          <p style={{ fontSize:10, fontWeight:700, textTransform:'uppercase', letterSpacing:'0.08em', color:'#9ca3af', margin:'0 0 10px' }}>Resumo</p>
           {[
             { label:'Vendas registradas', value: stats.vendas,  color:'#10b981' },
             { label:'Metas conquistadas', value: stats.metas,   color:'#6366f1' },
             { label:'Membros ativos',     value: stats.membros, color:'#f59e0b' },
           ].map(s => (
-            <div key={s.label} style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:'8px 0', borderBottom:'1px solid rgba(255,255,255,0.05)' }}>
-              <span style={{ fontSize:12, color:'rgba(255,255,255,0.55)' }}>{s.label}</span>
+            <div key={s.label} style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:'8px 0', borderBottom:'1px solid rgba(0,0,0,0.06)' }}>
+              <span style={{ fontSize:12, color:'#6b7280' }}>{s.label}</span>
               <span style={{ fontSize:15, fontWeight:800, color:s.color }}>{s.value}</span>
             </div>
           ))}
@@ -220,7 +220,7 @@ export default function FeedPage() {
 
         {/* Team */}
         <div style={{ padding:'16px' }}>
-          <p style={{ fontSize:10, fontWeight:700, textTransform:'uppercase', letterSpacing:'0.08em', color:'rgba(255,255,255,0.30)', margin:'0 0 10px', display:'flex', alignItems:'center', gap:5 }}>
+          <p style={{ fontSize:10, fontWeight:700, textTransform:'uppercase', letterSpacing:'0.08em', color:'#9ca3af', margin:'0 0 10px', display:'flex', alignItems:'center', gap:5 }}>
             <Users size={10} /> Equipe
           </p>
           <div style={{ display:'flex', flexDirection:'column', gap:8 }}>
@@ -230,13 +230,13 @@ export default function FeedPage() {
                   {p.nome.charAt(0).toUpperCase()}
                 </div>
                 <div style={{ flex:1, overflow:'hidden' }}>
-                  <p style={{ fontSize:12, fontWeight:600, color:'rgba(255,255,255,0.80)', margin:0, overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>{p.nome}</p>
-                  <p style={{ fontSize:10, color:'rgba(255,255,255,0.35)', margin:0 }}>{p.cargo || 'Vendedor'}</p>
+                  <p style={{ fontSize:12, fontWeight:600, color:'#111827', margin:0, overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>{p.nome}</p>
+                  <p style={{ fontSize:10, color:'#6b7280', margin:0 }}>{p.cargo || 'Vendedor'}</p>
                 </div>
                 <div style={{ width:7, height:7, borderRadius:'50%', background:'#10b981', flexShrink:0 }} />
               </div>
             ))}
-            {profiles.length === 0 && <p style={{ fontSize:12, color:'rgba(255,255,255,0.25)' }}>Nenhum membro.</p>}
+            {profiles.length === 0 && <p style={{ fontSize:12, color:'#9ca3af' }}>Nenhum membro.</p>}
           </div>
         </div>
       </div>
