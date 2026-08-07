@@ -61,20 +61,26 @@ export default function DocumentosPage() {
   async function handleUpload(files: FileList | null) {
     if (!files || files.length === 0) return
     setUploading(true)
+    let erros = 0
     for (const file of Array.from(files)) {
       const tipo = ext(file.name)
-      const path = `documentos/${Date.now()}_${file.name}`
-      const { error: upErr } = await supabase.storage.from('documentos').upload(path, file)
-      if (upErr) { console.error('Upload error:', upErr); continue }
+      const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, '_')
+      const path = `${Date.now()}_${safeName}`
+      const { error: upErr } = await supabase.storage.from('documentos').upload(path, file, { upsert: true })
+      if (upErr) { console.error('Upload error:', upErr); erros++; continue }
       const { data: urlData } = supabase.storage.from('documentos').getPublicUrl(path)
       const { data: profile } = await supabase.from('profiles').select('id').limit(1).single()
-      await supabase.from('documentos').insert({
+      const { error: insErr } = await supabase.from('documentos').insert({
         nome: file.name, tipo, pasta: 'Geral',
         storage_path: path, url: urlData.publicUrl,
         tamanho: file.size, autor_id: profile?.id || null,
       })
+      if (insErr) console.error('Insert error:', insErr)
     }
     setUploading(false)
+    if (erros > 0) alert(`${erros} arquivo(s) falharam no upload. Verifique o console.`)
+    // Reset input so same file can be re-uploaded
+    if (uploadInputRef.current) uploadInputRef.current.value = ''
     loadDocs()
   }
 
