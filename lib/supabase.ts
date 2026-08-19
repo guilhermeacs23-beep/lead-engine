@@ -216,6 +216,21 @@ export async function addActivity(
   return true
 }
 
+// ── Atividades do calendário ──────────────────────────────────
+
+export async function fetchCalendarActivities(year: number, month: number): Promise<Activity[]> {
+  const start = new Date(year, month - 1, 1).toISOString()
+  const end   = new Date(year, month, 1).toISOString()
+  const { data, error } = await supabase
+    .from('activities')
+    .select('*')
+    .gte('created_at', start)
+    .lt('created_at', end)
+    .order('created_at', { ascending: true })
+  if (error) { console.error('fetchCalendarActivities:', error); return [] }
+  return (data || []) as Activity[]
+}
+
 // ── Criar lead manualmente ────────────────────────────────────
 
 export async function createLead(data: {
