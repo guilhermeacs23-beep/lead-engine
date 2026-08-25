@@ -108,7 +108,16 @@ export default function ConfiguracoesPage() {
         body: JSON.stringify({ email: newEmail.trim().toLowerCase(), password: newSenha, cargo: newCargo }),
       })
       const json = await res.json()
-      if (json.error) { showError(`Erro: ${json.error}`); setCreating(false); return }
+      if (json.error) {
+        const msg = json.error?.toLowerCase() || ''
+        if (msg.includes('already been registered') || msg.includes('already registered')) {
+          showError('Este e-mail já está cadastrado. Use outro e-mail ou atualize a senha do usuário existente.')
+        } else {
+          showError(`Erro: ${json.error}`)
+        }
+        setCreating(false)
+        return
+      }
       setCreatedCreds({ email: newEmail.trim().toLowerCase(), senha: newSenha })
       setNewEmail(''); setNewSenha(''); setShowSenha(false)
       await loadTeam()
