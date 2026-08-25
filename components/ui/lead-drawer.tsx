@@ -13,7 +13,7 @@ import {
   Building2, Tag, TrendingUp, Star,
   ChevronRight, ChevronDown, MessageSquare, PhoneCall, Users,
   FileText, Send, Loader2, CheckCircle, Clock,
-  IdCard, UserCheck, AlertCircle, GitBranch,
+  CreditCard, User, AlertTriangle,
 } from 'lucide-react'
 
 interface LeadDrawerProps {
@@ -259,7 +259,7 @@ export function LeadDrawer({ lead, onClose, onStageChange }: LeadDrawerProps) {
         {isAdmin && (
           <div className="flex items-center gap-3 px-5 py-3"
             style={{ borderBottom: '0.5px solid rgba(255,255,255,0.06)', background: 'rgba(99,102,241,0.05)' }}>
-            <UserCheck size={14} strokeWidth={1.5} className="text-indigo-400 flex-shrink-0" />
+            <User size={14} strokeWidth={1.5} className="text-indigo-400 flex-shrink-0" />
             <span className="text-xs text-white/40 flex-shrink-0">Responsável</span>
             <select
               value={responsavelId}
@@ -358,7 +358,7 @@ export function LeadDrawer({ lead, onClose, onStageChange }: LeadDrawerProps) {
               onClick={() => setExpandContact(v => !v)}
               className="mt-1 flex items-center gap-1.5 text-[11px] text-white/30 hover:text-white/60 transition-colors"
             >
-              <IdCard size={12} strokeWidth={1.5} />
+              <CreditCard size={12} strokeWidth={1.5} />
               {expandContact ? 'Menos dados' : 'Mais dados do cadastro'}
               <ChevronDown size={11} className={`transition-transform ${expandContact ? 'rotate-180' : ''}`} />
             </button>
@@ -466,7 +466,7 @@ export function LeadDrawer({ lead, onClose, onStageChange }: LeadDrawerProps) {
             </div>
             {actError && (
               <p className="mt-1.5 flex items-center gap-1 text-[11px] text-red-400">
-                <AlertCircle size={11} /> Erro ao salvar. Verifique sua conexão.
+                <AlertTriangle size={11} /> Erro ao salvar. Verifique sua conexão.
               </p>
             )}
           </Section>
