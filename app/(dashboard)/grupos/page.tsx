@@ -228,11 +228,13 @@ export default function GruposPage() {
       {/* ═══ LEFT PANEL — group list ═══ */}
       <div style={{
         width: 300, flexShrink: 0, display: 'flex', flexDirection: 'column',
-        background: 'rgba(255,255,255,0.06)',
-        borderRight: '1px solid rgba(255,255,255,0.08)',
+        background: 'rgba(15,15,30,0.82)',
+        backdropFilter: 'blur(20px)',
+        WebkitBackdropFilter: 'blur(20px)',
+        borderRight: '1px solid rgba(255,255,255,0.10)',
       }}>
         {/* Header */}
-        <div style={{ padding: '14px 16px 10px', borderBottom: '1px solid rgba(255,255,255,0.07)' }}>
+        <div style={{ padding: '14px 16px 10px', borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
             <span style={{ fontSize: 15, fontWeight: 800, color: '#fff' }}>Grupos</span>
             <button onClick={() => setShowModal(true)}
@@ -240,10 +242,11 @@ export default function GruposPage() {
               <Plus size={14} strokeWidth={2.5} />
             </button>
           </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8, background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.09)', borderRadius: 10, padding: '7px 12px' }}>
-            <Search size={12} style={{ color: 'rgba(255,255,255,0.35)', flexShrink: 0 }} />
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, background: 'rgba(255,255,255,0.12)', border: '1px solid rgba(255,255,255,0.18)', borderRadius: 10, padding: '7px 12px' }}>
+            <Search size={12} style={{ color: 'rgba(255,255,255,0.55)', flexShrink: 0 }} />
             <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Buscar grupo…"
-              style={{ background: 'transparent', border: 'none', outline: 'none', fontSize: 12, color: 'rgba(255,255,255,0.70)', width: '100%' }} />
+              style={{ background: 'transparent', border: 'none', outline: 'none', fontSize: 12, color: '#ffffff', width: '100%' }}
+              placeholder-color="rgba(255,255,255,0.50)" />
           </div>
         </div>
 
@@ -335,25 +338,26 @@ export default function GruposPage() {
           {/* Chat header */}
           <div style={{
             display: 'flex', alignItems: 'center', gap: 14, padding: '12px 20px',
-            borderBottom: '1px solid rgba(255,255,255,0.08)',
-            background: 'rgba(255,255,255,0.04)', flexShrink: 0,
+            borderBottom: '1px solid #e5e7eb',
+            background: '#ffffff', flexShrink: 0,
+            boxShadow: '0 1px 6px rgba(0,0,0,0.07)',
           }}>
             <div style={{ width: 40, height: 40, borderRadius: 12, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 15, fontWeight: 800, background: `${selected.cor}25`, color: selected.cor, border: `1.5px solid ${selected.cor}50`, flexShrink: 0 }}>
               {selected.nome[0]}
             </div>
             <div style={{ flex: 1 }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                <span style={{ fontSize: 15, fontWeight: 800, color: '#fff' }}>{selected.nome}</span>
-                {selected.privacidade === 'privado' ? <Lock size={10} style={{ color: 'rgba(255,255,255,0.30)' }} /> : <Globe size={10} style={{ color: 'rgba(255,255,255,0.30)' }} />}
+                <span style={{ fontSize: 15, fontWeight: 800, color: '#111827' }}>{selected.nome}</span>
+                {selected.privacidade === 'privado' ? <Lock size={10} style={{ color: '#9ca3af' }} /> : <Globe size={10} style={{ color: '#9ca3af' }} />}
               </div>
-              <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.40)' }}>
+              <span style={{ fontSize: 11, color: '#6b7280' }}>
                 {membros.length} membro{membros.length !== 1 ? 's' : ''}
                 {selected.descricao ? ` · ${selected.descricao}` : ''}
               </span>
             </div>
 
             {/* Tabs */}
-            <div style={{ display: 'flex', gap: 2, background: 'rgba(255,255,255,0.06)', borderRadius: 10, padding: 3 }}>
+            <div style={{ display: 'flex', gap: 2, background: '#f3f4f6', borderRadius: 10, padding: 3 }}>
               {([
                 { key: 'chat',    icon: Send,       label: 'Chat'    },
                 { key: 'membros', icon: Users,      label: 'Membros' },
@@ -362,8 +366,9 @@ export default function GruposPage() {
                 <button key={key} onClick={() => setTab(key)}
                   style={{
                     display: 'flex', alignItems: 'center', gap: 5, padding: '6px 12px', borderRadius: 8, border: 'none', cursor: 'pointer', fontSize: 12, fontWeight: tab === key ? 700 : 400,
-                    background: tab === key ? 'rgba(255,255,255,0.12)' : 'transparent',
-                    color: tab === key ? '#fff' : 'rgba(255,255,255,0.45)',
+                    background: tab === key ? '#ffffff' : 'transparent',
+                    color: tab === key ? '#111827' : '#6b7280',
+                    boxShadow: tab === key ? '0 1px 4px rgba(0,0,0,0.10)' : 'none',
                   }}>
                   <Icon size={12} /> {label}
                 </button>
@@ -425,8 +430,8 @@ export default function GruposPage() {
               </div>
 
               {/* Input */}
-              <div style={{ padding: '12px 20px', borderTop: '1px solid rgba(255,255,255,0.08)', flexShrink: 0, background: 'rgba(255,255,255,0.03)' }}>
-                <div style={{ display: 'flex', alignItems: 'flex-end', gap: 10, background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.12)', borderRadius: 16, padding: '10px 14px' }}>
+              <div style={{ padding: '12px 20px', borderTop: '1px solid #e5e7eb', flexShrink: 0, background: '#ffffff' }}>
+                <div style={{ display: 'flex', alignItems: 'flex-end', gap: 10, background: '#f8f9fa', border: '1.5px solid #e5e7eb', borderRadius: 16, padding: '10px 14px' }}>
                   {/* Current user avatar */}
                   {currentUser && (
                     <div style={{ width: 28, height: 28, borderRadius: '50%', background: currentUser.cor || '#6366f1', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 10, fontWeight: 700, color: '#fff', flexShrink: 0 }}>
@@ -442,7 +447,7 @@ export default function GruposPage() {
                     rows={1}
                     style={{
                       flex: 1, background: 'transparent', border: 'none', outline: 'none',
-                      fontSize: 13, color: '#fff', resize: 'none', lineHeight: 1.5,
+                      fontSize: 13, color: '#111827', resize: 'none', lineHeight: 1.5,
                       maxHeight: 120, overflowY: 'auto',
                     }}
                     onInput={e => {
@@ -454,8 +459,8 @@ export default function GruposPage() {
                   <button onClick={sendMessage} disabled={!input.trim() || sending}
                     style={{
                       width: 34, height: 34, borderRadius: 10, border: 'none', flexShrink: 0,
-                      background: input.trim() ? '#6366f1' : 'rgba(255,255,255,0.10)',
-                      color: input.trim() ? '#fff' : 'rgba(255,255,255,0.25)',
+                      background: input.trim() ? '#6366f1' : '#e5e7eb',
+                      color: input.trim() ? '#fff' : '#9ca3af',
                       cursor: input.trim() ? 'pointer' : 'default',
                       display: 'flex', alignItems: 'center', justifyContent: 'center',
                       transition: 'all 0.15s',
