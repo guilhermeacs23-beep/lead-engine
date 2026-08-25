@@ -10,7 +10,7 @@ serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders })
 
   try {
-    const { email, password, cargo } = await req.json()
+    const { email, password, cargo, nome } = await req.json()
 
     if (!email || !password) {
       return new Response(JSON.stringify({ error: 'email e senha são obrigatórios' }), {
@@ -30,16 +30,20 @@ serve(async (req) => {
       email,
       password,
       email_confirm: true,
-      user_metadata: { cargo: cargo || 'Vendedor' },
+      user_metadata: { cargo: cargo || 'Vendedor', nome: nome || email.split('@')[0] },
     })
 
     if (error) throw error
 
-    // Atualiza cargo no profile (criado automaticamente pelo trigger)
+    // Atualiza cargo, nome e ativo no profile (criado automaticamente pelo trigger)
     if (data.user) {
       await supabaseAdmin
         .from('profiles')
-        .update({ cargo: cargo || 'Vendedor' })
+        .update({
+          cargo: cargo || 'Vendedor',
+          nome: nome || email.split('@')[0],
+          ativo: true,
+        })
         .eq('id', data.user.id)
     }
 

@@ -1,7 +1,7 @@
 'use client'
-import { useState, useEffect } from 'react'
+import React, { useState, useEffect } from 'react'
 import { createBrowserClient } from '@supabase/ssr'
-import { User, Bell, Shield, Palette, Save, Check, Plus, Trash2, Mail, RefreshCw, Eye, EyeOff, Copy, Lock } from 'lucide-react'
+import { User, Bell, Shield, Palette, Save, Check, Plus, Trash2, Mail, RefreshCw, Eye, EyeOff, Copy, Lock, KeyRound } from 'lucide-react'
 
 const supabase = createBrowserClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -67,12 +67,18 @@ export default function ConfiguracoesPage() {
   const [savedError,   setSavedError]  = useState<string | null>(null)
 
   // Cadastro novo usuário
+  const [newNome,      setNewNome]     = useState('')
   const [newEmail,     setNewEmail]    = useState('')
   const [newCargo,     setNewCargo]    = useState('Vendedor')
   const [newSenha,     setNewSenha]    = useState('')
   const [showSenha,    setShowSenha]   = useState(false)
   const [creating,     setCreating]    = useState(false)
-  const [createdCreds, setCreatedCreds] = useState<{email:string; senha:string} | null>(null)
+  const [createdCreds, setCreatedCreds] = useState<{email:string; senha:string; nome:string} | null>(null)
+
+  // Reset senha de membro existente
+  const [resetMemberId, setResetMemberId] = useState<string | null>(null)
+  const [resetSenha,    setResetSenha]    = useState('')
+  const [resetting,     setResetting]     = useState(false)
 
   // Segurança — troca de senha
   const [senhaAtual,   setSenhaAtual]  = useState('')
@@ -105,21 +111,21 @@ export default function ConfiguracoesPage() {
       const res = await fetch(`${process.env.NEXT_PUBLIC_SUPABASE_URL}/functions/v1/create-user`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'apikey': process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY! },
-        body: JSON.stringify({ email: newEmail.trim().toLowerCase(), password: newSenha, cargo: newCargo }),
+        body: JSON.stringify({ email: newEmail.trim().toLowerCase(), password: newSenha, cargo: newCargo, nome: newNome.trim() || undefined }),
       })
       const json = await res.json()
       if (json.error) {
         const msg = json.error?.toLowerCase() || ''
         if (msg.includes('already been registered') || msg.includes('already registered')) {
-          showError('Este e-mail já está cadastrado. Use outro e-mail ou atualize a senha do usuário existente.')
+          showError('Este e-mail já está cadastrado. Use outro e-mail ou redefina a senha pelo botão 🔑 na lista.')
         } else {
           showError(`Erro: ${json.error}`)
         }
         setCreating(false)
         return
       }
-      setCreatedCreds({ email: newEmail.trim().toLowerCase(), senha: newSenha })
-      setNewEmail(''); setNewSenha(''); setShowSenha(false)
+      setCreatedCreds({ email: newEmail.trim().toLowerCase(), senha: newSenha, nome: newNome.trim() || newEmail.split('@')[0] })
+      setNewNome(''); setNewEmail(''); setNewSenha(''); setShowSenha(false)
       await loadTeam()
       showSaved(`✓ Acesso criado para ${json.email}`)
     } catch {
@@ -161,15 +167,34 @@ export default function ConfiguracoesPage() {
 
   useEffect(() => { loadTeam() }, [])
 
-  /* ── Delete real member (soft) ── */
+  /* ── Delete real (remove do Auth) ── */
   async function deleteMember(member: Member) {
+    if (!confirm(`Remover ${member.isPending ? member.email : (member as Profile).nome}? O acesso será revogado.`)) return
     if (member.isPending) {
       await supabase.from('team_invites').delete().eq('id', member.id)
     } else {
-      await supabase.from('profiles').update({ ativo: false }).eq('id', member.id)
+      await fetch(`${process.env.NEXT_PUBLIC_SUPABASE_URL}/functions/v1/admin-user`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'apikey': process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY! },
+        body: JSON.stringify({ action: 'delete', user_id: member.id }),
+      })
     }
     setMembers(prev => prev.filter(m => m.id !== member.id))
-    showSaved('Membro removido.')
+    showSaved('Membro removido e acesso revogado.')
+  }
+
+  /* ── Reset senha de membro ── */
+  async function handleResetSenha(userId: string) {
+    if (!resetSenha.trim() || resetSenha.length < 6) { showError('Senha deve ter ao menos 6 caracteres.'); return }
+    setResetting(true)
+    const res = await fetch(`${process.env.NEXT_PUBLIC_SUPABASE_URL}/functions/v1/admin-user`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'apikey': process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY! },
+      body: JSON.stringify({ action: 'reset_password', user_id: userId, password: resetSenha }),
+    })
+    const json = await res.json()
+    if (json.error) { showError(`Erro: ${json.error}`) } else { showSaved('✓ Senha alterada com sucesso!') }
+    setResetMemberId(null); setResetSenha(''); setResetting(false)
   }
 
   /* ── Update color ── */
@@ -322,8 +347,18 @@ export default function ConfiguracoesPage() {
                 Crie o acesso abaixo, copie as credenciais e envie para o vendedor.
               </p>
               <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', marginBottom: 10 }}>
+                {/* Nome */}
+                <div style={{ flex: '1 1 180px', display: 'flex', alignItems: 'center', gap: 8, background: '#ffffff', border: '1px solid rgba(0,0,0,0.12)', borderRadius: 10, padding: '10px 14px' }}>
+                  <User size={14} style={{ color: '#9ca3af', flexShrink: 0 }} strokeWidth={1.5} />
+                  <input
+                    value={newNome}
+                    onChange={e => setNewNome(e.target.value)}
+                    placeholder="Nome completo"
+                    style={{ flex: 1, border: 'none', outline: 'none', fontSize: 13, color: '#111827', background: 'transparent' }}
+                  />
+                </div>
                 {/* Email */}
-                <div style={{ flex: '1 1 220px', display: 'flex', alignItems: 'center', gap: 8, background: '#ffffff', border: '1px solid rgba(0,0,0,0.12)', borderRadius: 10, padding: '10px 14px' }}>
+                <div style={{ flex: '1 1 200px', display: 'flex', alignItems: 'center', gap: 8, background: '#ffffff', border: '1px solid rgba(0,0,0,0.12)', borderRadius: 10, padding: '10px 14px' }}>
                   <Mail size={14} style={{ color: '#9ca3af', flexShrink: 0 }} strokeWidth={1.5} />
                   <input
                     value={newEmail}
@@ -441,7 +476,8 @@ Depois vá em Configurações → Segurança para alterar sua senha.`
                   const cor   = member.cor   || '#6366f1'
 
                   return (
-                    <div key={member.id} style={{ ...CARD, display: 'flex', alignItems: 'center', gap: 14 }}>
+                    <React.Fragment key={member.id}>
+                    <div style={{ ...CARD, display: 'flex', alignItems: 'center', gap: 14 }}>
                       {/* Avatar */}
                       <div style={{
                         width: 38, height: 38, borderRadius: '50%', flexShrink: 0,
@@ -495,6 +531,23 @@ Depois vá em Configurações → Segurança para alterar sua senha.`
                         ))}
                       </div>
 
+                      {/* Reset senha (só para membros reais, não pendentes) */}
+                      {!member.isPending && (
+                        <button
+                          onClick={() => { setResetMemberId(resetMemberId === member.id ? null : member.id); setResetSenha('') }}
+                          style={{
+                            width: 30, height: 30, borderRadius: 8, border: '1px solid rgba(0,0,0,0.09)',
+                            background: resetMemberId === member.id ? '#eff6ff' : '#fff',
+                            cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                            color: resetMemberId === member.id ? '#3b82f6' : '#9ca3af',
+                            transition: 'all 0.15s', flexShrink: 0,
+                          }}
+                          title="Redefinir senha"
+                        >
+                          <KeyRound size={13} strokeWidth={1.5} />
+                        </button>
+                      )}
+
                       {/* Delete */}
                       <button
                         onClick={() => deleteMember(member)}
@@ -510,6 +563,33 @@ Depois vá em Configurações → Segurança para alterar sua senha.`
                         <Trash2 size={13} strokeWidth={1.5} />
                       </button>
                     </div>
+
+                    {/* Painel inline reset senha */}
+                    {resetMemberId === member.id && (
+                      <div style={{ marginTop: 10, display: 'flex', gap: 8, alignItems: 'center', paddingTop: 10, borderTop: '1px solid #f0f0f0' }}>
+                        <Lock size={13} style={{ color: '#9ca3af', flexShrink: 0 }} strokeWidth={1.5} />
+                        <input
+                          type="password"
+                          value={resetSenha}
+                          onChange={e => setResetSenha(e.target.value)}
+                          onKeyDown={e => e.key === 'Enter' && handleResetSenha(member.id)}
+                          placeholder="Nova senha (mín. 6 caracteres)"
+                          style={{ flex: 1, border: '1px solid #e5e7eb', borderRadius: 8, padding: '7px 12px', fontSize: 13, color: '#111827', outline: 'none', background: '#f9fafb' }}
+                        />
+                        <button
+                          onClick={() => handleResetSenha(member.id)}
+                          disabled={resetting}
+                          style={{ padding: '7px 14px', borderRadius: 8, border: 'none', background: '#3b82f6', color: '#fff', fontWeight: 700, fontSize: 12, cursor: 'pointer', whiteSpace: 'nowrap' }}
+                        >
+                          {resetting ? 'Salvando…' : 'Salvar senha'}
+                        </button>
+                        <button onClick={() => { setResetMemberId(null); setResetSenha('') }}
+                          style={{ padding: '7px 10px', borderRadius: 8, border: '1px solid #e5e7eb', background: '#fff', color: '#9ca3af', fontSize: 12, cursor: 'pointer' }}>
+                          Cancelar
+                        </button>
+                      </div>
+                    )}
+                    </React.Fragment>
                   )
                 })}
               </div>
