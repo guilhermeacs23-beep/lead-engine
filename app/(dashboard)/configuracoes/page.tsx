@@ -1,7 +1,7 @@
 'use client'
 import { useState, useEffect } from 'react'
 import { createBrowserClient } from '@supabase/ssr'
-import { User, Bell, Shield, Palette, Save, Check, Plus, Trash2, Mail, RefreshCw } from 'lucide-react'
+import { User, Bell, Shield, Palette, Save, Check, Plus, Trash2, Mail, RefreshCw, Eye, EyeOff, Copy, Lock } from 'lucide-react'
 
 const supabase = createBrowserClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -64,14 +64,76 @@ export default function ConfiguracoesPage() {
   const [members,      setMembers]     = useState<Member[]>([])
   const [loadingTeam,  setLoadingTeam] = useState(true)
   const [saved,        setSaved]       = useState<string | null>(null)
-  const [inviteEmail,  setInviteEmail] = useState('')
-  const [inviteCargo,  setInviteCargo] = useState('Vendedor')
-  const [inviting,     setInviting]    = useState(false)
+  const [savedError,   setSavedError]  = useState<string | null>(null)
+
+  // Cadastro novo usuário
+  const [newEmail,     setNewEmail]    = useState('')
+  const [newCargo,     setNewCargo]    = useState('Vendedor')
+  const [newSenha,     setNewSenha]    = useState('')
+  const [showSenha,    setShowSenha]   = useState(false)
+  const [creating,     setCreating]    = useState(false)
+  const [createdCreds, setCreatedCreds] = useState<{email:string; senha:string} | null>(null)
+
+  // Segurança — troca de senha
+  const [senhaAtual,   setSenhaAtual]  = useState('')
+  const [senhaNova,    setSenhaNova]   = useState('')
+  const [senhaConf,    setSenhaConf]   = useState('')
+  const [trocando,     setTrocando]    = useState(false)
+
   const [notifs, setNotifs] = useState<Record<string, boolean>>({
     novo_lead: true, etapa_mudanca: true, atividade: false, meta_semanal: true,
   })
 
-  function showSaved(msg: string) { setSaved(msg); setTimeout(() => setSaved(null), 2800) }
+  function showSaved(msg: string) { setSaved(msg); setTimeout(() => setSaved(null), 3500) }
+  function showError(msg: string) { setSavedError(msg); setTimeout(() => setSavedError(null), 4000) }
+
+  function gerarSenha() {
+    const chars = 'abcdefghjkmnpqrstuvwxyz23456789'
+    const upper = 'ABCDEFGHJKLMNPQRSTUVWXYZ'
+    let s = upper[Math.floor(Math.random()*upper.length)]
+    for (let i = 0; i < 6; i++) s += chars[Math.floor(Math.random()*chars.length)]
+    s += Math.floor(10 + Math.random()*89)
+    setNewSenha(s)
+    setShowSenha(true)
+  }
+
+  async function handleCreateUser() {
+    if (!newEmail.trim() || !newSenha.trim()) return
+    setCreating(true)
+    setCreatedCreds(null)
+    try {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_SUPABASE_URL}/functions/v1/create-user`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'apikey': process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY! },
+        body: JSON.stringify({ email: newEmail.trim().toLowerCase(), password: newSenha, cargo: newCargo }),
+      })
+      const json = await res.json()
+      if (json.error) { showError(`Erro: ${json.error}`); setCreating(false); return }
+      setCreatedCreds({ email: newEmail.trim().toLowerCase(), senha: newSenha })
+      setNewEmail(''); setNewSenha(''); setShowSenha(false)
+      await loadTeam()
+      showSaved(`✓ Acesso criado para ${json.email}`)
+    } catch {
+      showError('Erro ao criar usuário. Tente novamente.')
+    }
+    setCreating(false)
+  }
+
+  async function handleTrocarSenha() {
+    if (!senhaNova || senhaNova !== senhaConf) { showError('Senhas não coincidem.'); return }
+    if (senhaNova.length < 6) { showError('Senha deve ter no mínimo 6 caracteres.'); return }
+    setTrocando(true)
+    // Re-autentica com a senha atual para verificar
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user?.email) { showError('Sessão inválida.'); setTrocando(false); return }
+    const { error: signInErr } = await supabase.auth.signInWithPassword({ email: user.email, password: senhaAtual })
+    if (signInErr) { showError('Senha atual incorreta.'); setTrocando(false); return }
+    const { error } = await supabase.auth.updateUser({ password: senhaNova })
+    if (error) { showError(`Erro: ${error.message}`); setTrocando(false); return }
+    setSenhaAtual(''); setSenhaNova(''); setSenhaConf('')
+    showSaved('✓ Senha alterada com sucesso!')
+    setTrocando(false)
+  }
 
   /* ── Load team ── */
   async function loadTeam() {
@@ -194,7 +256,7 @@ export default function ConfiguracoesPage() {
       {/* ── Content ── */}
       <div style={{ flex: 1, overflowY: 'auto', padding: 28, display: 'flex', flexDirection: 'column', gap: 20 }}>
 
-        {/* Toast */}
+        {/* Toasts */}
         {saved && (
           <div style={{
             position: 'fixed', bottom: 24, left: '50%', transform: 'translateX(-50%)', zIndex: 50,
@@ -204,6 +266,17 @@ export default function ConfiguracoesPage() {
             boxShadow: '0 8px 24px rgba(16,185,129,0.35)',
           }}>
             <Check size={14} /> {saved}
+          </div>
+        )}
+        {savedError && (
+          <div style={{
+            position: 'fixed', bottom: 24, left: '50%', transform: 'translateX(-50%)', zIndex: 50,
+            display: 'flex', alignItems: 'center', gap: 8,
+            background: 'rgba(239,68,68,0.92)', borderRadius: 12, padding: '12px 20px',
+            fontSize: 13, fontWeight: 600, color: '#ffffff',
+            boxShadow: '0 8px 24px rgba(239,68,68,0.35)',
+          }}>
+            {savedError}
           </div>
         )}
 
@@ -222,41 +295,88 @@ export default function ConfiguracoesPage() {
               </button>
             </div>
 
-            {/* Invite */}
+            {/* Cadastrar novo usuário */}
             <div style={{ ...CARD, background: '#f0f0ff', border: '1px solid rgba(99,102,241,0.20)' }}>
-              <p style={{ marginBottom: 12, fontSize: 13, fontWeight: 700, color: '#111827' }}>Convidar novo membro</p>
-              <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
-                <div style={{ flex: '1 1 240px', display: 'flex', alignItems: 'center', gap: 8, background: '#ffffff', border: '1px solid rgba(0,0,0,0.12)', borderRadius: 10, padding: '10px 14px' }}>
+              <p style={{ marginBottom: 4, fontSize: 13, fontWeight: 700, color: '#111827' }}>Cadastrar acesso para vendedor</p>
+              <p style={{ marginBottom: 14, fontSize: 12, color: '#6b7280' }}>
+                Crie o e-mail e senha, copie as credenciais e mande o link: <strong style={{ color: '#374151' }}>lead-engine-red-eight.vercel.app/login</strong>
+              </p>
+              <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', marginBottom: 10 }}>
+                {/* Email */}
+                <div style={{ flex: '1 1 220px', display: 'flex', alignItems: 'center', gap: 8, background: '#ffffff', border: '1px solid rgba(0,0,0,0.12)', borderRadius: 10, padding: '10px 14px' }}>
                   <Mail size={14} style={{ color: '#9ca3af', flexShrink: 0 }} strokeWidth={1.5} />
                   <input
-                    value={inviteEmail}
-                    onChange={e => setInviteEmail(e.target.value)}
-                    onKeyDown={e => e.key === 'Enter' && handleInvite()}
+                    value={newEmail}
+                    onChange={e => setNewEmail(e.target.value)}
                     placeholder="email@empresa.com.br"
                     style={{ flex: 1, border: 'none', outline: 'none', fontSize: 13, color: '#111827', background: 'transparent' }}
                   />
                 </div>
+                {/* Cargo */}
                 <select
-                  value={inviteCargo}
-                  onChange={e => setInviteCargo(e.target.value)}
+                  value={newCargo}
+                  onChange={e => setNewCargo(e.target.value)}
                   style={{ padding: '10px 12px', borderRadius: 10, border: '1px solid rgba(0,0,0,0.12)', background: '#ffffff', fontSize: 13, color: '#374151', cursor: 'pointer' }}
                 >
-                  {['Vendedor','Gerente Comercial','Administrador','Analista','Supervisor'].map(c => (
+                  {['Vendedor','Supervisor','Analista','Gerente Comercial','Administrador'].map(c => (
                     <option key={c} value={c}>{c}</option>
                   ))}
                 </select>
-                <button onClick={handleInvite} disabled={inviting || !inviteEmail.trim()} style={{
+              </div>
+              {/* Senha temporária */}
+              <div style={{ display: 'flex', gap: 10, marginBottom: 12 }}>
+                <div style={{ flex: 1, display: 'flex', alignItems: 'center', gap: 8, background: '#ffffff', border: '1px solid rgba(0,0,0,0.12)', borderRadius: 10, padding: '10px 14px' }}>
+                  <Lock size={14} style={{ color: '#9ca3af', flexShrink: 0 }} strokeWidth={1.5} />
+                  <input
+                    type={showSenha ? 'text' : 'password'}
+                    value={newSenha}
+                    onChange={e => setNewSenha(e.target.value)}
+                    placeholder="Senha temporária"
+                    style={{ flex: 1, border: 'none', outline: 'none', fontSize: 13, color: '#111827', background: 'transparent', fontFamily: showSenha ? 'inherit' : 'monospace' }}
+                  />
+                  <button onClick={() => setShowSenha(v => !v)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#9ca3af', display: 'flex', alignItems: 'center' }}>
+                    {showSenha ? <EyeOff size={14} /> : <Eye size={14} />}
+                  </button>
+                </div>
+                <button onClick={gerarSenha} style={{ padding: '10px 14px', borderRadius: 10, border: '1px solid rgba(0,0,0,0.12)', background: '#ffffff', fontSize: 12, color: '#6366f1', fontWeight: 600, cursor: 'pointer', whiteSpace: 'nowrap' }}>
+                  Gerar senha
+                </button>
+                <button onClick={handleCreateUser} disabled={creating || !newEmail.trim() || !newSenha.trim()} style={{
                   display: 'flex', alignItems: 'center', gap: 6, padding: '10px 18px',
-                  borderRadius: 10, border: 'none', cursor: inviting ? 'default' : 'pointer',
-                  background: inviting ? 'rgba(99,102,241,0.4)' : '#6366f1',
+                  borderRadius: 10, border: 'none', cursor: creating ? 'default' : 'pointer',
+                  background: (creating || !newEmail.trim() || !newSenha.trim()) ? 'rgba(99,102,241,0.4)' : '#6366f1',
                   color: '#ffffff', fontSize: 13, fontWeight: 700, whiteSpace: 'nowrap',
                 }}>
-                  <Plus size={13} strokeWidth={2} /> {inviting ? 'Convidando...' : 'Convidar'}
+                  <Plus size={13} strokeWidth={2} /> {creating ? 'Criando...' : 'Criar acesso'}
                 </button>
               </div>
-              <p style={{ marginTop: 10, fontSize: 11, color: '#9ca3af' }}>
-                O convite ficará pendente até o membro criar sua conta em <strong>/cadastro</strong> com este e-mail.
-              </p>
+
+              {/* Credenciais criadas — caixa para copiar */}
+              {createdCreds && (
+                <div style={{ background: '#f0fdf4', border: '1px solid rgba(16,185,129,0.30)', borderRadius: 10, padding: '12px 16px' }}>
+                  <p style={{ margin: '0 0 8px', fontSize: 12, fontWeight: 700, color: '#065f46' }}>✓ Acesso criado! Compartilhe estas credenciais:</p>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                    {[
+                      { label: 'Link', value: 'https://lead-engine-red-eight.vercel.app/login' },
+                      { label: 'E-mail', value: createdCreds.email },
+                      { label: 'Senha', value: createdCreds.senha },
+                    ].map(({ label, value }) => (
+                      <div key={label} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                        <span style={{ width: 44, fontSize: 11, fontWeight: 600, color: '#6b7280' }}>{label}</span>
+                        <code style={{ flex: 1, fontSize: 12, color: '#111827', background: '#ffffff', border: '1px solid rgba(0,0,0,0.08)', borderRadius: 6, padding: '4px 8px' }}>{value}</code>
+                        <button
+                          onClick={() => navigator.clipboard.writeText(value)}
+                          style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#6366f1', display: 'flex', alignItems: 'center' }}
+                          title="Copiar"
+                        >
+                          <Copy size={13} />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                  <p style={{ marginTop: 10, fontSize: 11, color: '#6b7280' }}>O vendedor acessa com estas credenciais e depois altera a senha em <strong>Configurações → Segurança</strong>.</p>
+                </div>
+              )}
             </div>
 
             {/* Members list */}
@@ -402,23 +522,36 @@ export default function ConfiguracoesPage() {
             <div style={CARD}>
               <p style={{ fontSize: 14, fontWeight: 700, color: '#111827', marginBottom: 16 }}>Alterar senha</p>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-                {['Senha atual', 'Nova senha', 'Confirmar nova senha'].map(label => (
+                {[
+                  { label: 'Senha atual',          value: senhaAtual, set: setSenhaAtual },
+                  { label: 'Nova senha',            value: senhaNova,  set: setSenhaNova },
+                  { label: 'Confirmar nova senha',  value: senhaConf,  set: setSenhaConf },
+                ].map(({ label, value, set }) => (
                   <div key={label}>
                     <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: '#374151', marginBottom: 6 }}>{label}</label>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 8, background: '#f9fafb', border: '1px solid rgba(0,0,0,0.10)', borderRadius: 10, padding: '10px 14px' }}>
                       <Shield size={13} style={{ color: '#9ca3af' }} strokeWidth={1.5} />
-                      <input type="password" placeholder="••••••••"
+                      <input type="password" placeholder="••••••••" value={value}
+                        onChange={e => set(e.target.value)}
                         style={{ flex: 1, border: 'none', outline: 'none', fontSize: 13, color: '#111827', background: 'transparent' }} />
                     </div>
                   </div>
                 ))}
               </div>
-              <button onClick={() => showSaved('Senha alterada com sucesso!')} style={{
-                display: 'inline-flex', alignItems: 'center', gap: 8, padding: '10px 18px',
-                borderRadius: 10, border: 'none', cursor: 'pointer', marginTop: 16,
-                background: '#6366f1', color: '#ffffff', fontSize: 13, fontWeight: 700,
-              }}>
-                <Save size={13} strokeWidth={1.5} /> Atualizar senha
+              {senhaNova && senhaConf && senhaNova !== senhaConf && (
+                <p style={{ marginTop: 8, fontSize: 12, color: '#ef4444' }}>As senhas não coincidem.</p>
+              )}
+              <button
+                onClick={handleTrocarSenha}
+                disabled={trocando || !senhaAtual || !senhaNova || senhaNova !== senhaConf}
+                style={{
+                  display: 'inline-flex', alignItems: 'center', gap: 8, padding: '10px 18px',
+                  borderRadius: 10, border: 'none', cursor: trocando ? 'default' : 'pointer', marginTop: 16,
+                  background: (trocando || !senhaAtual || !senhaNova || senhaNova !== senhaConf) ? 'rgba(99,102,241,0.4)' : '#6366f1',
+                  color: '#ffffff', fontSize: 13, fontWeight: 700,
+                }}>
+                {trocando ? <RefreshCw size={13} style={{ animation: 'spin 1s linear infinite' }} /> : <Save size={13} strokeWidth={1.5} />}
+                {trocando ? 'Alterando...' : 'Atualizar senha'}
               </button>
             </div>
             <div style={{ ...CARD, background: '#fff5f5', border: '1px solid rgba(239,68,68,0.18)' }}>
