@@ -247,6 +247,7 @@ export const SOURCE_LABELS: Record<string, { label: string; color: string; bg: s
   cnpj:      { label: 'CNPJ',      color: '#fbbf24', bg: 'rgba(245,158,11,0.15)'  },
   indicacao: { label: 'Indicação', color: '#c084fc', bg: 'rgba(192,132,252,0.15)' },
   apollo:    { label: 'Apollo',    color: '#60a5fa', bg: 'rgba(59,130,246,0.15)'  },
+  ebt:       { label: 'EBT',      color: '#4ade80', bg: 'rgba(22,163,74,0.15)'   },
 }
 
 export const SEGMENT_LABELS: Record<string, string> = {
