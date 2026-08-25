@@ -373,28 +373,51 @@ export default function ConfiguracoesPage() {
 
               {/* Credenciais criadas — caixa para copiar */}
               {createdCreds && (
-                <div style={{ background: '#f0fdf4', border: '1px solid rgba(16,185,129,0.30)', borderRadius: 10, padding: '12px 16px' }}>
-                  <p style={{ margin: '0 0 8px', fontSize: 12, fontWeight: 700, color: '#065f46' }}>✓ Acesso criado! Compartilhe estas credenciais:</p>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                <div style={{ background: '#f0fdf4', border: '1px solid rgba(16,185,129,0.30)', borderRadius: 10, padding: '14px 16px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
+                    <p style={{ margin: 0, fontSize: 12, fontWeight: 700, color: '#065f46' }}>✓ Acesso criado!</p>
+                    <button
+                      onClick={() => {
+                        const msg =
+`Olá! Seu acesso ao Lead+ foi criado. 🚀
+
+🔗 Link: https://lead-engine-red-eight.vercel.app/login
+📧 E-mail: ${createdCreds.email}
+🔑 Senha: ${createdCreds.senha}
+
+Acesse o link acima e faça login com essas credenciais.
+Depois vá em Configurações → Segurança para alterar sua senha.`
+                        navigator.clipboard.writeText(msg)
+                        showSaved('✓ Mensagem copiada! Cole no WhatsApp ou e-mail.')
+                      }}
+                      style={{
+                        display: 'flex', alignItems: 'center', gap: 6,
+                        padding: '7px 14px', borderRadius: 8, border: 'none', cursor: 'pointer',
+                        background: '#10b981', color: '#ffffff', fontSize: 12, fontWeight: 700,
+                      }}
+                    >
+                      <Copy size={12} /> Copiar tudo para WhatsApp
+                    </button>
+                  </div>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
                     {[
-                      { label: 'Link', value: 'https://lead-engine-red-eight.vercel.app/login' },
-                      { label: 'E-mail', value: createdCreds.email },
-                      { label: 'Senha', value: createdCreds.senha },
+                      { label: '🔗 Link',   value: 'https://lead-engine-red-eight.vercel.app/login' },
+                      { label: '📧 E-mail', value: createdCreds.email },
+                      { label: '🔑 Senha',  value: createdCreds.senha },
                     ].map(({ label, value }) => (
                       <div key={label} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                        <span style={{ width: 44, fontSize: 11, fontWeight: 600, color: '#6b7280' }}>{label}</span>
+                        <span style={{ width: 70, fontSize: 11, fontWeight: 600, color: '#6b7280', flexShrink: 0 }}>{label}</span>
                         <code style={{ flex: 1, fontSize: 12, color: '#111827', background: '#ffffff', border: '1px solid rgba(0,0,0,0.08)', borderRadius: 6, padding: '4px 8px' }}>{value}</code>
                         <button
                           onClick={() => navigator.clipboard.writeText(value)}
-                          style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#6366f1', display: 'flex', alignItems: 'center' }}
+                          style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#6366f1', display: 'flex', alignItems: 'center', flexShrink: 0 }}
                           title="Copiar"
                         >
-                          <Copy size={13} />
+                          <Copy size={12} />
                         </button>
                       </div>
                     ))}
                   </div>
-                  <p style={{ marginTop: 10, fontSize: 11, color: '#6b7280' }}>O vendedor acessa com estas credenciais e depois altera a senha em <strong>Configurações → Segurança</strong>.</p>
                 </div>
               )}
             </div>
