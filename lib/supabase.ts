@@ -289,3 +289,32 @@ export async function updateProfile(id: string, fields: { nome?: string; cor?: s
   const { error } = await supabase.from('profiles').update(fields).eq('id', id)
   return !error
 }
+
+// ── Pipeline histórico ────────────────────────────────────────
+
+export interface PipelineHistory {
+  id: string
+  lead_id: string
+  etapa_de: string | null
+  etapa_para: string
+  criado_em: string
+}
+
+export async function fetchPipelineHistory(leadId: string): Promise<PipelineHistory[]> {
+  const { data, error } = await supabase
+    .from('pipeline_historico')
+    .select('*')
+    .eq('lead_id', leadId)
+    .order('criado_em', { ascending: true })
+  if (error) { console.error('fetchPipelineHistory:', error); return [] }
+  return (data || []) as PipelineHistory[]
+}
+
+export async function updateLeadResponsavel(leadId: string, responsavelId: string | null): Promise<boolean> {
+  const { error } = await supabase
+    .from('leads')
+    .update({ responsavel_id: responsavelId })
+    .eq('id', leadId)
+  if (error) { console.error('updateLeadResponsavel:', error); return false }
+  return true
+}
