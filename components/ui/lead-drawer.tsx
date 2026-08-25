@@ -4,7 +4,7 @@ import { SOURCE_LABELS, SEGMENT_LABELS } from '@/lib/mock-data'
 import { getScoreColor, formatCurrencyShort } from '@/lib/utils'
 import {
   fetchActivities, addActivity, saveLeadNotes, updateLeadStatus,
-  fetchProfiles, fetchPipelineHistory, updateLeadResponsavel,
+  fetchPipelineHistory, updateLeadResponsavel,
   type Activity, type PipelineHistory,
 } from '@/lib/supabase'
 import { useEffect, useState, useRef, useCallback } from 'react'
@@ -141,8 +141,8 @@ export function LeadDrawer({ lead, onClose, onStageChange }: LeadDrawerProps) {
       if (!user) return
       const { data: prof } = await supabase.from('profiles').select('id,nome,cargo').eq('id', user.id).single()
       if (prof) setCurrentUser(prof as any)
-      const allProfs = await fetchProfiles()
-      setProfiles(allProfs as any)
+      const { data: allProfs } = await supabase.from('profiles').select('id,nome,cor,cargo').eq('ativo', true).order('nome')
+      setProfiles((allProfs ?? []) as any)
     }
     loadMeta()
   }, [])
