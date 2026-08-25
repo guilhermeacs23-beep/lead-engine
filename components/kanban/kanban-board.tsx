@@ -56,6 +56,48 @@ export function KanbanBoard() {
   const [newTitle, setNewTitle] = useState('')
   const [newColor, setNewColor] = useState(GRADIENT_PRESETS[0])
 
+  // ── Modal nova oportunidade ──
+  const [novaModal,   setNovaModal]   = useState(false)
+  const [novaStatus,  setNovaStatus]  = useState('novo')
+  const [novaEmpresa, setNovaEmpresa] = useState('')
+  const [novaContato, setNovaContato] = useState('')
+  const [novaCargo,   setNovaCargo]   = useState('')
+  const [novaTel,     setNovaTel]     = useState('')
+  const [novaEmail,   setNovaEmail]   = useState('')
+  const [novaValor,   setNovaValor]   = useState('')
+  const [novaSaving,  setNovaSaving]  = useState(false)
+
+  function openNovaModal(status = 'novo') {
+    setNovaStatus(status); setNovaEmpresa(''); setNovaContato('')
+    setNovaCargo(''); setNovaTel(''); setNovaEmail(''); setNovaValor('')
+    setNovaModal(true)
+  }
+
+  async function handleSaveNova() {
+    if (!novaEmpresa.trim()) return
+    setNovaSaving(true)
+    const { createLead } = await import('@/lib/supabase')
+    const newLead = await createLead({
+      empresa:       novaEmpresa.trim(),
+      contato_nome:  novaContato.trim() || 'Não informado',
+      contato_cargo: novaCargo.trim()   || '',
+      telefone:      novaTel.trim()     || '',
+      email:         novaEmail.trim()   || '',
+      valor_estimado: novaValor ? parseFloat(novaValor.replace(/\D/g, '')) : undefined,
+      status:        novaStatus,
+    })
+    if (newLead) setLeads(prev => [newLead as any, ...prev])
+    setNovaSaving(false)
+    setNovaModal(false)
+  }
+
+  // Escuta evento do topbar
+  useEffect(() => {
+    const handler = () => openNovaModal('novo')
+    window.addEventListener('open-nova-oportunidade', handler)
+    return () => window.removeEventListener('open-nova-oportunidade', handler)
+  }, [])
+
   const load = useCallback(async () => {
     setLoading(true)
     const data = await fetchLeadsByStatus()
@@ -139,6 +181,70 @@ export function KanbanBoard() {
 
   return (
     <div className="flex h-full flex-col" onMouseLeave={hideHover}>
+
+      {/* ── Modal Nova Oportunidade ── */}
+      {novaModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center" style={{ background: 'rgba(0,0,0,0.55)', backdropFilter: 'blur(6px)' }}
+          onClick={e => { if (e.target === e.currentTarget) setNovaModal(false) }}>
+          <div className="w-[480px] rounded-2xl p-6 shadow-2xl" style={{ background: '#fff', border: '1px solid rgba(0,0,0,0.09)' }}>
+            <div className="mb-5 flex items-center justify-between">
+              <h2 style={{ fontSize: 17, fontWeight: 800, color: '#111827', margin: 0 }}>Nova Oportunidade</h2>
+              <button onClick={() => setNovaModal(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#9ca3af', fontSize: 20, lineHeight: 1 }}>×</button>
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+              {/* Etapa */}
+              <div>
+                <label style={{ fontSize: 11, fontWeight: 600, color: '#6b7280', textTransform: 'uppercase', letterSpacing: '0.06em' }}>Etapa</label>
+                <select value={novaStatus} onChange={e => setNovaStatus(e.target.value)}
+                  style={{ width: '100%', marginTop: 4, padding: '9px 12px', borderRadius: 10, border: '1px solid #e5e7eb', fontSize: 13, color: '#111827', background: '#f9fafb' }}>
+                  {columns.map(c => <option key={c.id} value={c.id}>{c.title}</option>)}
+                </select>
+              </div>
+              {/* Empresa */}
+              <div>
+                <label style={{ fontSize: 11, fontWeight: 600, color: '#6b7280', textTransform: 'uppercase', letterSpacing: '0.06em' }}>Empresa *</label>
+                <input autoFocus value={novaEmpresa} onChange={e => setNovaEmpresa(e.target.value)}
+                  placeholder="Nome da empresa"
+                  style={{ width: '100%', marginTop: 4, padding: '9px 12px', borderRadius: 10, border: '1px solid #e5e7eb', fontSize: 13, color: '#111827', background: '#f9fafb', boxSizing: 'border-box', outline: 'none' }} />
+              </div>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+                <div>
+                  <label style={{ fontSize: 11, fontWeight: 600, color: '#6b7280', textTransform: 'uppercase', letterSpacing: '0.06em' }}>Contato</label>
+                  <input value={novaContato} onChange={e => setNovaContato(e.target.value)} placeholder="Nome do contato"
+                    style={{ width: '100%', marginTop: 4, padding: '9px 12px', borderRadius: 10, border: '1px solid #e5e7eb', fontSize: 13, color: '#111827', background: '#f9fafb', boxSizing: 'border-box', outline: 'none' }} />
+                </div>
+                <div>
+                  <label style={{ fontSize: 11, fontWeight: 600, color: '#6b7280', textTransform: 'uppercase', letterSpacing: '0.06em' }}>Cargo</label>
+                  <input value={novaCargo} onChange={e => setNovaCargo(e.target.value)} placeholder="Cargo"
+                    style={{ width: '100%', marginTop: 4, padding: '9px 12px', borderRadius: 10, border: '1px solid #e5e7eb', fontSize: 13, color: '#111827', background: '#f9fafb', boxSizing: 'border-box', outline: 'none' }} />
+                </div>
+                <div>
+                  <label style={{ fontSize: 11, fontWeight: 600, color: '#6b7280', textTransform: 'uppercase', letterSpacing: '0.06em' }}>Telefone</label>
+                  <input value={novaTel} onChange={e => setNovaTel(e.target.value)} placeholder="(00) 00000-0000"
+                    style={{ width: '100%', marginTop: 4, padding: '9px 12px', borderRadius: 10, border: '1px solid #e5e7eb', fontSize: 13, color: '#111827', background: '#f9fafb', boxSizing: 'border-box', outline: 'none' }} />
+                </div>
+                <div>
+                  <label style={{ fontSize: 11, fontWeight: 600, color: '#6b7280', textTransform: 'uppercase', letterSpacing: '0.06em' }}>Valor estimado/mês</label>
+                  <input value={novaValor} onChange={e => setNovaValor(e.target.value)} placeholder="R$ 0,00"
+                    style={{ width: '100%', marginTop: 4, padding: '9px 12px', borderRadius: 10, border: '1px solid #e5e7eb', fontSize: 13, color: '#111827', background: '#f9fafb', boxSizing: 'border-box', outline: 'none' }} />
+                </div>
+              </div>
+              <div>
+                <label style={{ fontSize: 11, fontWeight: 600, color: '#6b7280', textTransform: 'uppercase', letterSpacing: '0.06em' }}>E-mail</label>
+                <input value={novaEmail} onChange={e => setNovaEmail(e.target.value)} placeholder="email@empresa.com"
+                  style={{ width: '100%', marginTop: 4, padding: '9px 12px', borderRadius: 10, border: '1px solid #e5e7eb', fontSize: 13, color: '#111827', background: '#f9fafb', boxSizing: 'border-box', outline: 'none' }} />
+              </div>
+            </div>
+            <div style={{ display: 'flex', gap: 10, marginTop: 20 }}>
+              <button onClick={() => setNovaModal(false)} style={{ flex: 1, padding: '10px', borderRadius: 10, border: '1px solid #e5e7eb', background: '#f9fafb', color: '#6b7280', fontSize: 13, fontWeight: 600, cursor: 'pointer' }}>Cancelar</button>
+              <button onClick={handleSaveNova} disabled={!novaEmpresa.trim() || novaSaving}
+                style={{ flex: 2, padding: '10px', borderRadius: 10, border: 'none', background: novaEmpresa.trim() ? '#6366f1' : '#e5e7eb', color: '#fff', fontSize: 13, fontWeight: 700, cursor: novaEmpresa.trim() ? 'pointer' : 'default' }}>
+                {novaSaving ? 'Salvando...' : '+ Criar Oportunidade'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* LeadDrawer */}
       <LeadDrawer
@@ -317,6 +423,7 @@ export function KanbanBoard() {
               onRename={renameColumn}
               onColorChange={changeColumnColor}
               onLeadClick={(lead) => setSelectedLead(lead)}
+              onAddLead={(status) => openNovaModal(status)}
             />
           ))}
           {!adding ? (
