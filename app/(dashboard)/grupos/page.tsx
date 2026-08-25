@@ -1,5 +1,6 @@
 'use client'
 import { useState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 import { createBrowserClient } from '@supabase/ssr'
 import { Plus, Search, Users, Lock, Globe, Star, Trash2, RefreshCw, X } from 'lucide-react'
 
@@ -17,6 +18,7 @@ interface Grupo {
 }
 
 export default function GruposPage() {
+  const router = useRouter()
   const [view,      setView]      = useState<'grid'|'lista'>('grid')
   const [grupos,    setGrupos]    = useState<Grupo[]>([])
   const [loading,   setLoading]   = useState(true)
@@ -120,7 +122,7 @@ export default function GruposPage() {
         ) : view === 'grid' ? (
           <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fill, minmax(280px, 1fr))', gap:16 }}>
             {filtered.map(g => (
-              <div key={g.id} style={{ background:'#fff', border:'1px solid #e5e5e5', borderRadius:20, padding:20, boxShadow:'0 1px 4px rgba(0,0,0,0.06)', transition:'all 0.15s', position:'relative' }}
+              <div key={g.id} onClick={() => router.push(`/grupos/${g.id}`)} style={{ background:'#fff', border:'1px solid #e5e5e5', borderRadius:20, padding:20, boxShadow:'0 1px 4px rgba(0,0,0,0.06)', transition:'all 0.15s', position:'relative', cursor:'pointer' }}
                 onMouseEnter={e => { (e.currentTarget as HTMLElement).style.boxShadow='0 6px 20px rgba(0,0,0,0.12)'; (e.currentTarget as HTMLElement).style.transform='translateY(-2px)' }}
                 onMouseLeave={e => { (e.currentTarget as HTMLElement).style.boxShadow='0 1px 4px rgba(0,0,0,0.06)'; (e.currentTarget as HTMLElement).style.transform='translateY(0)' }}>
                 <div style={{ display:'flex', alignItems:'flex-start', gap:12, marginBottom:12 }}>
@@ -167,7 +169,9 @@ export default function GruposPage() {
               <div /><div>Nome</div><div>Criado em</div><div>Privacidade</div><div>Tags</div><div />
             </div>
             {filtered.map(g => (
-              <div key={g.id} style={{ display:'grid', gridTemplateColumns:'40px 1fr 100px 90px 130px 40px', padding:'12px 16px', borderBottom:'1px solid #f0f0f0', alignItems:'center' }}>
+              <div key={g.id} onClick={() => router.push(`/grupos/${g.id}`)} style={{ display:'grid', gridTemplateColumns:'40px 1fr 100px 90px 130px 40px', padding:'12px 16px', borderBottom:'1px solid #f0f0f0', alignItems:'center', cursor:'pointer' }}
+                onMouseEnter={e => (e.currentTarget as HTMLElement).style.background='#f9f9f9'}
+                onMouseLeave={e => (e.currentTarget as HTMLElement).style.background='transparent'}>
                 <div style={{ width:28, height:28, borderRadius:8, display:'flex', alignItems:'center', justifyContent:'center', fontSize:11, fontWeight:700, background:`${g.cor}20`, color:g.cor }}>{g.nome[0]}</div>
                 <div>
                   <p style={{ fontSize:13, fontWeight:700, color:'#111', margin:0 }}>{g.nome}</p>
