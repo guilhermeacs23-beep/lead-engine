@@ -13,7 +13,7 @@ import { supabase } from '@/lib/supabase'
 interface UserProfile { nome: string; cargo: string; cor: string }
 
 const NAV_ITEMS = [
-  { href: '/dashboard',  icon: LayoutDashboard, label: 'Dashboard'    },
+  { href: '/home',       icon: LayoutDashboard, label: 'Dashboard'    },
   { href: '/leads',      icon: Users,           label: 'Leads'        },
   { href: '/recap',      icon: RefreshCw,       label: 'Recap Clientes' },
   { href: '/pipeline',   icon: Kanban,          label: 'Pipeline'     },
