@@ -297,9 +297,20 @@ export default function ConfiguracoesPage() {
 
             {/* Cadastrar novo usuário */}
             <div style={{ ...CARD, background: '#f0f0ff', border: '1px solid rgba(99,102,241,0.20)' }}>
-              <p style={{ marginBottom: 4, fontSize: 13, fontWeight: 700, color: '#111827' }}>Cadastrar acesso para vendedor</p>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 4 }}>
+                <p style={{ fontSize: 13, fontWeight: 700, color: '#111827', margin: 0 }}>Cadastrar acesso para vendedor</p>
+                <button
+                  onClick={() => {
+                    navigator.clipboard.writeText('https://lead-engine-red-eight.vercel.app/login')
+                    showSaved('✓ Link copiado!')
+                  }}
+                  style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '6px 12px', borderRadius: 8, border: '1px solid rgba(99,102,241,0.30)', background: 'rgba(99,102,241,0.08)', color: '#6366f1', fontSize: 12, fontWeight: 600, cursor: 'pointer', whiteSpace: 'nowrap' }}
+                >
+                  <Copy size={12} /> Copiar link de acesso
+                </button>
+              </div>
               <p style={{ marginBottom: 14, fontSize: 12, color: '#6b7280' }}>
-                Crie o e-mail e senha, copie as credenciais e mande o link: <strong style={{ color: '#374151' }}>lead-engine-red-eight.vercel.app/login</strong>
+                Crie o acesso abaixo, copie as credenciais e envie para o vendedor.
               </p>
               <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', marginBottom: 10 }}>
                 {/* Email */}
