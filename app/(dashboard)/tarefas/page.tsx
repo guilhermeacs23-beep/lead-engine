@@ -78,7 +78,7 @@ export default function TarefasPage() {
   async function load() {
     setLoading(true)
     const [{ data: profs }, { data: tars }, { data: { user } }] = await Promise.all([
-      supabase.from('profiles').select('id,nome,cor,cargo').eq('tenant_id', TENANT_ID),
+      supabase.from('profiles').select('id,nome,cor,cargo').eq('ativo', true).order('nome'),
       supabase.from('tarefas').select('*').eq('tenant_id', TENANT_ID).order('created_at', { ascending: false }),
       supabase.auth.getUser(),
     ])

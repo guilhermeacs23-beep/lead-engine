@@ -279,8 +279,8 @@ export async function fetchProfiles() {
   const { data, error } = await supabase
     .from('profiles')
     .select('*')
-    .eq('tenant_id', TENANT_ID)
-    .order('created_at')
+    .eq('ativo', true)
+    .order('nome')
   if (error) { console.error('fetchProfiles:', error); return [] }
   return data ?? []
 }
