@@ -126,21 +126,33 @@ export default function ConfiguracoesPage() {
   async function handleInvite() {
     if (!inviteEmail.trim()) return
     setInviting(true)
+    const email = inviteEmail.trim().toLowerCase()
+
+    // 1. Salva convite na tabela
     const { error } = await supabase.from('team_invites').insert({
-      email: inviteEmail.trim().toLowerCase(),
-      cargo: inviteCargo,
-      cor: '#6366f1',
-      status: 'pendente',
+      email, cargo: inviteCargo, cor: '#6366f1', status: 'pendente',
     })
     if (error) {
       if (error.code === '23505') showSaved('Este e-mail já foi convidado.')
       else showSaved('Erro ao convidar. Tente novamente.')
-    } else {
-      showSaved(`Convite enviado para ${inviteEmail.trim()}`)
-      setInviteEmail('')
-      loadTeam()
+      setInviting(false)
+      return
     }
-    setInviting(false)
+
+    // 2. Dispara e-mail de convite via Edge Function
+    try {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_SUPABASE_URL}/functions/v1/invite-user`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'apikey': process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY! },
+        body: JSON.stringify({ email, cargo: inviteCargo }),
+      })
+      const json = await res.json()
+      if (json.error) showSaved(`Convite salvo, mas e-mail falhou: ${json.error}`)
+      else showSaved(`✓ Convite enviado para ${email}`)
+    } catch {
+      showSaved(`Convite salvo, mas e-mail não pôde ser enviado.`)
+    }
+
   }
 
   const activeCount  = members.filter(m => !m.isPending).length
