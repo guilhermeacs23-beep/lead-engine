@@ -440,10 +440,10 @@ export default function LeadsPage() {
         <div className="flex flex-wrap gap-2">
           {SOURCES.map(({ id, label }) => (
             <button key={id} onClick={() => toggleSource(id)}
-              className={`rounded-full px-4 py-1.5 text-sm font-medium transition-all duration-150 ${sources.includes(id) ? 'text-white' : 'text-white/60 hover:text-white'}`}
+              className="rounded-full px-4 py-1.5 text-sm font-medium transition-all duration-150"
               style={sources.includes(id)
-                ? { background: 'linear-gradient(135deg,#6366f1,#8b5cf6)', boxShadow: '0 0 16px rgba(99,102,241,0.3)' }
-                : { background: 'rgba(255,255,255,0.05)', border: '0.5px solid rgba(255,255,255,0.12)' }}>
+                ? { background: 'linear-gradient(135deg,#6366f1,#8b5cf6)', color: '#fff', boxShadow: '0 0 16px rgba(99,102,241,0.3)' }
+                : { background: '#ffffff', color: '#374151', border: '1px solid #e5e7eb' }}>
               {label}
             </button>
           ))}
@@ -454,11 +454,12 @@ export default function LeadsPage() {
       <div className="mb-3 flex items-center justify-between">
         <div className="flex items-center gap-3">
           <div className="flex items-center gap-2 rounded-lg px-3 py-2"
-            style={{ background: 'rgba(255,255,255,0.06)', border: '0.5px solid rgba(255,255,255,0.10)' }}>
-            <Search size={14} className="text-white/60" />
+            style={{ background: '#ffffff', border: '1px solid #e5e7eb' }}>
+            <Search size={14} style={{ color: '#9ca3af' }} />
             <input value={query} onChange={e => setQuery(e.target.value)}
               placeholder="Buscar empresa..."
-              className="w-44 bg-transparent text-sm text-white outline-none placeholder:text-white/40" />
+              className="w-44 bg-transparent text-sm outline-none placeholder:text-gray-400"
+              style={{ color: '#111827' }} />
           </div>
           <span className="text-sm text-white/70">
             {loading ? 'Buscando...' : `${leads.length} leads encontrados · pontuados por potencial de frete`}
@@ -545,8 +546,8 @@ function SelectField({ label, value, onChange, children }: {
     <div>
       <p className="mb-1.5 text-[13px] font-medium text-white">{label}</p>
       <select value={value} onChange={e => onChange(e.target.value)}
-        className="w-full appearance-none rounded-lg px-3 py-2.5 text-sm text-white outline-none"
-        style={{ background: 'rgba(255,255,255,0.07)', border: '0.5px solid rgba(255,255,255,0.12)' }}>
+        className="w-full appearance-none rounded-lg px-3 py-2.5 text-sm outline-none"
+        style={{ background: '#ffffff', border: '1px solid #e5e7eb', color: '#111827' }}>
         {children}
       </select>
     </div>
