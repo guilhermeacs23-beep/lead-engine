@@ -2,7 +2,7 @@
 import { Lead } from '@/types'
 import { formatCurrencyShort, getScoreColor } from '@/lib/utils'
 import { SOURCE_LABELS, SEGMENT_LABELS } from '@/lib/mock-data'
-import { Mail, Clock } from 'lucide-react'
+import { Mail, Clock, Phone, MessageSquare } from 'lucide-react'
 
 interface LeadCardProps {
   lead: Lead
@@ -81,9 +81,10 @@ export function LeadCard({ lead, onClick }: LeadCardProps) {
       </div>
 
       {/* Footer */}
-      <div className="mt-3 flex items-center gap-3 border-t pt-2.5" style={{ borderColor: '#edf2f7' }}>
-        {(lead as any).etapa_em ? (
-          <>
+      <div className="mt-3 flex items-center gap-2 border-t pt-2.5" style={{ borderColor: '#edf2f7' }}>
+        {/* Tempo na etapa */}
+        <div className="flex-1 min-w-0">
+          {(lead as any).etapa_em ? (
             <span className="flex items-center gap-1 text-[11px] font-medium text-slate-400">
               <Clock size={12} strokeWidth={1.5} />
               {(() => {
@@ -94,16 +95,53 @@ export function LeadCard({ lead, onClick }: LeadCardProps) {
                 return `${days}d nesta etapa`
               })()}
             </span>
-            <span className="ml-auto text-[10px] text-slate-400">
-              {new Date((lead as any).etapa_em).toLocaleDateString('pt-BR', { day:'2-digit', month:'2-digit', year:'2-digit' })}
+          ) : (
+            <span className="flex items-center gap-1 text-[11px] font-medium text-slate-400">
+              <Clock size={12} strokeWidth={1.5} />
+              {new Date(lead.created_at || '').toLocaleDateString('pt-BR', { day:'2-digit', month:'2-digit', year:'2-digit' })}
             </span>
-          </>
-        ) : (
-          <span className="flex items-center gap-1 text-[11px] font-medium text-slate-400">
-            <Clock size={12} strokeWidth={1.5} />
-            {new Date(lead.created_at || '').toLocaleDateString('pt-BR', { day:'2-digit', month:'2-digit', year:'2-digit' })}
-          </span>
-        )}
+          )}
+        </div>
+
+        {/* Ícones de contato rápido (Bitrix-style) */}
+        <div className="flex items-center gap-1 flex-shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
+          {lead.telefone && (
+            <a
+              href={`tel:${lead.telefone}`}
+              onClick={e => e.stopPropagation()}
+              title={lead.telefone}
+              className="flex h-6 w-6 items-center justify-center rounded-md transition-colors"
+              style={{ color: '#6b7280', background: '#f3f4f6' }}
+              onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = '#dbeafe'; (e.currentTarget as HTMLElement).style.color = '#2563eb' }}
+              onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = '#f3f4f6'; (e.currentTarget as HTMLElement).style.color = '#6b7280' }}
+            >
+              <Phone size={11} strokeWidth={1.8} />
+            </a>
+          )}
+          {lead.email && (
+            <a
+              href={`mailto:${lead.email}`}
+              onClick={e => e.stopPropagation()}
+              title={lead.email}
+              className="flex h-6 w-6 items-center justify-center rounded-md transition-colors"
+              style={{ color: '#6b7280', background: '#f3f4f6' }}
+              onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = '#d1fae5'; (e.currentTarget as HTMLElement).style.color = '#059669' }}
+              onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = '#f3f4f6'; (e.currentTarget as HTMLElement).style.color = '#6b7280' }}
+            >
+              <Mail size={11} strokeWidth={1.8} />
+            </a>
+          )}
+          <button
+            onClick={e => { e.stopPropagation(); (onClick as any)?.(lead, 'nota') }}
+            title="Adicionar nota"
+            className="flex h-6 w-6 items-center justify-center rounded-md transition-colors"
+            style={{ color: '#6b7280', background: '#f3f4f6' }}
+            onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = '#ede9fe'; (e.currentTarget as HTMLElement).style.color = '#7c3aed' }}
+            onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = '#f3f4f6'; (e.currentTarget as HTMLElement).style.color = '#6b7280' }}
+          >
+            <MessageSquare size={11} strokeWidth={1.8} />
+          </button>
+        </div>
       </div>
     </div>
   )
