@@ -240,25 +240,27 @@ export async function createLead(data: {
   contato_cargo: string
   telefone?: string
   email?: string
-  cidade: string
-  estado: string
-  segmento: string
-  fonte: string
+  cidade?: string
+  estado?: string
+  segmento?: string
+  fonte?: string
   valor_estimado?: number
   website?: string
   status?: string
-}): Promise<boolean> {
-  const { error } = await supabase
+}): Promise<any | null> {
+  const { data: inserted, error } = await supabase
     .from('leads')
     .insert({
       ...data,
       tenant_id:   TENANT_ID,
       status:      data.status ?? 'novo',
       score_ia:    70,
-      em_pipeline: true,  // leads criados pelo pipeline entram diretamente no funil
+      em_pipeline: true,
     })
-  if (error) { console.error('createLead:', error); return false }
-  return true
+    .select()
+    .single()
+  if (error) { console.error('createLead:', error); return null }
+  return inserted
 }
 
 // ── Busca global ──────────────────────────────────────────────
