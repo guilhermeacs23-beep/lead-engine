@@ -6,7 +6,7 @@ import { SOURCE_LABELS, SEGMENT_LABELS } from '@/lib/mock-data'
 import { getScoreColor } from '@/lib/utils'
 import { LeadDrawer } from '@/components/ui/lead-drawer'
 import {
-  Search, Sparkles, Plus, Filter, Loader2,
+  Search, Plus, Filter, Loader2,
   Upload, X, CheckCircle2, AlertCircle, ArrowLeft,
   FileSpreadsheet,
 } from 'lucide-react'
@@ -508,6 +508,16 @@ export default function LeadsPage() {
 function LeadRow({ lead, onClick }: { lead: any; onClick: () => void }) {
   const score  = getScoreColor(lead.score_ia)
   const source = SOURCE_LABELS[lead.fonte]
+  const [added, setAdded] = useState(lead.em_pipeline ?? false)
+
+  async function handleAddToPipeline(e: React.MouseEvent) {
+    e.stopPropagation()
+    if (added) return
+    setAdded(true)
+    const { createBrowserClient } = await import('@supabase/ssr')
+    const sb = createBrowserClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!)
+    await sb.from('leads').update({ em_pipeline: true, status: 'novo' }).eq('id', lead.id)
+  }
 
   return (
     <div onClick={onClick}
@@ -538,11 +548,15 @@ function LeadRow({ lead, onClick }: { lead: any; onClick: () => void }) {
         <span style={{ color: '#9ca3af', fontSize: 12 }}>{lead.fonte}</span>
       )}
       <div className="flex justify-end">
-        <button className="flex items-center gap-1 rounded-lg px-2.5 py-1 text-[13px] font-semibold transition-all"
-          style={{ color: '#6366f1' }}
-          onMouseEnter={e => (e.currentTarget.style.background = 'rgba(99,102,241,0.08)')}
+        <button
+          onClick={handleAddToPipeline}
+          className="flex items-center gap-1 rounded-lg px-2.5 py-1 text-[13px] font-semibold transition-all"
+          style={{ color: added ? '#16a34a' : '#6366f1' }}
+          onMouseEnter={e => !added && (e.currentTarget.style.background = 'rgba(99,102,241,0.08)')}
           onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}>
-          <Plus size={12} strokeWidth={2} />Adicionar
+          {added
+            ? <><CheckCircle2 size={12} strokeWidth={2} />No pipeline</>
+            : <><Plus size={12} strokeWidth={2} />Adicionar</>}
         </button>
       </div>
     </div>

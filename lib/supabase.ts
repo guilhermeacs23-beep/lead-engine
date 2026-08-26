@@ -36,6 +36,7 @@ export async function fetchLeadsByStatus() {
     .from('leads')
     .select('*')
     .eq('tenant_id', TENANT_ID)
+    .eq('em_pipeline', true)
     .order('created_at', { ascending: false })
 
   if (error) { console.error('fetchLeadsByStatus:', error); return [] }
@@ -251,9 +252,10 @@ export async function createLead(data: {
     .from('leads')
     .insert({
       ...data,
-      tenant_id:  TENANT_ID,
-      status:     data.status ?? 'novo',
-      score_ia:   70,
+      tenant_id:   TENANT_ID,
+      status:      data.status ?? 'novo',
+      score_ia:    70,
+      em_pipeline: true,  // leads criados pelo pipeline entram diretamente no funil
     })
   if (error) { console.error('createLead:', error); return false }
   return true
