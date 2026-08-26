@@ -149,13 +149,22 @@ export function LeadDrawer({ lead, onClose, onStageChange }: LeadDrawerProps) {
 
   useEffect(() => {
     if (!lead) return
-    setNotesList(parseNotes(lead.observacoes, lead.created_at))
     setNoteInput('')
     setActivities([])
     setNewActText('')
     setResponsavelId(lead.responsavel_id ?? '')
     loadActivities(lead.id)
     loadPipelineHist(lead.id)
+    // Fetch fresh observacoes from DB so saved notes always show
+    ;(async () => {
+      const { supabase } = await import('@/lib/supabase')
+      const { data } = await supabase
+        .from('leads')
+        .select('observacoes, created_at')
+        .eq('id', lead.id)
+        .single()
+      setNotesList(parseNotes(data?.observacoes ?? lead.observacoes, data?.created_at ?? lead.created_at))
+    })()
   }, [lead?.id])
 
   if (!lead) return null
