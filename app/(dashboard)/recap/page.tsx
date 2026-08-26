@@ -483,18 +483,18 @@ export default function RecapClientesPage() {
   return (
     <div style={{ padding: '12px', maxWidth: 1440, margin: '0 auto' }}>
 
-      <div style={{ background: '#ffffff', borderRadius: 14, boxShadow: '0 2px 16px rgba(0,0,0,0.09), 0 0 0 1px rgba(0,0,0,0.06)', overflow: 'hidden', padding: '24px 28px', display: 'flex', flexDirection: 'column', gap: 20 }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 20, padding: '12px 4px' }}>
       {/* ── Header ── */}
       <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 28 }}>
         <div>
-          <h1 style={{ fontSize: 24, fontWeight: 800, color: '#111827', margin: 0 }}>Recap de Clientes</h1>
-          <p style={{ color: 'rgba(255,255,255,0.40)', margin: '4px 0 0', fontSize: 14 }}>
+          <h1 style={{ fontSize: 24, fontWeight: 800, color: '#ffffff', margin: 0 }}>Recap de Clientes</h1>
+          <p style={{ color: 'rgba(255,255,255,0.65)', margin: '4px 0 0', fontSize: 14 }}>
             {kpis.total.toLocaleString('pt-BR')} clientes inativos · {kpis.aprovados.toLocaleString('pt-BR')} aprovados para reativação
           </p>
         </div>
         <button
           onClick={fetchData}
-          style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '10px 16px', borderRadius: 10, background: '#f4f5f8', border: '1px solid rgba(0,0,0,0.10)', color: '#374151', cursor: 'pointer', fontSize: 13, fontWeight: 600 }}
+          style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '10px 16px', borderRadius: 10, background: 'rgba(255,255,255,0.15)', border: '1px solid rgba(255,255,255,0.25)', color: '#ffffff', cursor: 'pointer', fontSize: 13, fontWeight: 600, backdropFilter: 'blur(8px)' }}
         >
           <RefreshCw size={14} /> Atualizar
         </button>
