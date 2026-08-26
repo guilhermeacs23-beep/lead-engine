@@ -408,29 +408,36 @@ export function KanbanBoard() {
       ) : view === 'kanban' ? (
 
         /* ── KANBAN ── */
-        <div className="flex gap-3 overflow-x-auto p-4" style={{ height: '100%', alignItems: 'stretch' }}>
+        <div className="flex overflow-x-auto" style={{ height: '100%', alignItems: 'stretch', gap: 0, padding: '12px 16px' }}>
           {columns.map((col, idx) => (
-            <KanbanColumn
-              key={col.id}
-              id={col.id}
-              title={col.title}
-              color={col.color}
-              fixed={col.fixed}
-              index={idx}
-              leads={getLeadsByStatus(col.id)}
-              onMoveCard={handleMoveCard}
-              onDelete={handleDeleteColumn}
-              onRename={renameColumn}
-              onColorChange={changeColumnColor}
-              onLeadClick={(lead) => setSelectedLead(lead)}
-              onAddLead={(status) => openNovaModal(status)}
-            />
+            <div key={col.id} style={{ display: 'flex', alignItems: 'stretch' }}>
+              <KanbanColumn
+                id={col.id}
+                title={col.title}
+                color={col.color}
+                fixed={col.fixed}
+                index={idx}
+                leads={getLeadsByStatus(col.id)}
+                onMoveCard={handleMoveCard}
+                onDelete={handleDeleteColumn}
+                onRename={renameColumn}
+                onColorChange={changeColumnColor}
+                onLeadClick={(lead) => setSelectedLead(lead)}
+                onAddLead={(status) => openNovaModal(status)}
+              />
+              {/* Separador pontilhado entre colunas (estilo Bitrix) */}
+              {idx < columns.length - 1 && (
+                <div style={{ width: 1, flexShrink: 0, margin: '0 6px', background: 'repeating-linear-gradient(to bottom, rgba(255,255,255,0.20) 0, rgba(255,255,255,0.20) 4px, transparent 4px, transparent 10px)' }} />
+              )}
+            </div>
           ))}
           {!adding ? (
             <button
               onClick={() => setAdding(true)}
-              className="flex w-[210px] flex-shrink-0 items-center gap-2 rounded-xl px-4 py-3 text-sm text-white/45 transition-all hover:bg-white/[0.07] hover:text-white/70"
-              style={{ border: '1.5px dashed rgba(255,255,255,0.15)', alignSelf: 'flex-start' }}
+              className="flex flex-shrink-0 items-center gap-2 rounded-xl px-4 py-3 text-sm transition-all"
+              style={{ width: 210, border: '1.5px dashed rgba(255,255,255,0.25)', alignSelf: 'flex-start', color: 'rgba(255,255,255,0.5)', background: 'transparent', marginLeft: 12 }}
+              onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.07)'; (e.currentTarget as HTMLElement).style.color = 'rgba(255,255,255,0.8)' }}
+              onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'transparent'; (e.currentTarget as HTMLElement).style.color = 'rgba(255,255,255,0.5)' }}
             >
               <Plus size={14} strokeWidth={2} />Nova etapa
             </button>
