@@ -408,7 +408,7 @@ export function KanbanBoard() {
       ) : view === 'kanban' ? (
 
         /* ── KANBAN ── */
-        <div className="flex flex-1 gap-3 overflow-x-auto overflow-y-hidden p-4 items-start">
+        <div className="flex gap-3 overflow-x-auto p-4" style={{ height: '100%', alignItems: 'stretch' }}>
           {columns.map((col, idx) => (
             <KanbanColumn
               key={col.id}

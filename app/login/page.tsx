@@ -64,23 +64,12 @@ export default function LoginPage() {
       {/* Overlay escuro */}
       <div style={{ position: 'absolute', inset: 0, background: 'rgba(5,10,25,0.42)' }} />
 
-      {/* ── Branding esquerda (estilo Bitrix) ── */}
+      {/* ── Branding centro-esquerda ── */}
       <div style={{
         position: 'relative', zIndex: 10,
-        flex: 1, padding: '0 0 0 72px',
-        display: 'flex', flexDirection: 'column',
+        flex: 1, display: 'flex', flexDirection: 'column',
+        justifyContent: 'center', padding: '0 0 0 12%',
       }}>
-        {/* Logo em branco */}
-        <img
-          src="/logo-lp.png"
-          alt="Lead+"
-          style={{
-            width: 96, height: 96, objectFit: 'contain', marginBottom: 24,
-            filter: 'brightness(0) invert(1)',
-            dropShadow: '0 4px 24px rgba(0,0,0,0.4)',
-          }}
-        />
-
         {/* Nome */}
         <h1 style={{
           margin: 0, fontSize: 56, fontWeight: 900,
@@ -92,7 +81,7 @@ export default function LoginPage() {
 
         {/* Tagline */}
         <p style={{
-          margin: '10px 0 0', fontSize: 18, fontWeight: 400,
+          margin: '10px 0 4px', fontSize: 18, fontWeight: 400,
           color: 'rgba(255,255,255,0.80)',
           textShadow: '0 1px 8px rgba(0,0,0,0.4)',
           letterSpacing: '0.01em',
@@ -102,7 +91,7 @@ export default function LoginPage() {
 
         {/* Assinatura */}
         <p style={{
-          margin: '20px 0 0', fontSize: 12,
+          margin: 0, fontSize: 12,
           color: 'rgba(255,255,255,0.40)',
           letterSpacing: '0.08em', textTransform: 'uppercase',
           fontWeight: 500,
