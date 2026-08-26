@@ -57,14 +57,15 @@ export function KanbanColumn({
       {/* ── Wrapper coluna ── */}
       <div style={{
         borderRadius: 12,
-        border: isDragOver ? `2px dashed ${color}` : '1px solid rgba(255,255,255,0.10)',
+        border: isDragOver ? `2px dashed ${color}` : '1px solid #e5e7eb',
         overflow: 'hidden',
         position: 'relative',
         transition: 'border 0.15s',
         display: 'flex', flexDirection: 'column', height: '100%',
+        boxShadow: '0 1px 4px rgba(0,0,0,0.06)',
       }}>
 
-        {/* ── Faixa colorida APENAS com o título ── */}
+        {/* ── Faixa colorida com título ── */}
         <div style={{
           background: color,
           borderRadius: '11px 11px 0 0',
@@ -97,17 +98,17 @@ export function KanbanColumn({
           </div>
         </div>
 
-        {/* ── Valor monetário: fora da cor, fundo escuro, branco grande ── */}
+        {/* ── Valor monetário: fundo branco, texto escuro ── */}
         <div style={{
-          background: 'rgba(255,255,255,0.06)',
-          borderBottom: '1px solid rgba(255,255,255,0.07)',
-          padding: '12px 12px 14px',
+          background: '#ffffff',
+          borderBottom: '1px solid #f3f4f6',
+          padding: '10px 12px 12px',
           textAlign: 'center',
         }}>
-          <p style={{ fontSize: 22, fontWeight: 300, color: '#ffffff', letterSpacing: '-0.5px' }}>
+          <p style={{ fontSize: 20, fontWeight: 300, color: '#374151', letterSpacing: '-0.5px' }}>
             {total > 0
               ? `${formatCurrencyShort(total)}/mês`
-              : <span style={{ color: 'rgba(255,255,255,0.25)', fontSize: 15 }}>—</span>}
+              : <span style={{ color: '#d1d5db', fontSize: 14 }}>—</span>}
           </p>
         </div>
 
@@ -168,7 +169,7 @@ export function KanbanColumn({
         <div className="flex flex-col gap-2 overflow-y-auto p-2"
           style={{
             flex: 1, minHeight: 60,
-            background: isDragOver ? `${color}15` : 'rgba(255,255,255,0.025)',
+            background: isDragOver ? `${color}10` : '#f5f7fa',
             transition: 'background 0.15s',
           }}
           onDragOver={handleDragOver} onDragLeave={handleDragLeave} onDrop={handleDrop}>
@@ -180,8 +181,8 @@ export function KanbanColumn({
 
       {/* Adicionar lead */}
       <button onClick={() => onAddLead?.(id)}
-        className="flex items-center gap-1.5 rounded-lg px-3 py-2 text-xs text-white/60 transition-all hover:bg-white/[0.07] hover:text-white"
-        style={{ border: '0.5px dashed rgba(255,255,255,0.18)' }}>
+        className="flex items-center gap-1.5 rounded-lg px-3 py-2 text-xs transition-all hover:bg-gray-100"
+        style={{ color: '#6b7280', border: '1px dashed #d1d5db', marginTop: 4 }}>
         <Plus size={13} strokeWidth={2} /> Adicionar lead
       </button>
     </div>
