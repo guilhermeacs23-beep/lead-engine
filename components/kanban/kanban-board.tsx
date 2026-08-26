@@ -78,15 +78,22 @@ export function KanbanBoard() {
     setNovaSaving(true)
     const { createLead } = await import('@/lib/supabase')
     const newLead = await createLead({
-      empresa:       novaEmpresa.trim(),
-      contato_nome:  novaContato.trim() || 'Não informado',
-      contato_cargo: novaCargo.trim()   || '',
-      telefone:      novaTel.trim()     || '',
-      email:         novaEmail.trim()   || '',
-      valor_estimado: novaValor ? parseFloat(novaValor.replace(/\D/g, '')) : undefined,
-      status:        novaStatus,
+      empresa:        novaEmpresa.trim(),
+      contato_nome:   novaContato.trim() || 'Não informado',
+      contato_cargo:  novaCargo.trim()   || '',
+      telefone:       novaTel.trim()     || '',
+      email:          novaEmail.trim()   || '',
+      valor_estimado: novaValor ? parseFloat(novaValor.replace(/[^\d]/g, '')) : undefined,
+      status:         novaStatus,
+      cidade:         '',
+      estado:         '',
+      segmento:       'outros',
+      fonte:          'manual',
     })
-    if (newLead) setLeads(prev => [newLead as any, ...prev])
+    if (newLead) {
+      // Insere imediatamente no estado local — sem precisar recarregar a página
+      setLeads(prev => [newLead, ...prev])
+    }
     setNovaSaving(false)
     setNovaModal(false)
   }
