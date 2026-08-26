@@ -2,20 +2,12 @@
 import { Lead } from '@/types'
 import { formatCurrencyShort, getScoreColor } from '@/lib/utils'
 import { SOURCE_LABELS, SEGMENT_LABELS } from '@/lib/mock-data'
-import { Mail, Clock, Phone, MessageSquare } from 'lucide-react'
+import { Phone, Mail, MessageSquare, Plus } from 'lucide-react'
 
 interface LeadCardProps {
   lead: Lead
   onClick?: (lead: Lead) => void
-}
-
-const STATUS_GRADIENT: Record<string, string> = {
-  novo:       'linear-gradient(90deg, #6366f1, #a78bfa)',
-  contactado: 'linear-gradient(90deg, #3b82f6, #60a5fa)',
-  proposta:   'linear-gradient(90deg, #f59e0b, #fbbf24)',
-  negociando: 'linear-gradient(90deg, #ec4899, #f472b6)',
-  fechado:    'linear-gradient(90deg, #10b981, #34d399)',
-  perdido:    'linear-gradient(90deg, #ef4444, #f87171)',
+  color?: string
 }
 
 const STATUS_VALUE_COLOR: Record<string, string> = {
@@ -27,12 +19,11 @@ const STATUS_VALUE_COLOR: Record<string, string> = {
   perdido:    '#dc2626',
 }
 
-export function LeadCard({ lead, onClick }: LeadCardProps) {
-  const score        = getScoreColor(lead.score_ia)
-  const source       = SOURCE_LABELS[lead.fonte]
-  const segment      = SEGMENT_LABELS[lead.segmento] ?? lead.segmento
-  const labelGradient = STATUS_GRADIENT[lead.status] ?? 'linear-gradient(90deg,#94a3b8,#cbd5e1)'
-  const valueColor   = STATUS_VALUE_COLOR[lead.status] ?? '#5b5fc7'
+export function LeadCard({ lead, onClick, color = '#818cf8' }: LeadCardProps) {
+  const score      = getScoreColor(lead.score_ia)
+  const source     = SOURCE_LABELS[lead.fonte]
+  const segment    = SEGMENT_LABELS[lead.segmento] ?? lead.segmento
+  const valueColor = STATUS_VALUE_COLOR[lead.status] ?? '#5b5fc7'
 
   function handleDragStart(e: React.DragEvent) {
     e.dataTransfer.setData('leadId', lead.id)
@@ -45,104 +36,174 @@ export function LeadCard({ lead, onClick }: LeadCardProps) {
 
   return (
     <div
-      className="lead-card group cursor-grab active:cursor-grabbing"
       draggable
       onDragStart={handleDragStart}
       onDragEnd={handleDragEnd}
       onClick={() => onClick?.(lead)}
+      style={{
+        background: '#ffffff',
+        borderRadius: 8,
+        boxShadow: '0 1px 6px rgba(0,0,0,0.10)',
+        border: '1px solid #e5e7eb',
+        padding: '10px 8px 10px 12px',
+        cursor: 'grab',
+        display: 'flex', gap: 8, alignItems: 'flex-start',
+        transition: 'box-shadow 0.15s, transform 0.1s',
+        margin: '0 4px',
+        position: 'relative',
+        borderLeft: `3px solid ${color}`,
+      }}
+      onMouseEnter={e => {
+        (e.currentTarget as HTMLElement).style.boxShadow = '0 4px 16px rgba(0,0,0,0.14)'
+        ;(e.currentTarget as HTMLElement).style.transform = 'translateY(-1px)'
+      }}
+      onMouseLeave={e => {
+        (e.currentTarget as HTMLElement).style.boxShadow = '0 1px 6px rgba(0,0,0,0.10)'
+        ;(e.currentTarget as HTMLElement).style.transform = 'translateY(0)'
+      }}
     >
-      {/* Barra colorida de status */}
-      <div className="mb-3 h-[3px] w-3/5 rounded-full" style={{ background: labelGradient }} />
-
-      {/* Nome da empresa */}
-      <p className="text-[14px] font-bold leading-tight text-slate-800">{lead.empresa}</p>
-      <p className="mt-1 mb-3 text-[12px] font-medium text-slate-500">
-        {lead.contato_nome} · {lead.contato_cargo}
-      </p>
-
-      {/* Valor estimado */}
-      {lead.valor_estimado && (
-        <p className="mb-2.5 text-[14px] font-bold" style={{ color: valueColor }}>
-          {formatCurrencyShort(lead.valor_estimado)}/mês
+      {/* Conteúdo principal */}
+      <div style={{ flex: 1, minWidth: 0 }}>
+        {/* Empresa */}
+        <p style={{ fontSize: 13, fontWeight: 700, color: '#111827', lineHeight: 1.3, marginBottom: 2 }}>
+          {lead.empresa}
         </p>
-      )}
 
-      {/* Tags */}
-      <div className="flex flex-wrap items-center gap-1.5">
-        <span className="tag">{segment}</span>
-        {source && (
-          <span className="tag" style={{ color: source.color, borderColor: `${source.color}40`, background: source.bg }}>
-            {source.label}
-          </span>
+        {/* Contato */}
+        {lead.contato_nome && (
+          <p style={{ fontSize: 11, color: '#6366f1', fontWeight: 500, marginBottom: 6 }}>
+            {lead.contato_nome}
+            {lead.contato_cargo ? ` · ${lead.contato_cargo}` : ''}
+          </p>
         )}
-        <span className="score-badge ml-auto text-[12px]" style={{ color: score.color, background: score.bg }}>
-          {lead.score_ia}
-        </span>
+
+        {/* Valor estimado */}
+        {lead.valor_estimado && (
+          <p style={{ fontSize: 12, fontWeight: 700, color: valueColor, marginBottom: 6 }}>
+            {formatCurrencyShort(lead.valor_estimado)}/mês
+          </p>
+        )}
+
+        {/* Tags */}
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4, marginBottom: 8 }}>
+          <span style={{
+            fontSize: 10, padding: '1px 6px', borderRadius: 4,
+            background: '#f3f4f6', color: '#6b7280', fontWeight: 500,
+          }}>
+            {segment}
+          </span>
+          {source && (
+            <span style={{
+              fontSize: 10, padding: '1px 6px', borderRadius: 4, fontWeight: 500,
+              color: source.color, background: source.bg,
+            }}>
+              {source.label}
+            </span>
+          )}
+          <span style={{
+            fontSize: 10, padding: '1px 6px', borderRadius: 4, fontWeight: 700, marginLeft: 'auto',
+            color: score.color, background: score.bg,
+          }}>
+            {lead.score_ia}
+          </span>
+        </div>
+
+        {/* Botão + Atividade */}
+        <button
+          onClick={e => { e.stopPropagation(); onClick?.(lead) }}
+          style={{
+            display: 'flex', alignItems: 'center', gap: 3,
+            fontSize: 11, color: '#9ca3af', fontWeight: 500,
+            background: 'none', border: 'none', cursor: 'pointer', padding: 0,
+          }}
+          onMouseEnter={e => ((e.currentTarget as HTMLElement).style.color = '#6366f1')}
+          onMouseLeave={e => ((e.currentTarget as HTMLElement).style.color = '#9ca3af')}
+        >
+          <Plus size={10} strokeWidth={2.5} /> Atividade
+        </button>
       </div>
 
-      {/* Footer */}
-      <div className="mt-3 flex items-center gap-2 border-t pt-2.5" style={{ borderColor: '#edf2f7' }}>
-        {/* Tempo na etapa */}
-        <div className="flex-1 min-w-0">
-          {(lead as any).etapa_em ? (
-            <span className="flex items-center gap-1 text-[11px] font-medium text-slate-400">
-              <Clock size={12} strokeWidth={1.5} />
-              {(() => {
-                const diff = Date.now() - new Date((lead as any).etapa_em).getTime()
-                const days = Math.floor(diff / 86400000)
-                if (days === 0) return 'hoje'
-                if (days === 1) return '1d nesta etapa'
-                return `${days}d nesta etapa`
-              })()}
-            </span>
-          ) : (
-            <span className="flex items-center gap-1 text-[11px] font-medium text-slate-400">
-              <Clock size={12} strokeWidth={1.5} />
-              {new Date(lead.created_at || '').toLocaleDateString('pt-BR', { day:'2-digit', month:'2-digit', year:'2-digit' })}
-            </span>
-          )}
-        </div>
-
-        {/* Ícones de contato rápido (Bitrix-style) */}
-        <div className="flex items-center gap-1 flex-shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
-          {lead.telefone && (
-            <a
-              href={`tel:${lead.telefone}`}
-              onClick={e => e.stopPropagation()}
-              title={lead.telefone}
-              className="flex h-6 w-6 items-center justify-center rounded-md transition-colors"
-              style={{ color: '#6b7280', background: '#f3f4f6' }}
-              onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = '#dbeafe'; (e.currentTarget as HTMLElement).style.color = '#2563eb' }}
-              onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = '#f3f4f6'; (e.currentTarget as HTMLElement).style.color = '#6b7280' }}
-            >
-              <Phone size={11} strokeWidth={1.8} />
-            </a>
-          )}
-          {lead.email && (
-            <a
-              href={`mailto:${lead.email}`}
-              onClick={e => e.stopPropagation()}
-              title={lead.email}
-              className="flex h-6 w-6 items-center justify-center rounded-md transition-colors"
-              style={{ color: '#6b7280', background: '#f3f4f6' }}
-              onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = '#d1fae5'; (e.currentTarget as HTMLElement).style.color = '#059669' }}
-              onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = '#f3f4f6'; (e.currentTarget as HTMLElement).style.color = '#6b7280' }}
-            >
-              <Mail size={11} strokeWidth={1.8} />
-            </a>
-          )}
-          <button
-            onClick={e => { e.stopPropagation(); (onClick as any)?.(lead, 'nota') }}
-            title="Adicionar nota"
-            className="flex h-6 w-6 items-center justify-center rounded-md transition-colors"
-            style={{ color: '#6b7280', background: '#f3f4f6' }}
-            onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = '#ede9fe'; (e.currentTarget as HTMLElement).style.color = '#7c3aed' }}
-            onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = '#f3f4f6'; (e.currentTarget as HTMLElement).style.color = '#6b7280' }}
-          >
-            <MessageSquare size={11} strokeWidth={1.8} />
-          </button>
-        </div>
+      {/* ── Ícones de contato empilhados na direita (estilo Bitrix) ── */}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 4, flexShrink: 0 }}>
+        <ActionIcon
+          href={lead.telefone ? `tel:${lead.telefone}` : undefined}
+          title={lead.telefone || 'Sem telefone'}
+          disabled={!lead.telefone}
+          hoverColor="#2563eb"
+          hoverBg="#dbeafe"
+        >
+          <Phone size={12} strokeWidth={1.8} />
+        </ActionIcon>
+        <ActionIcon
+          href={lead.email ? `mailto:${lead.email}` : undefined}
+          title={lead.email || 'Sem e-mail'}
+          disabled={!lead.email}
+          hoverColor="#059669"
+          hoverBg="#d1fae5"
+        >
+          <Mail size={12} strokeWidth={1.8} />
+        </ActionIcon>
+        <ActionIcon
+          onClick={e => { e.stopPropagation(); onClick?.(lead) }}
+          title="Abrir notas"
+          hoverColor="#7c3aed"
+          hoverBg="#ede9fe"
+        >
+          <MessageSquare size={12} strokeWidth={1.8} />
+        </ActionIcon>
       </div>
     </div>
+  )
+}
+
+// ── Helper: ícone de ação ──────────────────────────────────────
+function ActionIcon({
+  children, href, title, disabled, hoverColor, hoverBg, onClick,
+}: {
+  children: React.ReactNode
+  href?: string
+  title?: string
+  disabled?: boolean
+  hoverColor: string
+  hoverBg: string
+  onClick?: (e: React.MouseEvent) => void
+}) {
+  const base: React.CSSProperties = {
+    width: 26, height: 26, borderRadius: 6,
+    display: 'flex', alignItems: 'center', justifyContent: 'center',
+    background: '#f3f4f6', color: disabled ? '#d1d5db' : '#9ca3af',
+    border: 'none', cursor: disabled ? 'default' : 'pointer',
+    transition: 'background 0.12s, color 0.12s',
+    textDecoration: 'none', flexShrink: 0,
+  }
+
+  const handleEnter = (e: React.MouseEvent<HTMLElement>) => {
+    if (disabled) return
+    const el = e.currentTarget as HTMLElement
+    el.style.background = hoverBg
+    el.style.color = hoverColor
+  }
+  const handleLeave = (e: React.MouseEvent<HTMLElement>) => {
+    const el = e.currentTarget as HTMLElement
+    el.style.background = '#f3f4f6'
+    el.style.color = disabled ? '#d1d5db' : '#9ca3af'
+  }
+
+  if (href && !disabled) {
+    return (
+      <a href={href} title={title} style={base}
+        onClick={ev => ev.stopPropagation()}
+        onMouseEnter={handleEnter} onMouseLeave={handleLeave}>
+        {children}
+      </a>
+    )
+  }
+
+  return (
+    <button title={title} style={base} disabled={disabled}
+      onClick={onClick}
+      onMouseEnter={handleEnter} onMouseLeave={handleLeave}>
+      {children}
+    </button>
   )
 }
