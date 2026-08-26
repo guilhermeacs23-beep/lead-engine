@@ -52,72 +52,94 @@ export function KanbanColumn({
   }
 
   return (
-    <div
-      className="flex flex-shrink-0 flex-col"
-      style={{ width: 240, position: 'relative', minHeight: 0 }}
-    >
-      {/* ── Header compacto estilo Bitrix ── */}
+    <div style={{ width: 240, flexShrink: 0, display: 'flex', flexDirection: 'column', position: 'relative', minHeight: 0 }}>
+
+      {/* ── 1. Header FINO (36px) — sem uppercase agressivo ── */}
       <div style={{
         background: color,
-        borderRadius: '10px 10px 0 0',
-        padding: '8px 10px',
+        borderRadius: '8px 8px 0 0',
+        padding: '7px 10px',
         display: 'flex', alignItems: 'center', gap: 6,
+        minHeight: 36,
       }}>
         <span style={{
-          flex: 1, fontSize: 13, fontWeight: 700, color: '#fff',
-          textTransform: 'uppercase', letterSpacing: '0.04em',
+          flex: 1, fontSize: 12, fontWeight: 600, color: '#fff',
+          letterSpacing: '0.02em',
           overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
         }}>
           {title}
         </span>
-
-        {/* Contador */}
         <span style={{
-          minWidth: 22, height: 22, borderRadius: 11,
-          background: 'rgba(0,0,0,0.25)',
-          color: '#fff', fontSize: 11, fontWeight: 700,
+          minWidth: 20, height: 20, borderRadius: 10,
+          background: 'rgba(0,0,0,0.22)',
+          color: '#fff', fontSize: 10, fontWeight: 700,
           display: 'flex', alignItems: 'center', justifyContent: 'center',
-          padding: '0 6px',
+          padding: '0 5px', flexShrink: 0,
         }}>
           {leads.length}
         </span>
-
         {!fixed && (
           <>
-            <button onClick={openEdit}
-              style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'rgba(255,255,255,0.7)', padding: 2, lineHeight: 0 }}
-              title="Editar">
-              <Pencil size={11} strokeWidth={2} />
+            <button onClick={openEdit} title="Editar"
+              style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'rgba(255,255,255,0.65)', padding: 2, lineHeight: 0, flexShrink: 0 }}>
+              <Pencil size={10} strokeWidth={2} />
             </button>
-            <button onClick={() => onDelete?.(id)}
-              style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'rgba(255,255,255,0.7)', padding: 2, lineHeight: 0 }}
-              title="Excluir">
-              <Trash2 size={11} strokeWidth={2} />
+            <button onClick={() => onDelete?.(id)} title="Excluir"
+              style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'rgba(255,255,255,0.65)', padding: 2, lineHeight: 0, flexShrink: 0 }}>
+              <Trash2 size={10} strokeWidth={2} />
             </button>
           </>
         )}
       </div>
 
-      {/* ── Linha de valor (estilo Bitrix: R$X em cinza) ── */}
+      {/* ── 2. R$0 como PÍLLULA centralizada ── */}
       <div style={{
-        background: 'rgba(255,255,255,0.85)',
-        borderLeft: `3px solid ${color}`,
-        padding: '6px 10px',
-        display: 'flex', alignItems: 'center', gap: 6,
+        display: 'flex', justifyContent: 'center',
+        padding: '8px 10px 4px',
       }}>
-        <span style={{ fontSize: 13, fontWeight: 300, color: '#6b7280', letterSpacing: '-0.3px' }}>
-          {total > 0 ? `R$ ${formatCurrencyShort(total)}/mês` : <span style={{ color: '#d1d5db' }}>R$0</span>}
+        <span style={{
+          display: 'inline-flex', alignItems: 'center',
+          background: 'rgba(255,255,255,0.18)',
+          borderRadius: 20, padding: '3px 14px',
+          fontSize: 13, fontWeight: 300, color: '#fff',
+          letterSpacing: '-0.3px',
+        }}>
+          {total > 0
+            ? `R$${formatCurrencyShort(total)}`
+            : <span>R$<strong style={{ fontWeight: 700 }}>0</strong></span>}
         </span>
       </div>
 
-      {/* ── Área de cards (drop zone) ── */}
+      {/* ── 3. Botão + DENTRO da coluna, abaixo do pill ── */}
+      <div style={{ padding: '4px 10px 6px' }}>
+        <button
+          onClick={() => onAddLead?.(id)}
+          style={{
+            width: '100%', display: 'flex', alignItems: 'center', justifyContent: index === 0 ? 'flex-start' : 'center',
+            gap: 4, padding: '6px 10px',
+            background: index === 0 ? 'rgba(255,255,255,0.20)' : 'transparent',
+            border: index === 0 ? 'none' : 'none',
+            borderRadius: 6, cursor: 'pointer',
+            color: '#fff', fontSize: 12, fontWeight: 500,
+            transition: 'background 0.15s',
+          }}
+          onMouseEnter={e => ((e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.28)')}
+          onMouseLeave={e => ((e.currentTarget as HTMLElement).style.background = index === 0 ? 'rgba(255,255,255,0.20)' : 'transparent')}
+        >
+          <Plus size={13} strokeWidth={2.5} />
+          {index === 0 ? 'Lead rápido' : ''}
+        </button>
+      </div>
+
+      {/* ── Área de cards ── */}
       <div
-        className="flex flex-col gap-2 overflow-y-auto"
         style={{
-          flex: 1, minHeight: 60, padding: '6px 0',
-          background: isDragOver ? `${color}12` : 'transparent',
-          borderLeft: isDragOver ? `2px dashed ${color}` : '2px solid transparent',
-          transition: 'background 0.15s, border 0.15s',
+          flex: 1, minHeight: 60,
+          display: 'flex', flexDirection: 'column', gap: 6,
+          overflowY: 'auto', padding: '4px 4px 8px',
+          background: isDragOver ? `${color}15` : 'transparent',
+          borderLeft: isDragOver ? `2px dashed ${color}80` : '2px solid transparent',
+          transition: 'background 0.15s',
         }}
         onDragOver={handleDragOver}
         onDragLeave={handleDragLeave}
@@ -128,29 +150,10 @@ export function KanbanColumn({
         ))}
       </div>
 
-      {/* ── Botão adicionar (estilo Bitrix: + Adicionar) ── */}
-      <button
-        onClick={() => onAddLead?.(id)}
-        style={{
-          display: 'flex', alignItems: 'center', gap: 4,
-          padding: '7px 10px',
-          background: 'rgba(255,255,255,0.75)',
-          border: 'none', borderTop: '1px solid rgba(0,0,0,0.06)',
-          borderRadius: '0 0 8px 8px',
-          cursor: 'pointer', color: '#6b7280', fontSize: 12, fontWeight: 500,
-          transition: 'background 0.15s',
-        }}
-        onMouseEnter={e => (e.currentTarget.style.background = 'rgba(255,255,255,0.95)')}
-        onMouseLeave={e => (e.currentTarget.style.background = 'rgba(255,255,255,0.75)')}
-      >
-        <Plus size={13} strokeWidth={2.5} style={{ color }} />
-        Adicionar lead
-      </button>
-
       {/* ── Painel de edição flutuante ── */}
       {editOpen && (
         <div ref={panelRef} style={{
-          position: 'absolute', top: 52, left: 0, right: 0, zIndex: 100,
+          position: 'absolute', top: 44, left: 0, right: 0, zIndex: 200,
           background: '#1e1b4b', backdropFilter: 'blur(20px)',
           border: '1px solid rgba(255,255,255,0.15)', borderRadius: 10, padding: 14,
           boxShadow: '0 20px 60px rgba(0,0,0,0.5)',
