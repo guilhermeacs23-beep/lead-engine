@@ -481,18 +481,18 @@ export default function LeadsPage() {
       </div>
 
       {/* Tabela */}
-      <div className="overflow-hidden rounded-xl" style={{ border: '0.5px solid rgba(255,255,255,0.10)' }}>
-        <div className="grid items-center px-4 py-3 text-[13px] font-semibold text-white"
-          style={{ gridTemplateColumns: '2fr 1.2fr 0.8fr 0.7fr 0.7fr 90px', background: 'rgba(255,255,255,0.07)', borderBottom: '0.5px solid rgba(255,255,255,0.10)' }}>
+      <div className="overflow-hidden rounded-xl" style={{ border: '1px solid #e5e7eb', background: '#ffffff', boxShadow: '0 4px 24px rgba(0,0,0,0.08)' }}>
+        <div className="grid items-center px-4 py-3 text-[13px] font-semibold"
+          style={{ gridTemplateColumns: '2fr 1.2fr 0.8fr 0.7fr 0.7fr 90px', background: '#f9fafb', borderBottom: '1px solid #e5e7eb', color: '#374151' }}>
           <span>Empresa</span><span>Segmento</span><span>Cidade / UF</span><span>Potencial</span><span>Fonte</span><span></span>
         </div>
 
         {loading ? (
-          <div className="flex items-center justify-center gap-2 py-16 text-base text-white/50">
+          <div className="flex items-center justify-center gap-2 py-16 text-base" style={{ color: '#9ca3af' }}>
             <Loader2 size={18} className="animate-spin" />Carregando leads...
           </div>
         ) : leads.length === 0 ? (
-          <div className="py-12 text-center text-base text-white/50">
+          <div className="py-12 text-center text-base" style={{ color: '#9ca3af' }}>
             Nenhum lead encontrado com esses filtros
           </div>
         ) : (
@@ -511,16 +511,23 @@ function LeadRow({ lead, onClick }: { lead: any; onClick: () => void }) {
 
   return (
     <div onClick={onClick}
-      className="grid cursor-pointer items-center px-4 py-3.5 text-sm transition-all hover:bg-white/[0.06]"
-      style={{ gridTemplateColumns: '2fr 1.2fr 0.8fr 0.7fr 0.7fr 90px', borderBottom: '0.5px solid rgba(255,255,255,0.06)' }}>
+      className="grid cursor-pointer items-center px-4 py-3.5 text-sm transition-all"
+      style={{
+        gridTemplateColumns: '2fr 1.2fr 0.8fr 0.7fr 0.7fr 90px',
+        borderBottom: '1px solid #f3f4f6',
+        background: '#ffffff',
+      }}
+      onMouseEnter={e => (e.currentTarget.style.background = '#f9fafb')}
+      onMouseLeave={e => (e.currentTarget.style.background = '#ffffff')}
+    >
       <div>
-        <p className="font-semibold text-white">{lead.empresa}</p>
-        <p className="mt-0.5 text-[12px] text-white/65">{lead.contato_nome} · {lead.contato_cargo}</p>
+        <p className="font-semibold" style={{ color: '#111827' }}>{lead.empresa}</p>
+        <p className="mt-0.5 text-[12px]" style={{ color: '#6b7280' }}>{lead.contato_nome} · {lead.contato_cargo}</p>
       </div>
-      <span className="font-medium text-white">{SEGMENT_LABELS[lead.segmento] ?? lead.segmento}</span>
-      <span className="font-medium text-white">{lead.cidade}, {lead.estado}</span>
+      <span className="font-medium" style={{ color: '#374151' }}>{SEGMENT_LABELS[lead.segmento] ?? lead.segmento}</span>
+      <span className="font-medium" style={{ color: '#374151' }}>{lead.cidade}, {lead.estado}</span>
       <div className="flex items-center gap-2">
-        <div className="flex-1 overflow-hidden rounded-full" style={{ height: 5, background: 'rgba(255,255,255,0.10)' }}>
+        <div className="flex-1 overflow-hidden rounded-full" style={{ height: 5, background: '#e5e7eb' }}>
           <div className="h-full rounded-full" style={{ width: `${lead.score_ia}%`, background: score.color }} />
         </div>
         <span className="min-w-[28px] text-right text-[13px] font-bold" style={{ color: score.color }}>{lead.score_ia}</span>
@@ -528,10 +535,13 @@ function LeadRow({ lead, onClick }: { lead: any; onClick: () => void }) {
       {source ? (
         <span className="w-fit rounded-lg px-2 py-0.5 text-[12px] font-medium" style={{ color: source.color, background: source.bg }}>{source.label}</span>
       ) : (
-        <span className="text-white/60">{lead.fonte}</span>
+        <span style={{ color: '#9ca3af', fontSize: 12 }}>{lead.fonte}</span>
       )}
       <div className="flex justify-end">
-        <button className="flex items-center gap-1 rounded-lg px-2.5 py-1 text-[13px] font-semibold text-indigo-300 transition-all hover:bg-indigo-500/15">
+        <button className="flex items-center gap-1 rounded-lg px-2.5 py-1 text-[13px] font-semibold transition-all"
+          style={{ color: '#6366f1' }}
+          onMouseEnter={e => (e.currentTarget.style.background = 'rgba(99,102,241,0.08)')}
+          onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}>
           <Plus size={12} strokeWidth={2} />Adicionar
         </button>
       </div>
