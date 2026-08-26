@@ -408,7 +408,7 @@ export default function LeadsPage() {
     setSources(prev => prev.includes(id) ? prev.filter(s => s !== id) : [...prev, id])
 
   return (
-    <div className="flex h-full flex-col overflow-auto p-5">
+    <div className="flex h-full flex-col overflow-hidden p-5">
       <LeadDrawer lead={selectedLead} onClose={() => setSelectedLead(null)} />
 
       {showImport && (
@@ -480,10 +480,10 @@ export default function LeadsPage() {
         </div>
       </div>
 
-      {/* Tabela */}
-      <div className="overflow-hidden rounded-xl" style={{ border: '1px solid #e5e7eb', background: '#ffffff', boxShadow: '0 4px 24px rgba(0,0,0,0.08)' }}>
+      {/* Tabela — flex-1 + overflow-y-auto para scroll dedicado */}
+      <div className="flex-1 overflow-y-auto rounded-xl" style={{ border: '1px solid #e5e7eb', background: '#ffffff', boxShadow: '0 4px 24px rgba(0,0,0,0.08)', minHeight: 0 }}>
         <div className="grid items-center px-4 py-3 text-[13px] font-semibold"
-          style={{ gridTemplateColumns: '2fr 1.2fr 0.8fr 0.7fr 0.7fr 90px', background: '#f9fafb', borderBottom: '1px solid #e5e7eb', color: '#374151' }}>
+          style={{ gridTemplateColumns: '2fr 1.2fr 0.8fr 0.7fr 0.7fr 90px', background: '#f9fafb', borderBottom: '1px solid #e5e7eb', color: '#374151', position: 'sticky', top: 0, zIndex: 10 }}>
           <span>Empresa</span><span>Segmento</span><span>Cidade / UF</span><span>Potencial</span><span>Fonte</span><span></span>
         </div>
 
