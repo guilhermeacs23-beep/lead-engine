@@ -52,139 +52,143 @@ export function KanbanColumn({
   }
 
   return (
-    <div className="flex w-[230px] flex-shrink-0 flex-col" style={{ position: 'relative', minHeight: 0 }}>
-
-      {/* ── Wrapper coluna ── */}
+    <div
+      className="flex flex-shrink-0 flex-col"
+      style={{ width: 240, position: 'relative', minHeight: 0 }}
+    >
+      {/* ── Header compacto estilo Bitrix ── */}
       <div style={{
-        borderRadius: 12,
-        border: isDragOver ? `2px dashed ${color}` : '1px solid #e5e7eb',
-        overflow: 'hidden',
-        position: 'relative',
-        transition: 'border 0.15s',
-        display: 'flex', flexDirection: 'column', height: '100%',
-        boxShadow: '0 1px 4px rgba(0,0,0,0.06)',
+        background: color,
+        borderRadius: '10px 10px 0 0',
+        padding: '8px 10px',
+        display: 'flex', alignItems: 'center', gap: 6,
       }}>
-
-        {/* ── Faixa colorida com título ── */}
-        <div style={{
-          background: color,
-          borderRadius: '11px 11px 0 0',
-          padding: '10px 12px',
+        <span style={{
+          flex: 1, fontSize: 13, fontWeight: 700, color: '#fff',
+          textTransform: 'uppercase', letterSpacing: '0.04em',
+          overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
         }}>
-          <div className="flex items-center justify-between gap-2">
-            <span className="truncate text-[13px] font-bold text-white uppercase tracking-wider drop-shadow">
-              {title}
-            </span>
-            <div className="flex items-center gap-1.5 flex-shrink-0">
-              <span className="rounded-full px-2 py-0.5 text-[11px] font-bold text-white"
-                style={{ background: 'rgba(0,0,0,0.28)' }}>
-                {leads.length}
-              </span>
-              {!fixed && (
-                <button onClick={openEdit}
-                  className="rounded p-0.5 text-white/70 hover:bg-white/25 hover:text-white transition-all"
-                  title="Editar cor / nome">
-                  <Pencil size={12} strokeWidth={2} />
-                </button>
-              )}
-              {!fixed && (
-                <button onClick={() => onDelete?.(id)}
-                  className="rounded p-0.5 text-white/70 hover:bg-white/25 hover:text-red-200 transition-all"
-                  title="Excluir etapa">
-                  <Trash2 size={12} strokeWidth={2} />
-                </button>
-              )}
-            </div>
-          </div>
-        </div>
+          {title}
+        </span>
 
-        {/* ── Valor monetário: fundo branco, texto escuro ── */}
-        <div style={{
-          background: '#ffffff',
-          borderBottom: '1px solid #f3f4f6',
-          padding: '10px 12px 12px',
-          textAlign: 'center',
+        {/* Contador */}
+        <span style={{
+          minWidth: 22, height: 22, borderRadius: 11,
+          background: 'rgba(0,0,0,0.25)',
+          color: '#fff', fontSize: 11, fontWeight: 700,
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          padding: '0 6px',
         }}>
-          <p style={{ fontSize: 20, fontWeight: 300, color: '#374151', letterSpacing: '-0.5px' }}>
-            {total > 0
-              ? `${formatCurrencyShort(total)}/mês`
-              : <span style={{ color: '#d1d5db', fontSize: 14 }}>—</span>}
-          </p>
-        </div>
+          {leads.length}
+        </span>
 
-        {/* ── Painel de edição flutuante ── */}
-        {editOpen && (
-          <div ref={panelRef} style={{
-            position: 'absolute', top: 'calc(100% + 6px)', left: 0, right: 0, zIndex: 100,
-            background: 'rgba(12,10,35,0.98)', backdropFilter: 'blur(20px)',
-            border: '1px solid rgba(255,255,255,0.15)', borderRadius: 10, padding: 14,
-            boxShadow: '0 20px 60px rgba(0,0,0,0.7)',
-          }}>
-            <p className="mb-1 text-[11px] font-semibold text-white/50 uppercase tracking-wider">Nome da etapa</p>
-            <input autoFocus value={editTitle}
-              onChange={e => setEditTitle(e.target.value)}
-              onKeyDown={e => { if (e.key === 'Enter') handleSave() }}
-              className="w-full rounded-lg px-3 py-2 text-sm text-white outline-none mb-4"
-              style={{ background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.15)' }}
-            />
-
-            <p className="mb-2 text-[11px] font-semibold text-white/50 uppercase tracking-wider">Cor da coluna</p>
-            <div className="grid grid-cols-6 gap-2 mb-3">
-              {COLOR_PALETTE.map((c) => (
-                <button key={c} onClick={() => setEditColor(c)}
-                  style={{
-                    width: 30, height: 30, borderRadius: '50%', background: c,
-                    outline: editColor === c ? `3px solid ${c}` : '2px solid transparent',
-                    outlineOffset: 2,
-                    transform: editColor === c ? 'scale(1.22)' : 'scale(1)',
-                    transition: 'all 0.12s ease',
-                    boxShadow: editColor === c ? `0 0 12px ${c}99` : 'none',
-                  }}
-                />
-              ))}
-            </div>
-
-            {/* Preview */}
-            <div className="mb-3 flex items-center gap-2 rounded-lg px-3 py-2"
-              style={{ background: editColor + '22', border: `1px solid ${editColor}55` }}>
-              <div style={{ width: 14, height: 14, borderRadius: 4, background: editColor, flexShrink: 0 }} />
-              <span className="text-xs text-white font-mono">{editColor}</span>
-            </div>
-
-            <div className="flex gap-2">
-              <button onClick={handleSave}
-                className="flex-1 flex items-center justify-center gap-1.5 rounded-lg py-2 text-sm font-bold text-white"
-                style={{ background: editColor, boxShadow: `0 4px 16px ${editColor}66` }}>
-                <Check size={13} strokeWidth={2.5} /> Salvar
-              </button>
-              <button onClick={() => setEditOpen(false)}
-                className="rounded-lg px-3 py-2 text-white/40 hover:bg-white/10 transition-all">
-                <X size={13} strokeWidth={2} />
-              </button>
-            </div>
-          </div>
+        {!fixed && (
+          <>
+            <button onClick={openEdit}
+              style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'rgba(255,255,255,0.7)', padding: 2, lineHeight: 0 }}
+              title="Editar">
+              <Pencil size={11} strokeWidth={2} />
+            </button>
+            <button onClick={() => onDelete?.(id)}
+              style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'rgba(255,255,255,0.7)', padding: 2, lineHeight: 0 }}
+              title="Excluir">
+              <Trash2 size={11} strokeWidth={2} />
+            </button>
+          </>
         )}
-
-        {/* ── Cards ── */}
-        <div className="flex flex-col gap-2 overflow-y-auto p-2"
-          style={{
-            flex: 1, minHeight: 60,
-            background: isDragOver ? `${color}10` : '#f5f7fa',
-            transition: 'background 0.15s',
-          }}
-          onDragOver={handleDragOver} onDragLeave={handleDragLeave} onDrop={handleDrop}>
-          {leads.map((lead) => (
-            <LeadCard key={lead.id} lead={lead} onClick={onLeadClick} />
-          ))}
-        </div>
       </div>
 
-      {/* Adicionar lead */}
-      <button onClick={() => onAddLead?.(id)}
-        className="flex items-center gap-1.5 rounded-lg px-3 py-2 text-xs transition-all hover:bg-gray-100"
-        style={{ color: '#6b7280', border: '1px dashed #d1d5db', marginTop: 4 }}>
-        <Plus size={13} strokeWidth={2} /> Adicionar lead
+      {/* ── Linha de valor (estilo Bitrix: R$X em cinza) ── */}
+      <div style={{
+        background: 'rgba(255,255,255,0.85)',
+        borderLeft: `3px solid ${color}`,
+        padding: '6px 10px',
+        display: 'flex', alignItems: 'center', gap: 6,
+      }}>
+        <span style={{ fontSize: 13, fontWeight: 300, color: '#6b7280', letterSpacing: '-0.3px' }}>
+          {total > 0 ? `R$ ${formatCurrencyShort(total)}/mês` : <span style={{ color: '#d1d5db' }}>R$0</span>}
+        </span>
+      </div>
+
+      {/* ── Área de cards (drop zone) ── */}
+      <div
+        className="flex flex-col gap-2 overflow-y-auto"
+        style={{
+          flex: 1, minHeight: 60, padding: '6px 0',
+          background: isDragOver ? `${color}12` : 'transparent',
+          borderLeft: isDragOver ? `2px dashed ${color}` : '2px solid transparent',
+          transition: 'background 0.15s, border 0.15s',
+        }}
+        onDragOver={handleDragOver}
+        onDragLeave={handleDragLeave}
+        onDrop={handleDrop}
+      >
+        {leads.map(lead => (
+          <LeadCard key={lead.id} lead={lead} onClick={onLeadClick} color={color} />
+        ))}
+      </div>
+
+      {/* ── Botão adicionar (estilo Bitrix: + Adicionar) ── */}
+      <button
+        onClick={() => onAddLead?.(id)}
+        style={{
+          display: 'flex', alignItems: 'center', gap: 4,
+          padding: '7px 10px',
+          background: 'rgba(255,255,255,0.75)',
+          border: 'none', borderTop: '1px solid rgba(0,0,0,0.06)',
+          borderRadius: '0 0 8px 8px',
+          cursor: 'pointer', color: '#6b7280', fontSize: 12, fontWeight: 500,
+          transition: 'background 0.15s',
+        }}
+        onMouseEnter={e => (e.currentTarget.style.background = 'rgba(255,255,255,0.95)')}
+        onMouseLeave={e => (e.currentTarget.style.background = 'rgba(255,255,255,0.75)')}
+      >
+        <Plus size={13} strokeWidth={2.5} style={{ color }} />
+        Adicionar lead
       </button>
+
+      {/* ── Painel de edição flutuante ── */}
+      {editOpen && (
+        <div ref={panelRef} style={{
+          position: 'absolute', top: 52, left: 0, right: 0, zIndex: 100,
+          background: '#1e1b4b', backdropFilter: 'blur(20px)',
+          border: '1px solid rgba(255,255,255,0.15)', borderRadius: 10, padding: 14,
+          boxShadow: '0 20px 60px rgba(0,0,0,0.5)',
+        }}>
+          <p style={{ marginBottom: 4, fontSize: 11, fontWeight: 600, color: 'rgba(255,255,255,0.5)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>Nome da etapa</p>
+          <input autoFocus value={editTitle}
+            onChange={e => setEditTitle(e.target.value)}
+            onKeyDown={e => { if (e.key === 'Enter') handleSave() }}
+            style={{ width: '100%', borderRadius: 8, padding: '8px 12px', fontSize: 13, color: '#fff', marginBottom: 14, background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.15)', outline: 'none', boxSizing: 'border-box' }}
+          />
+          <p style={{ marginBottom: 8, fontSize: 11, fontWeight: 600, color: 'rgba(255,255,255,0.5)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>Cor</p>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', gap: 8, marginBottom: 12 }}>
+            {COLOR_PALETTE.map(c => (
+              <button key={c} onClick={() => setEditColor(c)} style={{
+                width: 30, height: 30, borderRadius: '50%', background: c,
+                outline: editColor === c ? `3px solid ${c}` : '2px solid transparent',
+                outlineOffset: 2, transform: editColor === c ? 'scale(1.2)' : 'scale(1)',
+                transition: 'all 0.12s', border: 'none', cursor: 'pointer',
+              }} />
+            ))}
+          </div>
+          <div style={{ display: 'flex', gap: 8 }}>
+            <button onClick={handleSave} style={{
+              flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 4,
+              borderRadius: 8, padding: '8px', fontSize: 13, fontWeight: 700, color: '#fff',
+              background: editColor, border: 'none', cursor: 'pointer',
+            }}>
+              <Check size={13} strokeWidth={2.5} /> Salvar
+            </button>
+            <button onClick={() => setEditOpen(false)} style={{
+              borderRadius: 8, padding: '8px 12px', color: 'rgba(255,255,255,0.4)',
+              background: 'transparent', border: '1px solid rgba(255,255,255,0.15)', cursor: 'pointer',
+            }}>
+              <X size={13} strokeWidth={2} />
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
