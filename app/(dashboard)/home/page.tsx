@@ -4,7 +4,7 @@ import { useRouter } from 'next/navigation'
 import { createBrowserClient } from '@supabase/ssr'
 import {
   Kanban, Users, CheckSquare, Map, BarChart2,
-  UsersRound, Settings, ChevronRight, Zap,
+  UsersRound, ChevronRight, TrendingUp, Clock, Target, Activity,
 } from 'lucide-react'
 
 const supabase = createBrowserClient(
@@ -12,14 +12,25 @@ const supabase = createBrowserClient(
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 )
 
+const TENANT_ID = '00000000-0000-0000-0000-000000000001'
+
 const QUICK_LINKS = [
-  { href: '/pipeline',    icon: Kanban,      label: 'Pipeline',     desc: 'Funil de vendas',             color: '#818cf8' },
-  { href: '/leads',       icon: Users,       label: 'Leads',        desc: 'Base de prospects',           color: '#60a5fa' },
-  { href: '/tarefas',     icon: CheckSquare, label: 'Tarefas',      desc: 'Atividades da equipe',        color: '#34d399' },
-  { href: '/relatorios',  icon: BarChart2,   label: 'Análises',     desc: 'Métricas e relatórios',       color: '#fbbf24' },
-  { href: '/mapa',        icon: Map,         label: 'Mapa',         desc: 'Leads por região',            color: '#f472b6' },
-  { href: '/grupos',      icon: UsersRound,  label: 'Grupos',       desc: 'Times de trabalho',           color: '#a78bfa' },
+  { href: '/pipeline',   icon: Kanban,      label: 'Pipeline',   desc: 'Funil de vendas',       color: '#818cf8' },
+  { href: '/leads',      icon: Users,       label: 'Leads',      desc: 'Base de prospects',     color: '#60a5fa' },
+  { href: '/tarefas',    icon: CheckSquare, label: 'Tarefas',    desc: 'Atividades da equipe',  color: '#34d399' },
+  { href: '/relatorios', icon: BarChart2,   label: 'Análises',   desc: 'Métricas e relatórios', color: '#fbbf24' },
+  { href: '/mapa',       icon: Map,         label: 'Mapa',       desc: 'Leads por região',      color: '#f472b6' },
+  { href: '/grupos',     icon: UsersRound,  label: 'Grupos',     desc: 'Times de trabalho',     color: '#a78bfa' },
 ]
+
+const STAGE_COLORS: Record<string, string> = {
+  novo: '#818cf8', contactado: '#60a5fa', proposta: '#fbbf24',
+  negociando: '#f472b6', fechado: '#34d399', perdido: '#ef4444',
+}
+const STAGE_LABELS: Record<string, string> = {
+  novo: 'Novo', contactado: 'Contactado', proposta: 'Proposta',
+  negociando: 'Negociando', fechado: 'Fechado', perdido: 'Perdido',
+}
 
 function greeting() {
   const h = new Date().getHours()
@@ -28,115 +39,211 @@ function greeting() {
   return 'Boa noite'
 }
 
+interface Stats {
+  totalLeads: number
+  leadsEsseMes: number
+  tarefasPendentes: number
+  pipelineAtivo: number
+  byStage: { status: string; count: number }[]
+}
+
 export default function HomePage() {
   const router = useRouter()
-  const [nome, setNome] = useState('')
+  const [nome,  setNome]  = useState('')
+  const [stats, setStats] = useState<Stats | null>(null)
 
   useEffect(() => {
-    async function loadUser() {
+    async function load() {
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) return
-      const { data } = await supabase.from('profiles').select('nome').eq('id', user.id).single()
-      setNome(data?.nome?.split(' ')[0] || user.email?.split('@')[0] || '')
+      const { data: prof } = await supabase.from('profiles').select('nome').eq('id', user.id).single()
+      setNome(prof?.nome?.split(' ')[0] || user.email?.split('@')[0] || '')
+
+      // KPIs
+      const [{ count: totalLeads }, { count: tarefasPendentes }] = await Promise.all([
+        supabase.from('leads').select('*', { count: 'exact', head: true }).eq('tenant_id', TENANT_ID),
+        supabase.from('tarefas').select('*', { count: 'exact', head: true }).eq('tenant_id', TENANT_ID).eq('status', 'pendente'),
+      ])
+
+      const inicioDeMes = new Date(); inicioDeMes.setDate(1); inicioDeMes.setHours(0, 0, 0, 0)
+      const { count: leadsEsseMes } = await supabase
+        .from('leads').select('*', { count: 'exact', head: true })
+        .eq('tenant_id', TENANT_ID).gte('created_at', inicioDeMes.toISOString())
+
+      // Pipeline por etapa
+      const { data: stageData } = await supabase
+        .from('leads').select('status').eq('tenant_id', TENANT_ID)
+        .in('status', ['novo','contactado','proposta','negociando','fechado'])
+
+      const stageCounts: Record<string, number> = {}
+      for (const row of stageData ?? []) {
+        stageCounts[row.status] = (stageCounts[row.status] || 0) + 1
+      }
+      const byStage = Object.entries(stageCounts).map(([status, count]) => ({ status, count }))
+      const pipelineAtivo = byStage.filter(s => s.status !== 'fechado' && s.status !== 'perdido').reduce((a, b) => a + b.count, 0)
+
+      setStats({ totalLeads: totalLeads ?? 0, leadsEsseMes: leadsEsseMes ?? 0, tarefasPendentes: tarefasPendentes ?? 0, pipelineAtivo, byStage })
     }
-    loadUser()
+    load()
   }, [])
+
+  const maxStage = Math.max(...(stats?.byStage.map(s => s.count) ?? [1]), 1)
 
   return (
     <div style={{
       display: 'flex', flexDirection: 'column',
-      alignItems: 'center', justifyContent: 'center',
-      height: '100%', overflow: 'auto', padding: '40px 24px',
+      alignItems: 'center',
+      height: '100%', overflow: 'auto', padding: '32px 24px 40px',
     }}>
 
-      {/* Hero */}
-      <div style={{ textAlign: 'center', marginBottom: 56 }}>
-        {/* Logo + Nome */}
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 18, marginBottom: 16 }}>
+      {/* ── Hero ── */}
+      <div style={{ textAlign: 'center', marginBottom: 40 }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 18, marginBottom: 12 }}>
           <img src="/logo-lp.png" alt="Lead+"
-            style={{ width: 72, height: 72, objectFit: 'contain', filter: 'drop-shadow(0 4px 24px rgba(224,79,10,0.35))' }} />
-          <h1 style={{
-            fontSize: 64, fontWeight: 900, letterSpacing: '-2px',
-            color: '#ffffff', margin: 0, lineHeight: 1,
-          }}>
+            style={{ width: 64, height: 64, objectFit: 'contain', filter: 'drop-shadow(0 4px 24px rgba(224,79,10,0.35))' }} />
+          <h1 style={{ fontSize: 60, fontWeight: 900, letterSpacing: '-2px', color: '#ffffff', margin: 0, lineHeight: 1 }}>
             Lead<span style={{ color: '#E04F0A' }}>+</span>
           </h1>
         </div>
-
-        <p style={{
-          fontSize: 18, color: 'rgba(255,255,255,0.55)', fontWeight: 400,
-          letterSpacing: '0.04em', margin: 0, marginBottom: 28,
-        }}>
+        <p style={{ fontSize: 17, color: 'rgba(255,255,255,0.55)', margin: '0 0 20px', letterSpacing: '0.04em' }}>
           Inteligência que impulsiona
         </p>
-
         {nome && (
           <div style={{
             display: 'inline-flex', alignItems: 'center', gap: 10,
-            background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.12)',
-            borderRadius: 100, padding: '8px 20px',
+            background: 'rgba(255,255,255,0.10)', border: '1px solid rgba(255,255,255,0.15)',
+            borderRadius: 100, padding: '8px 20px', backdropFilter: 'blur(8px)',
           }}>
-            <div style={{ width: 28, height: 28, borderRadius: '50%', background: 'linear-gradient(135deg,#E04F0A,#fbbf24)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, fontWeight: 700, color: '#fff' }}>
+            <div style={{ width: 26, height: 26, borderRadius: '50%', background: 'linear-gradient(135deg,#E04F0A,#fbbf24)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, fontWeight: 700, color: '#fff' }}>
               {nome[0]?.toUpperCase()}
             </div>
-            <span style={{ fontSize: 14, color: 'rgba(255,255,255,0.75)', fontWeight: 500 }}>
+            <span style={{ fontSize: 13, color: 'rgba(255,255,255,0.80)', fontWeight: 500 }}>
               {greeting()}, <strong style={{ color: '#fff', fontWeight: 700 }}>{nome}</strong>
             </span>
           </div>
         )}
       </div>
 
-      {/* Quick access */}
-      <div style={{
-        display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
-        gap: 14, width: '100%', maxWidth: 860,
-      }}>
+      {/* ── Quick access ── */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12, width: '100%', maxWidth: 820, marginBottom: 16 }}>
         {QUICK_LINKS.map(({ href, icon: Icon, label, desc, color }) => (
-          <button
-            key={href}
-            onClick={() => router.push(href)}
+          <button key={href} onClick={() => router.push(href)}
             style={{
               display: 'flex', alignItems: 'center', gap: 14,
-              padding: '18px 20px', borderRadius: 18,
-              background: 'rgba(255,255,255,0.07)',
-              border: '1px solid rgba(255,255,255,0.10)',
+              padding: '16px 18px', borderRadius: 16,
+              background: '#ffffff', border: '1px solid #e5e7eb',
               cursor: 'pointer', textAlign: 'left',
+              boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
               transition: 'all 0.18s',
             }}
             onMouseEnter={e => {
               const el = e.currentTarget as HTMLElement
-              el.style.background = 'rgba(255,255,255,0.12)'
-              el.style.border = `1px solid ${color}55`
               el.style.transform = 'translateY(-2px)'
-              el.style.boxShadow = `0 8px 24px ${color}25`
+              el.style.boxShadow = `0 8px 24px ${color}30`
+              el.style.border = `1px solid ${color}55`
             }}
             onMouseLeave={e => {
               const el = e.currentTarget as HTMLElement
-              el.style.background = 'rgba(255,255,255,0.07)'
-              el.style.border = '1px solid rgba(255,255,255,0.10)'
               el.style.transform = 'translateY(0)'
-              el.style.boxShadow = 'none'
+              el.style.boxShadow = '0 2px 8px rgba(0,0,0,0.08)'
+              el.style.border = '1px solid #e5e7eb'
             }}
           >
             <div style={{
-              width: 42, height: 42, borderRadius: 12, flexShrink: 0,
-              background: `${color}20`, border: `1.5px solid ${color}45`,
+              width: 40, height: 40, borderRadius: 11, flexShrink: 0,
+              background: `${color}18`, border: `1.5px solid ${color}40`,
               display: 'flex', alignItems: 'center', justifyContent: 'center',
             }}>
-              <Icon size={18} strokeWidth={1.6} style={{ color }} />
+              <Icon size={17} strokeWidth={1.6} style={{ color }} />
             </div>
             <div style={{ flex: 1, minWidth: 0 }}>
-              <p style={{ margin: 0, fontSize: 14, fontWeight: 700, color: '#fff' }}>{label}</p>
-              <p style={{ margin: 0, fontSize: 11, color: 'rgba(255,255,255,0.40)', marginTop: 2 }}>{desc}</p>
+              <p style={{ margin: 0, fontSize: 13, fontWeight: 700, color: '#111827' }}>{label}</p>
+              <p style={{ margin: '2px 0 0', fontSize: 11, color: '#9ca3af' }}>{desc}</p>
             </div>
-            <ChevronRight size={14} strokeWidth={1.5} style={{ color: 'rgba(255,255,255,0.25)', flexShrink: 0 }} />
+            <ChevronRight size={13} strokeWidth={1.5} style={{ color: '#d1d5db', flexShrink: 0 }} />
           </button>
         ))}
       </div>
 
-      {/* Footer tagline */}
-      <p style={{ marginTop: 48, fontSize: 11, color: 'rgba(255,255,255,0.20)', letterSpacing: '0.06em' }}>
+      {/* ── Analytics card ── */}
+      <div style={{
+        width: '100%', maxWidth: 820,
+        background: '#ffffff', borderRadius: 20,
+        border: '1px solid #e5e7eb',
+        boxShadow: '0 4px 20px rgba(0,0,0,0.10)',
+        padding: '22px 24px',
+      }}>
+        {/* Header */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 20 }}>
+          <Activity size={16} strokeWidth={1.8} style={{ color: '#6366f1' }} />
+          <span style={{ fontSize: 14, fontWeight: 700, color: '#111827' }}>Visão Geral</span>
+        </div>
+
+        {/* KPIs */}
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12, marginBottom: 24 }}>
+          {[
+            { label: 'Total leads',        value: stats?.totalLeads       ?? '—', icon: Users,      color: '#60a5fa' },
+            { label: 'Pipeline ativo',     value: stats?.pipelineAtivo    ?? '—', icon: Target,     color: '#818cf8' },
+            { label: 'Leads este mês',     value: stats?.leadsEsseMes     ?? '—', icon: TrendingUp, color: '#34d399' },
+            { label: 'Tarefas pendentes',  value: stats?.tarefasPendentes ?? '—', icon: Clock,      color: '#fbbf24' },
+          ].map(({ label, value, icon: Icon, color }) => (
+            <div key={label} style={{
+              padding: '14px 16px', borderRadius: 12,
+              background: '#f9fafb', border: '1px solid #f0f0f0',
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8 }}>
+                <div style={{ width: 28, height: 28, borderRadius: 8, background: `${color}18`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <Icon size={13} strokeWidth={1.8} style={{ color }} />
+                </div>
+                <span style={{ fontSize: 11, color: '#6b7280', fontWeight: 500 }}>{label}</span>
+              </div>
+              <p style={{ margin: 0, fontSize: 24, fontWeight: 800, color: '#111827', lineHeight: 1 }}>
+                {typeof value === 'number' ? value.toLocaleString('pt-BR') : value}
+              </p>
+            </div>
+          ))}
+        </div>
+
+        {/* Bar chart — leads por etapa */}
+        <div>
+          <p style={{ margin: '0 0 12px', fontSize: 12, fontWeight: 600, color: '#6b7280', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+            Leads por etapa
+          </p>
+          {stats && stats.byStage.length > 0 ? (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+              {['novo','contactado','proposta','negociando','fechado'].map(status => {
+                const entry = stats.byStage.find(s => s.status === status)
+                const count = entry?.count ?? 0
+                const pct = Math.round((count / maxStage) * 100)
+                const color = STAGE_COLORS[status] ?? '#94a3b8'
+                return (
+                  <div key={status} style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                    <span style={{ width: 90, fontSize: 12, color: '#374151', fontWeight: 500, flexShrink: 0 }}>
+                      {STAGE_LABELS[status]}
+                    </span>
+                    <div style={{ flex: 1, height: 10, background: '#f3f4f6', borderRadius: 99, overflow: 'hidden' }}>
+                      <div style={{
+                        height: '100%', borderRadius: 99, width: `${pct}%`,
+                        background: color, transition: 'width 0.6s ease',
+                        minWidth: count > 0 ? 6 : 0,
+                      }} />
+                    </div>
+                    <span style={{ width: 40, fontSize: 12, fontWeight: 700, color: '#111827', textAlign: 'right', flexShrink: 0 }}>
+                      {count.toLocaleString('pt-BR')}
+                    </span>
+                  </div>
+                )
+              })}
+            </div>
+          ) : (
+            <div style={{ textAlign: 'center', padding: '20px 0', color: '#9ca3af', fontSize: 13 }}>
+              Carregando dados…
+            </div>
+          )}
+        </div>
+      </div>
+
+      <p style={{ marginTop: 28, fontSize: 11, color: 'rgba(255,255,255,0.20)', letterSpacing: '0.06em' }}>
         EBT Transportadora · Lead Engine v1.0
       </p>
     </div>
