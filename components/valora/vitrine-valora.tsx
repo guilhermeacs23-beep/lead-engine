@@ -109,14 +109,26 @@ export function VitrineValora({
   titulo?: string
 }) {
   return (
+    <>
+      {/* A vitrine flutua sobre a foto, e o card de login é fixo à direita.
+          Em tela estreita os dois disputam o mesmo espaço — e quem tem que
+          ganhar é o login. Abaixo de 1100px ela simplesmente sai: telefone
+          na porta do restaurante não é lugar de catálogo. */}
+      <style>{`
+        @media (max-width: 1100px) { .valora-vitrine { display: none !important; } }
+      `}</style>
+
     <div
+      className="valora-vitrine"
       aria-label="Outros produtos da Valora"
       style={{
         position: 'absolute',
         top: 28,
         left: 28,
         zIndex: 20,
-        maxWidth: 'min(560px, calc(100vw - 56px))',
+        // 520px é o card de login (400) mais o respiro dele. A vitrine nunca
+        // cresce até encostar nele.
+        maxWidth: 'calc(100vw - 560px)',
       }}
     >
       <p
@@ -166,6 +178,7 @@ export function VitrineValora({
         ))}
       </div>
     </div>
+    </>
   )
 }
 
