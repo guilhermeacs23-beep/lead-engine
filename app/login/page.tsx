@@ -3,6 +3,7 @@ import React, { useState } from 'react'
 import Link from 'next/link'
 import { supabase } from '@/lib/supabase'
 import { Mail, Lock, Loader2, AlertCircle, Eye, EyeOff } from 'lucide-react'
+import { VitrineValora } from '@/components/valora/vitrine-valora'
 
 // ─── Weekly rotating backgrounds ──────────────────────────────────────────────
 // Alterna automaticamente a cada 7 dias — paisagens e animais fofinhos 🐾🌿
@@ -63,6 +64,9 @@ export default function LoginPage() {
     }}>
       {/* Overlay escuro */}
       <div style={{ position: 'absolute', inset: 0, background: 'rgba(5,10,25,0.42)' }} />
+
+      {/* O que mais a Valora faz. Fica acima do overlay e abaixo do card. */}
+      <VitrineValora />
 
       {/* ── Branding centro-esquerda ── */}
       <div style={{
