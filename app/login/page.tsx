@@ -1,11 +1,10 @@
 'use client'
-import { LoginValora } from '@/components/valora/login-valora'
+import { LoginValora } from 'valora-nucleo'
 import { supabase } from '@/lib/supabase'
 
 /**
- * A tela é da Valora e vive em components/valora/login-valora.tsx — a mesma
- * para todo produto da casa. Aqui fica só o que é do Lead+: quem autentica e
- * para onde vai depois.
+ * A tela vem do núcleo — é a mesma de todo produto da Valora. Aqui fica só o
+ * que é do Lead+: quem autentica e para onde vai depois.
  */
 export default function LoginPage() {
   async function entrar(email: string, senha: string) {
