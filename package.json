@@ -21,7 +21,7 @@
     "framer-motion": "^11.2.10",
     "zustand": "^4.5.2",
     "leaflet": "^1.9.4",
-    "valora-nucleo": "github:guilhermeacs23-beep/valora-nucleo#20c5d8d9402b6e5f7e11c8d278fcab7b3b309412"
+    "valora-nucleo": "github:guilhermeacs23-beep/valora-nucleo#1afe5da9e328e213c2ba8c1a68d2bd6d0ec39b04"
   },
   "devDependencies": {
     "typescript": "^5",
