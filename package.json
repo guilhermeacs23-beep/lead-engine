@@ -20,7 +20,7 @@
     "react": "^18",
     "react-dom": "^18",
     "tailwind-merge": "^2.3.0",
-    "valora-nucleo": "github:guilhermeacs23-beep/valora-nucleo#b105affc166012812a0e5865be45ae8ec3b7f876",
+    "valora-nucleo": "github:guilhermeacs23-beep/valora-nucleo#f4b163dc96e3089e0090cb7c62a8f8c14d150985",
     "zustand": "^4.5.2"
   },
   "devDependencies": {
